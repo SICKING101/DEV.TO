@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRARSE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <form action="/register" method="POST">
+            <h2>REGISTRARSE</h2>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="section">
+                <div class="title">USUARIO</div>
+                <div class="field">
+                    <input type="text" id="username" name="username" required>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="title">CONTRASEÑA</div>
+                <div class="field">
+                    <input type="password" id="password" name="password" required minlength="6">
+                    <small>La contraseña debe tener al menos 6 caracteres</small>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="button">
+                    <input type="submit" value="REGISTRAR USUARIO">
+                </div>
+                <div class="button">
+                    <a href="Login.html">INICIAR SESIÓN</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // Manejo de mensajes de respuesta
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const messageType = urlParams.get('type');
+        
+        if (message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${messageType || 'error'}`;
+            messageDiv.style.display = 'block';
+        }
+        
+        // Validación básica del formulario
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                e.preventDefault();
+                alert('Por favor, complete todos los campos');
+                return;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 6 caracteres');
+            }
+        });
+    </script>
+</body>
+</html>
