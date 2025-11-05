@@ -122,7 +122,6 @@
             padding: 0 16px;
         }
         
-        /* Estilos para el formulario de usuario/contraseña */
         .form-section {
             margin-bottom: 20px;
         }
@@ -214,7 +213,6 @@
             text-decoration: underline;
         }
         
-        /* Estilos para mensajes */
         .message {
             padding: 12px;
             border-radius: 6px;
@@ -249,10 +247,8 @@
 </head>
 <body>
     <div class="login-container">
-        <!-- LOGO DEV EN FONDO NEGRO -->
         <div style="text-align: center; margin-bottom: 20px;">
-            <!-- Reemplaza 'dev-logo.png' con tu imagen -->
-            <img src="/dev-black.png" alt="DEV Logo" width="60" height="60">
+            <img src="/IMAGENES/dev-black.png" alt="DEV Logo" width="60" height="60">
         </div>
 
         <div class="login-header">
@@ -278,9 +274,11 @@
                     <i class="fab fa-twitter" style="margin-right: 8px;"></i>
                     Continuar con Twitter
                 </button>
+                <a href="/auth/google">
                 <button type="button" class="social-btn google">
                     <i class="fab fa-google" style="margin-right: 8px;"></i>
-                    Continuar con Google
+                    Continuar con Google>
+                </a>
                 </button>
                 <button type="button" class="social-btn linkedin">
                     <i class="fab fa-linkedin" style="margin-right: 8px;"></i>
@@ -292,7 +290,7 @@
                 <span>OR</span>
             </div>
 
-            <form action="/authenticate" method="POST">
+            <form id="loginForm">
                 <div id="message" class="message"></div>
 
                 <div class="form-section">
@@ -305,7 +303,6 @@
                     <input type="password" id="password" name="password" class="form-input" required>
                 </div>
 
-                <!-- ENLACE OLVIDASTE TU CONTRASEÑA -->
                 <div style="text-align: right; margin-bottom: 16px;">
                     <a href="#" style="font-size: 14px; color: #3b49df; text-decoration: none;">¿Olvidaste tu contraseña?</a>
                 </div>
@@ -329,6 +326,54 @@
     </div>
 
     <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!username || !password) {
+                messageDiv.textContent = 'Por favor, complete todos los campos';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    messageDiv.textContent = data.message;
+                    messageDiv.className = 'message success';
+                    messageDiv.style.display = 'block';
+                    
+                    // Redirigir al index después de login exitoso
+                    setTimeout(() => {
+                        window.location.href = '/index';
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = data.message || 'Error al iniciar sesión';
+                    messageDiv.className = 'message error';
+                    messageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.textContent = 'Error de conexión';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+            }
+        });
+
+        // Manejo de mensajes de URL (para registro exitoso, etc.)
         const urlParams = new URLSearchParams(window.location.search);
         const message = urlParams.get('message');
         const messageType = urlParams.get('type');
@@ -339,15 +384,6 @@
             messageDiv.className = `message ${messageType || 'error'}`;
             messageDiv.style.display = 'block';
         }
-
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                e.preventDefault();
-                alert('Por favor, complete todos los campos');
-            }
-        });
     </script>
 </body>
+</html>
