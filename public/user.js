@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     },
     googleId: {
         type: String,
-        sparse: true // Permite múltiples documentos sin googleId
+        sparse: true // Permite múltiples documentos sin GoogleId
     },
     profilePicture: {
         type: String,

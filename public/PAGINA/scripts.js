@@ -166,6 +166,6 @@
       leftbar.classList.toggle('open');
     });
 
-    // Initialize
+    // Inicializar
     renderTags();
     loadFeed();

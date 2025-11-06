@@ -444,7 +444,7 @@ body {
 }
 
 .article__tag {
-    background: #f5f6ff;
+    background: #f5f6fd;
     color: var(--accent);
     padding: 0.25rem 0.5rem;
     border-radius: 999px;
