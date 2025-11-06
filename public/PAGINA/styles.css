@@ -41,11 +41,13 @@ body {
     border-bottom: 1px solid var(--border);
     z-index: 1000;
     height: 56px;
+    width: 100%;
+    margin-left: 60px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .topbar__inner {
-    max-width: var(--maxw);
+    width: var(--maxw);
     margin: 0 auto;
     padding: 0 1rem;
     display: flex;
@@ -267,9 +269,9 @@ body {
 .minibar {
     position: fixed;
     left: 0;
-    top: 56px;
     bottom: 0;
     width: 60px;
+    height: 100%;
     background: #fff;
     border-right: 1px solid var(--border);
     z-index: 2;
@@ -432,6 +434,7 @@ body {
     gap: 1.5rem;
     padding: 2rem 1rem 2rem 5rem; /* Left padding for minibar */
     min-height: calc(100vh - 56px);
+   /* margin-left: 60px; */ 
 }
 
 /* ===== LEFT SIDEBAR STYLES ===== */

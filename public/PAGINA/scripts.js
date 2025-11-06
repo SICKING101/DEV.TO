@@ -1,4 +1,4 @@
-// ===== MOCK DATA =====
+ // ===== MOCK DATA =====
         const mockArticles = [
             {
                 id: 1,
@@ -42,6 +42,34 @@
         const userDropdown = document.getElementById('userDropdown');
         const menuToggle = document.getElementById('menuToggle');
         const leftbar = document.getElementById('leftbar');
+        const minibar = document.getElementById('minibar');
+
+// ===== MINIBAR FUNCTIONALITY =====
+function initMinibar() {
+    const minibarItems = document.querySelectorAll('.minibar__item');
+    
+    minibarItems.forEach(item => {
+        const link = item.querySelector('.minibar__link');
+        const preview = item.querySelector('.minibar__preview');
+        
+        link.addEventListener('mouseenter', () => {
+            // Hide all other previews
+            minibarItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('minibar__item--preview');
+                }
+            });
+            
+            // Show this preview
+            item.classList.add('minibar__item--preview');
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            item.classList.remove('minibar__item--preview');
+        });
+    });
+}
+
 
         // ===== AUTHENTICATION FUNCTIONS =====
         async function checkAuth() {
@@ -223,3 +251,4 @@
         checkAuth();
         renderTags();
         loadFeed();
+        initMinibar();
