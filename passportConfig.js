@@ -1,3 +1,4 @@
+// Inicio de sesion de google
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./public/user'); // tu modelo de usuario
