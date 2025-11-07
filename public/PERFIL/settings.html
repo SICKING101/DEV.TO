@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Perfil - dev.to</title>
+    <style>
+        :root {
+            --brand-color: #400000;
+            --accent-color: #3b49df;
+            --text-primary: #242424;
+            --text-secondary: #595959;
+            --text-muted: #717171;
+            --border-color: #e5e5e5;
+            --bg-color: #ffffff;
+            --bg-secondary: #f9f9f9;
+
+            /* Colors */
+            --bg: #f5f5f5;
+            --card: #ffffff;
+            --muted: #6b6b6b;
+            --accent: #3b49df;
+            --accent-hover: #2f3ab2;
+            --border: #e6e6e6;
+            --text: #242424;
+
+            /* Spacing & Sizing */
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --maxw: 1200px;
+
+
+            --radius: 5px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+                0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .sidebar a.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .sidebar a svg {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .char-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input {
+            margin-right: 8px;
+        }
+
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius);
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+            border: 1px solid var(--border-color);
+        }
+
+        .brand-color-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-color-input input {
+            width: 100px;
+            margin-left: 10px;
+        }
+
+        .connect-accounts {
+            margin-top: 20px;
+        }
+
+        .connect-account {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .connect-account:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .connect-account svg {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+        }
+
+        .profile-image {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-image img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-image button {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .profile-image button:hover {
+            background-color: var(--border-color);
+        }
+
+        .save-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .save-button:hover {
+            background-color: #2a38c9;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 20px 0;
+        }
+
+        .work-hours {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .work-hour {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background-color: var(--bg-secondary);
+        }
+
+        .work-hour input {
+            margin-right: 5px;
+        }
+
+        .pronouns-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .pronoun-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .pronoun-option input {
+            margin-right: 5px;
+        }
+
+        .learning-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+        }
+
+        .learning-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .learning-content {
+            flex: 1;
+        }
+
+        .learning-content textarea {
+            width: 100%;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--bg-secondary);
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .highlight {
+            background-color: #fff9db;
+            border-left: 3px solid #ffd43b;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        /* ===== MINIBAR STYLES ===== */
+        .minibar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 60px;
+            height: 100%;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            z-index: 2;
+            padding: 1rem 0;
+        }
+
+        .minibar__nav {
+            height: 100%;
+        }
+
+        .minibar__list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .minibar__item {
+            position: relative;
+        }
+
+        .minibar__link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            color: inherit;
+        }
+
+        .minibar__link:hover {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .minibar__item--active .minibar__link {
+            background: #f5f6fd;
+            color: var(--accent);
+        }
+
+        .minibar__image {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .minibar__icon {
+            color: currentColor;
+            width: 24px;
+            height: 24px;
+        }
+
+        .minibar__preview {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            width: 320px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 999;
+            margin-left: 10px;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        /* ✅ Esto permite que el preview aparezca y se mantenga visible */
+        .minibar__item:hover .minibar__preview {
+            display: block;
+        }
+
+        .minibar__item--preview .minibar__preview {
+            display: block;
+        }
+
+        .preview__header {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .preview__header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview__icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 0 1rem;
+            background: #f8f9fa;
+        }
+
+        .preview__icon {
+            color: var(--accent);
+            width: 64px;
+            height: 64px;
+        }
+
+        .preview__content {
+            padding: 1.5rem;
+        }
+
+        .preview__title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .preview__description {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .preview__btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .preview__btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Animacion */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== MINIBAR ===== -->
+    <aside class="minibar" id="minibar">
+        <nav class="minibar__nav">
+            <ul class="minibar__list">
+
+                <!-- Item: DEV Community -->
+                <li class="minibar__item minibar__item--active">
+                    <a href="#" class="minibar__link" data-preview="DEV Community">
+                        <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
+                    </a>
+                    <div class="minibar__preview">
+                        <div class="preview__header">
+                            <img src="/IMAGENES/dev-header.png" alt="DEV Community Header"
+                                class="preview__header-image">
+                        </div>
+                        <div class="preview__content">
+                            <h3 class="preview__title">DEV Community</h3>
+                            <p class="preview__description">
+                                A space to discuss and keep up with software development and manage your software
+                                career.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </div>
+                    </div>
+                </li>
+
+                <!-- Item: Future -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Future">
+                        <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <div class="minibar__preview">
+                        <div class="preview__icon-wrapper">
+                            <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="preview__content">
+                            <h3 class="preview__title">Future</h3>
+                            <p class="preview__description">
+                                News and discussion of science and technology such as AI, VR, cryptocurrency, quantum
+                                computing, and more.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </nav>
+    </aside>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Configuración</h2>
+            <ul>
+                <li><a href="#" class="active">Perfil</a></li>
+                <li><a href="#">Cuenta</a></li>
+                <li><a href="#">Notificaciones</a></li>
+                <li><a href="#">Extensión</a></li>
+                <li><a href="#">Billing</a></li>
+                <li><a href="#">API Keys</a></li>
+                <li><a href="#">Organizaciones</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Sección Básica -->
+            <section class="section">
+                <h1>Básico</h1>
+
+                <div class="form-group">
+                    <label for="website">URL del sitio web</label>
+                    <input type="url" id="website" class="form-control" value="https://yoursite.com">
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="form-group">
+                    <label for="location">Ubicación</label>
+                    <input type="text" id="location" class="form-control" value="Halifax, Nova Scotia">
+                    <div class="char-count">0/100</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">Biografía</label>
+                    <textarea id="bio" class="form-control" rows="4" placeholder="Una biografía corta..."></textarea>
+                    <div class="char-count">0/200</div>
+                </div>
+            </section>
+
+            <!-- Sección de Codificación -->
+            <section class="section">
+                <h1>Codificación</h1>
+
+                <div class="form-group">
+                    <h3>Aprendiendo actualmente</h3>
+                    <p class="form-text">¿Qué estás aprendiendo ahora? ¿Qué nuevas herramientas y lenguajes estás
+                        adquiriendo?</p>
+
+                    <div class="learning-item">
+                        <input type="checkbox">
+                        <div class="learning-content">
+                            <textarea class="form-control" placeholder="Disponible para..."></textarea>
+                            <div class="char-count">0/200</div>
+                            <p class="form-text">¿Qué tipo de colaboraciones o discusiones estás disponible? ¿Cuál es
+                                una buena razón para contactarte estos días?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Personal -->
+            <section class="section">
+                <h1>Personal</h1>
+
+                <div class="form-group">
+                    <label>Pronombres</label>
+                    <div class="pronouns-options">
+                        <div class="pronoun-option">
+                            <input type="radio" id="pronoun-none" name="pronouns" checked>
+                            <label for="pronoun-none">No especificar</label>
+                        </div>
+                        <div class="pronoun-option">
+                            <input type="radio" id="pronoun-he" name="pronouns">
+                            <label for="pronoun-he">Él</label>
+                        </div>
+                        <div class="pronoun-option">
+                            <input type="radio" id="pronoun-she" name="pronouns">
+                            <label for="pronoun-she">Ella</label>
+                        </div>
+                        <div class="pronoun-option">
+                            <input type="radio" id="pronoun-they" name="pronouns">
+                            <label for="pronoun-they">Ellos</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>Trabajo</h3>
+                    <div class="work-hours">
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-mon">
+                            <label for="work-mon">(0:00)</label>
+                        </div>
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-tue">
+                            <label for="work-tue">(0:00)</label>
+                        </div>
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-wed">
+                            <label for="work-wed">(0:00)</label>
+                        </div>
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-thu">
+                            <label for="work-thu">(0:00)</label>
+                        </div>
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-fri">
+                            <label for="work-fri">(0:00)</label>
+                        </div>
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-sat">
+                            <label for="work-sat">(0:00)</label>
+                        </div>
+                        <div class="work-hour">
+                            <input type="checkbox" id="work-sun">
+                            <label for="work-sun">(0:00)</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Disponible para -->
+            <section class="section">
+                <h1>Disponible para</h1>
+                <p class="form-text">¿Para qué tipo de colaboraciones o discusiones estás disponible? ¿Cuál es una buena
+                    razón para contactarte en tus días de enfoque?</p>
+
+                <div class="divider"></div>
+
+                <div class="form-group">
+                    <h2>Estilo/Lenguajes</h2>
+                    <p class="form-text">¿Con qué herramientas y lenguajes tienes más experiencia? ¿Eres especializado o
+                        más generalista?</p>
+                    <p class="form-text">¿Algún lenguaje, framework, etc. para destacar?</p>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="form-group">
+                    <h2>Actualmente trabajando en</h2>
+                    <p class="form-text">¿Qué proyectos ocupan la mayor parte de tu tiempo actualmente?</p>
+                </div>
+            </section>
+
+            <!-- Sección Trabajo -->
+            <section class="section">
+                <h1>Trabajo</h1>
+                <p class="form-text">¿A qué te dedicas? Ejemplo: CEO en ACME Inc.</p>
+
+                <div class="form-group">
+                    <h2>Educación</h2>
+                    <p class="form-text">¿Dónde estudiaste?</p>
+                </div>
+
+                <div class="form-group">
+                    <h2>Marca</h2>
+                    <h3>Color de marca</h3>
+                    <p class="form-text">Usado para fondo, bordes, etc.</p>
+                    <div class="brand-color-input">
+                        <div class="color-preview" style="background-color: #400000;"></div>
+                        <input type="text" class="form-control" value="400000">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Usuario -->
+            <section class="section">
+                <h1>Pros_navarretejaredalex</h1>
+
+                <div class="connect-accounts">
+                    <div class="connect-account">
+                        <svg viewBox="0 0 24 24" fill="#1877F2">
+                            <path
+                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                        Conectar cuenta de Facebook
+                    </div>
+                    <div class="connect-account">
+                        <svg viewBox="0 0 24 24" fill="#000000">
+                            <path
+                                d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm4.441 16.892c-2.102.144-6.784.144-8.883 0C5.282 16.736 5.017 15.622 5 12c.017-3.629.285-4.736 2.558-4.892 2.099-.144 6.782-.144 8.883 0C18.718 7.264 18.982 8.378 19 12c-.018 3.629-.285 4.736-2.559 4.892zM10 9.658l4.917 2.338L10 14.342V9.658z" />
+                        </svg>
+                        Conectar cuenta de Forem
+                    </div>
+                    <div class="connect-account">
+                        <svg viewBox="0 0 24 24" fill="#000000">
+                            <path
+                                d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
+                        </svg>
+                        Conectar cuenta de GitHub
+                    </div>
+                    <div class="connect-account">
+                        <svg viewBox="0 0 24 24" fill="#1DA1F2">
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        </svg>
+                        Conectar cuenta de Twitter (X)
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="form-group">
+                    <h2>Usuario</h2>
+
+                    <div class="profile-image">
+                        <img src="https://via.placeholder.com/80" alt="Profile image">
+                        <button>Seleccionar archivo</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Nombre</label>
+                        <input type="text" id="name" class="form-control" value="Kos Navarrete Jared Alexander">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" class="form-control" value="ricnavarretejaree@gmail.com">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="display-email">
+                            <label for="display-email">Mostrar correo en el perfil</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Nombre de usuario</label>
+                        <input type="text" id="username" class="form-control" value="rot_navarretejaredalex">
+                    </div>
+                </div>
+            </section>
+
+            <button class="save-button">Guardar Información del Perfil</button>
+        </main>
+    </div>
+
+    <script>
+        // Funcionalidad para actualizar el contador de caracteres
+        document.querySelectorAll('textarea, input[type="text"]').forEach(element => {
+            element.addEventListener('input', function () {
+                const maxLength = this.getAttribute('maxlength') || 200;
+                const currentLength = this.value.length;
+                const charCount = this.parentElement.querySelector('.char-count');
+
+                if (charCount) {
+                    charCount.textContent = `${currentLength}/${maxLength}`;
+
+                    if (currentLength > maxLength * 0.8) {
+                        charCount.style.color = '#ff6b6b';
+                    } else {
+                        charCount.style.color = '#717171';
+                    }
+                }
+            });
+
+            // Inicializar contadores
+            if (element.value) {
+                element.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Funcionalidad para el selector de color de marca
+        const colorInput = document.querySelector('.brand-color-input input');
+        const colorPreview = document.querySelector('.color-preview');
+
+        colorInput.addEventListener('input', function () {
+            const colorValue = this.value.startsWith('#') ? this.value : '#' + this.value;
+            colorPreview.style.backgroundColor = colorValue;
+        });
+    </script>
+</body>
+
+</html>

@@ -4,248 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
     <title>Iniciar Sesión</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-        }
-        
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .login-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 10px;
-        }
-        
-        .login-header p {
-            color: #666;
-            font-size: 16px;
-        }
-        
-        .highlight {
-            color: #3b49df;
-            font-weight: 600;
-        }
-        
-        .login-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e5e5;
-        }
-        
-        .social-login {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 16px;
-            border: 1px solid #d6d6d7;
-            border-radius: 6px;
-            background-color: white;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .social-btn:hover {
-            background-color: #f9f9f9;
-        }
-        
-        .social-btn.apple {
-            color: #000;
-        }
-        
-        .social-btn.facebook {
-            color: #000000;
-        }
-        
-        .social-btn.forum {
-            color: #000000;
-        }
-        
-        .social-btn.github {
-            color: #000000;
-        }
-        
-        .social-btn.google {
-            color: #000000;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background-color: #e5e5e5;
-        }
-        
-        .divider span {
-            padding: 0 16px;
-        }
-        
-        .form-section {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #242424;
-            font-size: 14px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d6d6d7;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3b49df;
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        
-        .remember-me input {
-            margin-right: 8px;
-        }
-        
-        .remember-me label {
-            font-size: 14px;
-            color: #242424;
-        }
-        
-        .login-btn {
-            width: 100%;
-            padding: 12px 16px;
-            background-color: #3b49df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-bottom: 16px;
-        }
-        
-        .login-btn:hover {
-            background-color: #2f3ab2;
-        }
-        
-        .register-link {
-            text-align: center;
-            margin-top: 16px;
-        }
-        
-        .register-link a {
-            color: #3b49df;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .terms {
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-            margin-top: 24px;
-        }
-        
-        .terms a {
-            color: #3b49df;
-            text-decoration: none;
-        }
-        
-        .terms a:hover {
-            text-decoration: underline;
-        }
-        
-        .message {
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 20px;
-            }
-            
-            .social-btn, .form-input, .login-btn {
-                padding: 10px 14px;
-                font-size: 15px;
-            }
-        }
-    </style>
 </head>
 <body>
+    <main>
+    <!-- ===== MINIBAR ===== -->
+<aside class="minibar" id="minibar">
+    <nav class="minibar__nav">
+        <ul class="minibar__list">
+
+            <!-- Item: DEV Community -->
+            <li class="minibar__item minibar__item--active">
+                <a href="#" class="minibar__link" data-preview="DEV Community">
+                    <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
+                </a>
+                <div class="minibar__preview">
+                    <div class="preview__header">
+                        <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
+                    </div>
+                    <div class="preview__content">
+                        <h3 class="preview__title">DEV Community</h3>
+                        <p class="preview__description">
+                            A space to discuss and keep up with software development and manage your software career.
+                        </p>
+                        <button class="preview__btn">Follow</button>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Item: Future -->
+            <li class="minibar__item">
+                <a href="#" class="minibar__link" data-preview="Future">
+                    <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </a>
+                <div class="minibar__preview">
+                    <div class="preview__icon-wrapper">
+                        <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="preview__content">
+                        <h3 class="preview__title">Future</h3>
+                        <p class="preview__description">
+                            News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
+                        </p>
+                        <button class="preview__btn">Follow</button>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </nav>
+</aside>
+</main>
     <div class="login-container">
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="/IMAGENES/dev-black.png" alt="DEV Logo" width="60" height="60">
@@ -274,12 +96,12 @@
                     <i class="fab fa-twitter" style="margin-right: 8px;"></i>
                     Continuar con Twitter
                 </button>
-                <a href="/auth/google">
+                <a href="/auth/google" class="social-google">
                 <button type="button" class="social-btn google">
                     <i class="fab fa-google" style="margin-right: 8px;"></i>
-                    Continuar con Google>
-                </a>
+                    Continuar con Google
                 </button>
+            </a>
                 <button type="button" class="social-btn linkedin">
                     <i class="fab fa-linkedin" style="margin-right: 8px;"></i>
                     Continuar con LinkedIn
@@ -325,65 +147,6 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const messageDiv = document.getElementById('message');
-
-            if (!username || !password) {
-                messageDiv.textContent = 'Por favor, complete todos los campos';
-                messageDiv.className = 'message error';
-                messageDiv.style.display = 'block';
-                return;
-            }
-
-            try {
-                const response = await fetch('/authenticate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    messageDiv.textContent = data.message;
-                    messageDiv.className = 'message success';
-                    messageDiv.style.display = 'block';
-                    
-                    // Redirigir al index después de un login exitoso
-                    setTimeout(() => {
-                        window.location.href = '/index';
-                    }, 1000);
-                } else {
-                    messageDiv.textContent = data.message || 'Error al iniciar sesión';
-                    messageDiv.className = 'message error';
-                    messageDiv.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                messageDiv.textContent = 'Error de conexión';
-                messageDiv.className = 'message error';
-                messageDiv.style.display = 'block';
-            }
-        });
-
-        // Manejo de mensajes de URL (para registro exitoso, etc.)
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        const messageType = urlParams.get('type');
-
-        if (message) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
-            messageDiv.className = `message ${messageType || 'error'}`;
-            messageDiv.style.display = 'block';
-        }
-    </script>
+    <script src="/scripts"></script>
 </body>
 </html>
