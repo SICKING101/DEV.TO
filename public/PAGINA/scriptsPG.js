@@ -47,9 +47,9 @@ const tabs = document.querySelectorAll('.tab');
 const authActions = document.getElementById('authActions');
 const userNav = document.getElementById('userNav');
 const userAvatar = document.getElementById('userAvatar');
-const sidebarAvatar = document.getElementById('sidebarAvatar');
-const sidebarUsername = document.getElementById('sidebarUsername');
-const sidebarMeta = document.getElementById('sidebarMeta');
+const dropdownAvatar = document.getElementById('dropdownAvatar');
+const dropdownUsername = document.getElementById('dropdownUsername');
+const dropdownEmail = document.getElementById('dropdownEmail');
 const userDropdown = document.getElementById('userDropdown');
 const menuToggle = document.getElementById('menuToggle');
 const leftbar = document.getElementById('leftbar');
@@ -64,14 +64,11 @@ function initMinibar() {
         const preview = item.querySelector('.minibar__preview');
         
         link.addEventListener('mouseenter', () => {
-            // Hide all other previews
             minibarItems.forEach(otherItem => {
                 if (otherItem !== item) {
                     otherItem.classList.remove('minibar__item--preview');
                 }
             });
-            
-            // Show this preview
             item.classList.add('minibar__item--preview');
         });
         
@@ -89,13 +86,9 @@ function handleImageError(img) {
 }
 
 function setupImageErrorHandlers() {
-    // Add error handler for user avatar
     userAvatar.addEventListener('error', () => handleImageError(userAvatar));
-    
-    // Add error handler for sidebar avatar
-    const sidebarAvatarImg = document.getElementById('sidebarAvatarImg');
-    if (sidebarAvatarImg) {
-        sidebarAvatarImg.addEventListener('error', () => handleImageError(sidebarAvatarImg));
+    if (dropdownAvatar) {
+        dropdownAvatar.addEventListener('error', () => handleImageError(dropdownAvatar));
     }
 }
 
@@ -103,32 +96,23 @@ function setupImageErrorHandlers() {
 async function checkAuth() {
     try {
         console.log('Checking authentication status...');
-        
         const response = await fetch('/api/user', {
             method: 'GET',
-            credentials: 'include', // Important for session cookies
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         console.log('Auth response:', data);
         
         if (data.user && data.user.id) {
-            // User is authenticated
             showAuthenticatedState(data.user);
         } else {
-            // User is not authenticated
             showUnauthenticatedState();
         }
     } catch (error) {
         console.error('Error checking auth:', error);
-        // Fallback to logged out state on error
         showUnauthenticatedState();
     }
 }
@@ -136,75 +120,72 @@ async function checkAuth() {
 function showAuthenticatedState(user) {
     console.log('Showing authenticated state for user:', user);
     
-    // Hide login buttons, show user navigation
+    // Mostrar/ocultar elementos de navegación
     if (authActions) authActions.style.display = 'none';
     if (userNav) userNav.style.display = 'flex';
-    
-    // Update user info with proper fallbacks
-    const profilePic = user.profilePicture || '/IMAGENES/default-avatar.png';
-    const username = user.username || 'User';
-    const bio = user.bio || 'Welcome back!';
-    
-    // Update header user avatar
+
+    // Obtener datos del usuario
+    const profilePic = user.profilePicture || user.avatar || '/IMAGENES/default-avatar.png';
+    const username = user.username || user.name || 'User';
+    const email = user.email || 'user@example.com';
+    const displayName = user.displayName || username;
+
+    console.log('User data to display:', { profilePic, username, email, displayName });
+
+    // Actualizar avatar principal
     if (userAvatar) {
         userAvatar.src = profilePic;
         userAvatar.alt = username;
         userAvatar.onerror = () => handleImageError(userAvatar);
     }
+
+    // ACTUALIZAR DROPDOWN DEL USUARIO - ESTA ES LA PARTE CRÍTICA
+    if (dropdownAvatar) {
+        dropdownAvatar.src = profilePic;
+        dropdownAvatar.alt = username;
+        dropdownAvatar.onerror = () => handleImageError(dropdownAvatar);
+    }
     
-    // Update sidebar user info
-    if (sidebarUsername) sidebarUsername.textContent = username;
-    if (sidebarMeta) sidebarMeta.textContent = bio;
+    if (dropdownUsername) {
+        dropdownUsername.textContent = displayName;
+    }
     
-    // Update sidebar avatar
-    updateSidebarAvatar(profilePic, username);
+    if (dropdownEmail) {
+        dropdownEmail.textContent = email;
+    }
+
+    console.log('Dropdown updated with user info');
 }
 
 function showUnauthenticatedState() {
     console.log('Showing unauthenticated state');
-    
-    // Show login buttons, hide user navigation
     if (authActions) authActions.style.display = 'flex';
     if (userNav) userNav.style.display = 'none';
-    
-    // Reset to default state
     resetUserInfo();
 }
 
 function resetUserInfo() {
     const defaultAvatar = '/IMAGENES/default-avatar.png';
-    
-    // Reset header avatar
+    const defaultUsername = 'Username';
+    const defaultEmail = 'user@example.com';
+
     if (userAvatar) {
         userAvatar.src = defaultAvatar;
         userAvatar.alt = 'Default Avatar';
     }
     
-    // Reset sidebar info
-    if (sidebarUsername) sidebarUsername.textContent = 'Welcome';
-    if (sidebarMeta) sidebarMeta.textContent = 'Explore the latest in development';
-    
-    // Reset sidebar avatar
-    updateSidebarAvatar(defaultAvatar, 'Default Avatar');
-}
-
-function updateSidebarAvatar(profilePic, username) {
-    // Check if sidebar avatar exists as img element
-    let sidebarAvatarImg = document.getElementById('sidebarAvatarImg');
-    
-    if (!sidebarAvatarImg && sidebarAvatar) {
-        // Create img element if it doesn't exist
-        sidebarAvatarImg = document.createElement('img');
-        sidebarAvatarImg.id = 'sidebarAvatarImg';
-        sidebarAvatarImg.className = 'profilecard__avatar-img';
-        sidebarAvatarImg.alt = username;
-        sidebarAvatar.appendChild(sidebarAvatarImg);
+    // Resetear dropdown también
+    if (dropdownAvatar) {
+        dropdownAvatar.src = defaultAvatar;
+        dropdownAvatar.alt = 'Default Avatar';
     }
     
-    if (sidebarAvatarImg) {
-        sidebarAvatarImg.src = profilePic;
-        sidebarAvatarImg.alt = username;
-        sidebarAvatarImg.onerror = () => handleImageError(sidebarAvatarImg);
+    if (dropdownUsername) {
+        dropdownUsername.textContent = defaultUsername;
+    }
+    
+    if (dropdownEmail) {
+        dropdownEmail.textContent = defaultEmail;
     }
 }
 
@@ -219,25 +200,18 @@ function initUserDropdown() {
         });
     }
     
-    // Close dropdown when clicking outside
     document.addEventListener('click', () => {
-        if (userDropdown) {
-            userDropdown.style.display = 'none';
-        }
+        if (userDropdown) userDropdown.style.display = 'none';
     });
     
-    // Prevent dropdown from closing when clicking inside it
     if (userDropdown) {
-        userDropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+        userDropdown.addEventListener('click', (e) => e.stopPropagation());
     }
 }
 
 // ===== TAGS FUNCTIONS =====
 function renderTags() {
     if (!popularTagsEl) return;
-    
     popularTagsEl.innerHTML = '';
     popularTags.forEach(tag => {
         const li = document.createElement('li');
@@ -245,8 +219,6 @@ function renderTags() {
         li.innerHTML = `<a href="#" class="taglist__link" data-tag="${tag}">#${tag}</a>`;
         popularTagsEl.appendChild(li);
     });
-
-    // Add click handlers for tags
     popularTagsEl.addEventListener('click', (e) => {
         const a = e.target.closest('a');
         if (!a) return;
@@ -288,31 +260,22 @@ function articleCard(article) {
 
 function renderFeed(list) {
     if (!articlesEl) return;
-    
     articlesEl.innerHTML = '';
     if (!list.length) {
         articlesEl.innerHTML = '<div class="article">No articles found.</div>';
         return;
     }
-    
-    list.forEach(a => {
-        articlesEl.appendChild(articleCard(a));
-    });
-
-    // Add reaction handlers
+    list.forEach(a => articlesEl.appendChild(articleCard(a)));
     articlesEl.querySelectorAll('.reaction').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id, 10);
             const action = btn.dataset.action;
             if (action === 'like') {
                 const newLikes = incrementLike(id);
                 btn.textContent = '❤️ ' + newLikes;
             } else {
-                // Simulate opening comments
                 const article = mockArticles.find(x => x.id === id);
-                if (article) {
-                    alert(`Opening comments for: "${article.title}"`);
-                }
+                if (article) alert(`Opening comments for: "${article.title}"`);
             }
         });
     });
@@ -325,56 +288,44 @@ function incrementLike(id) {
     return art.likes;
 }
 
-// ===== DATA FETCHING FUNCTIONS =====
+// ===== DATA FETCHING =====
 function fetchArticles({ sort = 'new' } = {}) {
     return new Promise(resolve => {
         setTimeout(() => {
             let data = [...mockArticles];
-            if (sort === 'popular') {
-                data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-            } else {
-                data.sort((a, b) => b.id - a.id);
-            }
+            if (sort === 'popular') data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+            else data.sort((a, b) => b.id - a.id);
             resolve(data);
-        }, 500); // Reduced loading time for better UX
+        }, 500);
     });
 }
 
 async function loadFeed() {
     if (!loadingEl || !articlesEl) return;
-    
     loadingEl.style.display = 'block';
     articlesEl.style.opacity = '0.5';
-    
     const sort = sortSelect ? sortSelect.value : 'new';
     const data = await fetchArticles({ sort });
-    
     loadingEl.style.display = 'none';
     articlesEl.style.opacity = '1';
     renderFeed(data);
 }
 
-// ===== SEARCH FUNCTION =====
+// ===== SEARCH =====
 function doSearch() {
     const q = (searchInput ? searchInput.value.trim().toLowerCase() : '');
-    if (!q) {
-        loadFeed();
-        return;
-    }
-    
+    if (!q) return loadFeed();
     const filtered = mockArticles.filter(a => {
         const searchText = (a.title + ' ' + a.excerpt + ' ' + a.author).toLowerCase();
         const inText = searchText.includes(q);
         const inTags = a.tags.some(t => t.toLowerCase().includes(q.replace('#', '')));
         return inText || inTags;
     });
-    
     renderFeed(filtered);
 }
 
-// ===== EVENT LISTENERS SETUP =====
+// ===== EVENT LISTENERS =====
 function setupEventListeners() {
-    // Search functionality
     if (searchInput) {
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -382,69 +333,45 @@ function setupEventListeners() {
                 doSearch();
             }
         });
-        
-        // Add debounced search
         let searchTimeout;
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(doSearch, 300);
         });
     }
-    
-    // Sort functionality
-    if (sortSelect) {
-        sortSelect.addEventListener('change', loadFeed);
-    }
-    
-    // Tab switching
+    if (sortSelect) sortSelect.addEventListener('change', loadFeed);
     if (tabs.length > 0) {
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('tab--active'));
                 tab.classList.add('tab--active');
                 const view = tab.dataset.view;
-                if (sortSelect) {
-                    sortSelect.value = view === 'top' ? 'popular' : 'new';
-                }
+                if (sortSelect) sortSelect.value = view === 'top' ? 'popular' : 'new';
                 loadFeed();
             });
         });
     }
-    
-    // Mobile menu toggle
     if (menuToggle && leftbar) {
-        menuToggle.addEventListener('click', () => {
-            leftbar.classList.toggle('open');
-        });
+        menuToggle.addEventListener('click', () => leftbar.classList.toggle('open'));
     }
-    
-    // Create post button
     const createPostBtn = document.getElementById('createPostBtn');
     if (createPostBtn) {
         createPostBtn.addEventListener('click', () => {
-            // Check if user is authenticated
-            if (userNav.style.display === 'flex') {
-                window.location.href = '/createPost';
-            } else {
-                window.location.href = '/Login.html';
-            }
+            if (userNav.style.display === 'flex') window.location.href = '/createPost';
+            else window.location.href = '/Login.html';
         });
     }
 }
 
-// ===== DEBUGGING FUNCTIONS =====
+// ===== DEBUGGING =====
 async function debugAuth() {
     try {
         console.log('=== AUTH DEBUG ===');
         const response = await fetch('/api/user', { 
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
         console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        
         const data = await response.json();
         console.log('User data:', data);
         console.log('=== END DEBUG ===');
@@ -458,33 +385,21 @@ async function debugAuth() {
 // ===== INITIALIZATION =====
 function init() {
     console.log('Initializing DEV Community...');
-    
-    // Setup all functionality
     setupImageErrorHandlers();
     initUserDropdown();
     renderTags();
     setupEventListeners();
     initMinibar();
-    
-    // Load initial content
     loadFeed();
-    
-    // Check authentication status
     checkAuth();
-    
-    // Re-check auth state periodically (optional)
-    setInterval(checkAuth, 60000); // Every 60 seconds
-    
+    setInterval(checkAuth, 60000);
     console.log('DEV Community initialized successfully');
 }
 
-// ===== START APPLICATION =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Small delay to ensure DOM is fully ready
     setTimeout(init, 100);
 });
 
-// Export for debugging (optional)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { debugAuth, checkAuth };
 }

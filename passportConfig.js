@@ -5,6 +5,7 @@
 // Importar dependencias principales
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
 const User = require('./public/user'); // Modelo de usuario
 
 /******************************************************
@@ -26,6 +27,7 @@ async (accessToken, refreshToken, profile, done) => {
         if (!user) {
             user = new User({
                 username: profile.displayName,
+                email: profile.emails?.[0]?.value || null,
                 googleId: profile.id,
                 profilePicture: profile.photos[0].value
             });
@@ -40,6 +42,46 @@ async (accessToken, refreshToken, profile, done) => {
         return done(err, null);
     }
 }));
+
+/******************************************************
+ *             ESTRATEGIA DE GITHUB
+ ******************************************************/
+passport.use(new GitHubStrategy({
+    clientID: 'Ov23lieYzKQaz5axfnd1',
+    clientSecret: 'ca52c7c433b0c2436e319fd4a1668492d142f2a0',
+    callbackURL: 'http://localhost:3000/auth/github/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        let user = await User.findOne({ username: profile.username });
+
+        if (!user) {
+            user = new User({
+                username: profile.username,
+                email: profile.emails?.[0]?.value || null,
+                profilePicture: profile.photos?.[0]?.value || null,
+                password: null
+            });
+            await user.save();
+        }
+
+        return done(null, user);
+    } catch (err) {
+        return done(err, null);
+    }
+}));
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
 
 /******************************************************
  *       SERIALIZACIÓN Y DESERIALIZACIÓN DE SESIÓN

@@ -55,11 +55,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true // Agrega createdAt y updatedAt automáticamente
 });
 
-// Índices para mejor performance
-userSchema.index({ username: 1 });
-userSchema.index({ googleId: 1 }, { sparse: true });
-userSchema.index({ email: 1 }, { sparse: true });
-
 // Middleware pre-save: solo cifrar si la contraseña fue modificada y existe
 userSchema.pre('save', async function(next) {
     const user = this;

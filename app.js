@@ -5,7 +5,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const passport = require('./passportConfig'); // Configuración de Passport (Google)
+const passport = require('./passportConfig'); // Configuración de Passport (Google y GitHub)
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const User = require('./public/user');
@@ -18,15 +18,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Configuración de sesiones
+// Configuración de sesiones (Importante para Passport)
 app.use(session({
-    secret: 'your-secret-key', // Cambiar por una clave segura
+    secret: 'your-secret-key', // Cambia por una clave segura
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // Expira en 24 horas
 }));
 
-// Inicializar Passport (para Google Login)
+// Inicializar Passport (para Google y GitHub Login)
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -64,7 +64,7 @@ app.get('/index', (req, res) => {
  ******************************************************/
 app.post('/register', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, email, password } = req.body;
 
         // Validaciones básicas
         if (!username || !password)
@@ -79,7 +79,7 @@ app.post('/register', async (req, res) => {
             return res.status(400).send('El usuario ya existe');
 
         // Crear y guardar nuevo usuario
-        const user = new User({ username, password });
+        const user = new User({ username, email, password });
         await user.save();
 
         res.status(200).send('Usuario registrado exitosamente');
@@ -96,7 +96,6 @@ app.post('/authenticate', async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Validaciones básicas
         if (!username || !password)
             return res.status(400).send('Usuario y contraseña son requeridos');
 
@@ -117,7 +116,9 @@ app.post('/authenticate', async (req, res) => {
                 req.session.user = {
                     id: user._id,
                     username: user.username,
-                    profilePicture: user.profilePicture
+                    email: user.email || `${user.username}@devcommunity.com`,
+                    profilePicture: user.profilePicture || '/IMAGENES/default-avatar.png',
+                    authProvider: 'local'
                 };
                 res.status(200).json({
                     success: true,
@@ -151,6 +152,19 @@ app.get('/logout', (req, res) => {
 app.get('/api/user', (req, res) => {
     if (req.session.user) {
         res.json({ user: req.session.user });
+    } else if (req.isAuthenticated() && req.user) {
+        // Si Passport lo autenticó (Google/GitHub)
+        const { id, username, email, displayName, profilePicture, authProvider } = req.user;
+        res.json({
+            user: {
+                id,
+                username,
+                email,
+                displayName,
+                profilePicture,
+                authProvider
+            }
+        });
     } else {
         res.json({ user: null });
     }
@@ -159,22 +173,43 @@ app.get('/api/user', (req, res) => {
 /******************************************************
  *        AUTENTICACIÓN CON GOOGLE (PASSPORT)
  ******************************************************/
-// Iniciar sesión con Google
 app.get('/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-// Callback de Google después de autenticación
 app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/Login.html' }),
     (req, res) => {
-        // Guardar usuario en sesión
+        // Guardar usuario en sesión con correo
         req.session.user = {
             id: req.user._id,
             username: req.user.username,
-            profilePicture: req.user.profilePicture
+            email: req.user.email || `${req.user.username}@gmail.com`,
+            profilePicture: req.user.profilePicture,
+            authProvider: 'Google'
         };
-        res.redirect('/index'); // Redirigir al dashboard o página principal
+        res.redirect('/index');
+    }
+);
+
+/******************************************************
+ *        AUTENTICACIÓN CON GITHUB (PASSPORT)
+ ******************************************************/
+app.get('/auth/github',
+    passport.authenticate('github', { scope: ['user:email'] })
+);
+
+app.get('/auth/github/callback',
+    passport.authenticate('github', { failureRedirect: '/Login.html' }),
+    (req, res) => {
+        req.session.user = {
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email || `${req.user.username}@github.com`,
+            profilePicture: req.user.profilePicture,
+            authProvider: 'GitHub'
+        };
+        res.redirect('/index');
     }
 );
 

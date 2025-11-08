@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="/PAGINA/stylesPG.css">
     <title>DEV Community</title>
 </head>
+
 <body>
     <!-- ===== HEADER / NAVIGATION ===== -->
     <header class="topbar">
@@ -39,12 +41,29 @@
                 <nav class="user-menu">
                     <img id="userAvatar" src="/IMAGENES/default-avatar.png" alt="User Avatar" class="user-avatar">
                     <menu class="user-dropdown" id="userDropdown">
-                        <li><a href="/dashboard" class="dropdown-item"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                        <li><a href="/createPost" class="dropdown-item"><i class="fas fa-edit"></i> Create Post</a></li>
-                        <li><a href="/readingList" class="dropdown-item"><i class="fas fa-bookmark"></i> Reading list</a></li>
-                        <li><a href="/PERFIL/settings.html" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a></li>
+                        <!-- Información del usuario -->
+                        <li class="user-info">
+                            <div class="user-info__details">
+                                <div class="user-info__name" id="dropdownUsername">Username</div>
+                               <!-- <div class="user-info__email" id="dropdownEmail">user@example.com</div> -->
+                            </div>
+                        </li>
                         <li class="dropdown-divider"></li>
-                        <li><a href="/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Sign out</a></li>
+
+                        <!-- Opciones del menú -->
+                        <li><a href="/dashboard" class="dropdown-item"><i class="fas fa-chart-line"></i> Dashboard</a>
+                        </li>
+                        <li><a href="/createPost" class="dropdown-item"><i class="fas fa-edit"></i> Create Post</a></li>
+                        <li><a href="/readingList" class="dropdown-item"><i class="fas fa-bookmark"></i> Reading
+                                list</a></li>
+                        <li><a href="/PERFIL/settings.html" class="dropdown-item"><i class="fas fa-cog"></i>
+                                Settings</a></li>
+                        <li class="dropdown-divider"></li>
+
+                        <!-- Cerrar sesión -->
+                        <li><a href="/logout" class="dropdown-item dropdown-item--logout">
+                                <i class="fas fa-sign-out-alt"></i> Sign out
+                            </a></li>
                     </menu>
                 </nav>
             </section>
@@ -57,244 +76,100 @@
     <!-- ===== MAIN LAYOUT ===== -->
     <main class="layout">
         <!-- ===== MINIBAR ===== -->
-<aside class="minibar" id="minibar">
-    <nav class="minibar__nav">
-        <ul class="minibar__list">
+        <aside class="minibar" id="minibar">
+            <nav class="minibar__nav">
+                <ul class="minibar__list">
 
-            <!-- Item: DEV Community -->
-            <li class="minibar__item minibar__item--active">
-                <a href="#" class="minibar__link" data-preview="DEV Community">
-                    <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
-                </a>
-                <div class="minibar__preview">
-                    <div class="preview__header">
-                        <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
-                    </div>
-                    <div class="preview__content">
-                        <h3 class="preview__title">DEV Community</h3>
-                        <p class="preview__description">
-                            A space to discuss and keep up with software development and manage your software career.
-                        </p>
-                        <button class="preview__btn">Follow</button>
-                    </div>
-                </div>
-            </li>
+                    <!-- Item: DEV Community -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <div class="minibar__preview">
+                            <div class="preview__header">
+                                <img src="/IMAGENES/dev-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </div>
+                            <div class="preview__content">
+                                <h3 class="preview__title">DEV Community</h3>
+                                <p class="preview__description">
+                                    A space to discuss and keep up with software development and manage your software
+                                    career.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </div>
+                        </div>
+                    </li>
 
-            <!-- Item: Future -->
-            <li class="minibar__item">
-                <a href="#" class="minibar__link" data-preview="Future">
-                    <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </a>
-                <div class="minibar__preview">
-                    <div class="preview__icon-wrapper">
-                        <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </div>
-                    <div class="preview__content">
-                        <h3 class="preview__title">Future</h3>
-                        <p class="preview__description">
-                            News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
-                        </p>
-                        <button class="preview__btn">Follow</button>
-                    </div>
-                </div>
-            </li>
+                    <!-- Item: Future -->
+                    <li class="minibar__item">
+                        <a href="#" class="minibar__link" data-preview="Future">
+                            <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                        <div class="minibar__preview">
+                            <div class="preview__icon-wrapper">
+                                <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="preview__content">
+                                <h3 class="preview__title">Future</h3>
+                                <p class="preview__description">
+                                    News and discussion of science and technology such as AI, VR, cryptocurrency,
+                                    quantum computing, and more.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </div>
+                        </div>
+                    </li>
 
-        </ul>
-    </nav>
-</aside>
-
-        <!-- ===== LEFT SIDEBAR CONTENT ===== -->
-        <aside class="leftbar" id="leftbar">
-            <!-- Navigation Menu -->
-            <nav class="section section--navigation">
-                <ul class="navlist">
-                    <li class="navlist__item navlist__item--active">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Home</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Reading List</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C13.3132 2 14.6136 2.25866 15.8268 2.7612C17.0401 3.26375 18.1425 4.00035 19.0711 4.92893C19.9997 5.85752 20.7362 6.95991 21.2388 8.17317C21.7413 9.38642 22 10.6868 22 12C22 13.3132 21.7413 14.6136 21.2388 15.8268C20.7362 17.0401 19.9997 18.1425 19.0711 19.0711C18.1425 19.9997 17.0401 20.7362 15.8268 21.2388C14.6136 21.7413 13.3132 22 12 22C10.6868 22 9.38642 21.7413 8.17317 21.2388C6.95991 20.7362 5.85752 19.9997 4.92893 19.0711C4.00035 18.1425 3.26375 17.0401 2.7612 15.8268C2.25866 14.6136 2 13.3132 2 12C2 10.6868 2.25866 9.38642 2.7612 8.17317C3.26375 6.95991 4.00035 5.85752 4.92893 4.92893C5.85752 4.00035 6.95991 3.26375 8.17317 2.7612C9.38642 2.25866 10.6868 2 12 2V2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Podcasts</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14 5H3C2.46957 5 1.96086 5.21071 1.58579 5.58579C1.21071 5.96086 1 6.46957 1 7V17C1 17.5304 1.21071 18.0391 1.58579 18.4142C1.96086 18.7893 2.46957 19 3 19H14C14.5304 19 15.0391 18.7893 15.4142 18.4142C15.7893 18.0391 16 17.5304 16 17V7C16 6.46957 15.7893 5.96086 15.4142 5.58579C15.0391 5.21071 14.5304 5 14 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Videos</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20.59 13.41L13.42 20.58C13.2343 20.766 13.0137 20.9135 12.7709 21.0141C12.5281 21.1148 12.2678 21.1666 12.005 21.1666C11.7422 21.1666 11.4819 21.1148 11.2391 21.0141C10.9963 20.9135 10.7757 20.766 10.59 20.58L1 11V1H11L20.59 10.59C20.9625 10.9647 21.1716 11.4716 21.1716 12C21.1716 12.5284 20.9625 13.0353 20.59 13.41V13.41Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M7 7H7.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Tags</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">DEV++</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 14C13.6569 14 15 12.6569 15 11C15 9.34315 13.6569 8 12 8C10.3431 8 9 9.34315 9 11C9 12.6569 10.3431 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M19 21V19C19 17.9391 18.5786 16.9217 17.8284 16.1716C17.0783 15.4214 16.0609 15 15 15H9C7.93913 15 6.92172 15.4214 6.17157 16.1716C5.42143 16.9217 5 17.9391 5 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M19 5C19 6.06087 18.5786 7.07828 17.8284 7.82843C17.0783 8.57857 16.0609 9 15 9H9C7.93913 9 6.92172 8.57857 6.17157 7.82843C5.42143 7.07828 5 6.06087 5 5C5 3.93913 5.42143 2.92172 6.17157 2.17157C6.92172 1.42143 7.93913 1 9 1H15C16.0609 1 17.0783 1.42143 17.8284 2.17157C18.5786 2.92172 19 3.93913 19 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">DEV Education Tracks</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M19.4 15C19.2663 15.9248 18.9628 16.8165 18.505 17.625C18.0472 18.4335 17.4441 19.1424 16.7285 19.7118C16.0129 20.2812 15.1989 20.7002 14.3313 20.9457C13.4638 21.1912 12.5593 21.2585 11.6668 21.144C10.7743 21.0295 9.91137 20.7354 9.12487 20.2778C8.33838 19.8202 7.64392 19.2077 7.08058 18.4742C6.51724 17.7407 6.09577 16.9004 5.83953 16.0001C5.58329 15.0998 5.49715 14.1573 5.58581 13.2249" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M5 9C5.08329 8.06756 5.34153 7.15816 5.75981 6.32487C6.17808 5.49159 6.74769 4.75126 7.43338 4.14805C8.11907 3.54484 8.90717 3.09052 9.75192 2.81133C10.5967 2.53214 11.481 2.43335 12.3598 2.52006" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">DEV Challenges</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15848 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">DEV Help</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Advertise on DEV</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">DEV Showcase</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M4.93 4.93L9.17 9.17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14.83 14.83L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14.83 9.17L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14.83 9.17L18.36 5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M4.93 19.07L9.17 14.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">About</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Contact</span>
-                        </a>
-                    </li>
-                    <li class="navlist__item">
-                        <!-- Icono SVG (momentaneo) -->
-                        <a href="#" class="navlist__link">
-                            <svg class="navlist__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16 11V7C16 5.93913 15.5786 4.92172 14.8284 4.17157C14.0783 3.42143 13.0609 3 12 3H5C3.93913 3 2.92172 3.42143 2.17157 4.17157C1.42143 4.92172 1 5.93913 1 7V17C1 18.0609 1.42143 19.0783 2.17157 19.8284C2.92172 20.5786 3.93913 21 5 21H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8.5 15.5C9.32843 15.5 10 14.8284 10 14C10 13.1716 9.32843 12.5 8.5 12.5C7.67157 12.5 7 13.1716 7 14C7 14.8284 7.67157 15.5 8.5 15.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14 14L16 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M16 14L14 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M23 18V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M20 15H26" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="navlist__text">Forem Shop</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
+        </aside>
 
-            <!-- User Profile Card -->
-            <section class="profilecard">
-                <figure class="profilecard__avatar" id="sidebarAvatar"></figure>
-                <header>
-                    <h2 class="profilecard__name" id="sidebarUsername">Welcome</h2>
-                    <p class="profilecard__meta" id="sidebarMeta">Explore the latest in development</p>
-                </header>
+        <!-- ===== LEFT SIDEBAR CONTENT ===== -->
+        <!-- Left Sidebar -->
+        <aside class="leftbar" id="leftbar">
+
+            <!--menu lateral-->
+            <section class="contenedor">
+                <aside class="subnav">
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">DEV++</a></li>
+                        <li><a href="#">Podcast</a></li>
+                        <li><a href="#">Videos</a></li>
+                        <li><a href="#">DEV Education Tracks</a></li>
+                        <li><a href="#">DEV Challenges</a></li>
+                        <li><a href="#">DEV Help</a></li>
+                        <li><a href="#">Advertise on DEV</a></li>
+                        <li><a href="#">DEV Showcase</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Free Postgres Database</a></li>
+                        <li><a href="#">Software comparisons</a></li>
+                        <li><a href="#">Forem Shop</a></li>
+                    </ul>
+                </aside>
             </section>
 
-            <!-- Popular Tags Section -->
             <section class="section">
                 <h3 class="section__title">Popular Tags</h3>
                 <ul class="taglist" id="popularTags">
-                    <!-- Tags populated by JavaScript -->
+                    <!-- Tags will be populated by JS -->
                 </ul>
             </section>
 
-            <!-- Topics Section -->
             <section class="section">
                 <h3 class="section__title">Topics</h3>
                 <ul class="topiclist">
@@ -306,7 +181,6 @@
                 </ul>
             </section>
 
-            <!-- Resources Section -->
             <section class="section">
                 <h3 class="section__title">Resources</h3>
                 <ul class="resourceList">
@@ -323,7 +197,8 @@
             <header class="hero">
                 <section class="hero__inner">
                     <h1 class="hero__title">DEV Community is a community of 3,555,904 amazing developers</h1>
-                    <p class="hero__description">We're a place where coders share, stay up-to-date and grow their careers.</p>
+                    <p class="hero__description">We're a place where coders share, stay up-to-date and grow their
+                        careers.</p>
                 </section>
             </header>
 
@@ -366,8 +241,10 @@
                 <ul class="small-list">
                     <li class="small-list__item">
                         <p><strong>Just Launched!</strong></p>
-                        <a href="#" class="small-list__link">Agentic Postgres Challenge with Tiger Data: $3,000 in Prizes!</a>
-                        <p class="challenge-desc">Build something experimental that showcases Agentic Postgres in a creative way.</p>
+                        <a href="#" class="small-list__link">Agentic Postgres Challenge with Tiger Data: $3,000 in
+                            Prizes!</a>
+                        <p class="challenge-desc">Build something experimental that showcases Agentic Postgres in a
+                            creative way.</p>
                     </li>
                 </ul>
             </section>
@@ -376,8 +253,10 @@
             <section class="card">
                 <h4 class="card__title">Happening Now</h4>
                 <ul class="small-list">
-                    <li class="small-list__item"><a href="#" class="small-list__link">Frontend Challenge: Halloween Edition</a></li>
-                    <li class="small-list__item"><a href="#" class="small-list__link">Frontend Challenge: Halloween Edition</a></li>
+                    <li class="small-list__item"><a href="#" class="small-list__link">Frontend Challenge: Halloween
+                            Edition</a></li>
+                    <li class="small-list__item"><a href="#" class="small-list__link">Frontend Challenge: Halloween
+                            Edition</a></li>
                 </ul>
             </section>
         </aside>
@@ -398,4 +277,5 @@
     <!-- ===== JAVASCRIPT ===== -->
     <script src="/PAGINA/scriptsPG.js"></script>
 </body>
-</html>      
+
+</html>
