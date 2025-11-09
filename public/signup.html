@@ -3,71 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REGISTRARSE</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Iniciar Sesión</title>
 </head>
 <body>
-    <div class="container">
-        <form action="/register" method="POST">
-            <h2>REGISTRARSE</h2>
-            
-            <div id="message" class="message"></div>
-            
-            <div class="section">
-                <div class="title">USUARIO</div>
-                <div class="field">
-                    <input type="text" id="username" name="username" required>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="title">CONTRASEÑA</div>
-                <div class="field">
-                    <input type="password" id="password" name="password" required minlength="6">
-                    <small>La contraseña debe tener al menos 6 caracteres</small>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="button">
-                    <input type="submit" value="REGISTRAR USUARIO">
-                </div>
-                <div class="button">
-                    <a href="Login.html">INICIAR SESIÓN</a>
-                </div>
-            </div>
-        </form>
-    </div>
-    
-    <script>
-        // Manejo de mensajes de respuesta
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        const messageType = urlParams.get('type');
-        
-        if (message) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
-            messageDiv.className = `message ${messageType || 'error'}`;
-            messageDiv.style.display = 'block';
-        }
-        
-        // Validación básica del formulario de registrarse
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (!username || !password) {
-                e.preventDefault();
-                alert('Por favor, complete todos los campos');
-                return;
-            }
-            
-            if (password.length < 6) {
-                e.preventDefault();
-                alert('La contraseña debe tener al menos 6 caracteres');
-            }
-        });
-    </script>
+    <!-- ===== MINIBAR ===== -->
+    <aside class="minibar" id="minibar">
+        <nav class="minibar__nav">
+            <ul class="minibar__list">
+
+                <!-- Item: DEV Community -->
+                <li class="minibar__item minibar__item--active">
+                    <a href="#" class="minibar__link" data-preview="DEV Community">
+                        <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">DEV Community</h3>
+                            <p class="preview__description">
+                                A space to discuss and keep up with software development and manage your software career.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item: Future -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Future">
+                        <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <article class="minibar__preview">
+                        <figure class="preview__icon-wrapper">
+                            <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </figure>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Future</h3>
+                            <p class="preview__description">
+                                News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN LOGIN CONTENT ===== -->
+    <main class="login-container">
+        <figure style="text-align: center; margin-bottom: 20px;">
+            <img src="/IMAGENES/dev-black.png" alt="DEV Logo" width="60" height="60">
+        </figure>
+
+        <header class="login-header">
+            <h1>Únete a nuestra Comunidad</h1>
+            <p>Nuestra comunidad tiene más de <span class="highlight">3,152,305</span> desarrolladores increíbles</p>
+        </header>
+
+        <section class="login-card">
+            <section class="social-login">
+                <button type="button" class="social-btn apple">
+                    <i class="fab fa-apple" aria-hidden="true" style="margin-right: 8px;"></i>
+                    Continuar con Apple
+                </button>
+                <button type="button" class="social-btn facebook" onclick="window.location.href='/auth/facebook'">
+                    <i class="fab fa-facebook" aria-hidden="true" style="margin-right: 8px;"></i>
+                    Continuar con Facebook
+                </button>
+                <button type="button" class="social-btn github" onclick="window.location.href='/auth/github'">
+                    <i class="fab fa-github" aria-hidden="true" style="margin-right: 8px;"></i>
+                    Continuar con GitHub
+                </button>
+                <button type="button" class="social-btn twitter">
+                    <i class="fab fa-twitter" aria-hidden="true" style="margin-right: 8px;"></i>
+                    Continuar con Twitter
+                </button>
+                <a href="/auth/google" class="social-google">
+                    <button type="button" class="social-btn google">
+                        <i class="fab fa-google" aria-hidden="true" style="margin-right: 8px;"></i>
+                        Continuar con Google
+                    </button>
+                </a>
+                <button type="button" class="social-btn linkedin">
+                    <i class="fab fa-linkedin" aria-hidden="true" style="margin-right: 8px;"></i>
+                    Continuar con LinkedIn
+                </button>
+            </section>
+
+            <hr class="divider">
+
+                <button type="submit" class="login-btn">INICIAR SESIÓN</button>
+
+                <nav class="register-link">
+                    <a href="Login.html">¿Ya tienes una cuenta? Inicia sesión</a>
+                </nav>
+            </form>
+
+            <footer class="terms">
+                Al iniciar sesión, aceptas nuestra <a href="#">política de privacidad</a> y <a href="#">términos de uso</a>
+            </footer>
+        </section>
+    </main>
+
+    <script src="/scripts.js"></script>
 </body>
 </html>

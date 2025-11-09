@@ -1,4 +1,7 @@
-// ===== MOCK DATA =====
+// =====================================================================
+// MOCK DATA SECTION
+// =====================================================================
+
 const mockArticles = [
     {
         id: 1,
@@ -37,7 +40,10 @@ const mockArticles = [
 
 const popularTags = ['javascript', 'webdev', 'python', 'devops', 'react', 'nodejs', 'ai', 'machinelearning'];
 
-// ===== DOM ELEMENTS =====
+// =====================================================================
+// DOM ELEMENTS SECTION
+// =====================================================================
+
 const articlesEl = document.getElementById('articles');
 const loadingEl = document.getElementById('loading');
 const popularTagsEl = document.getElementById('popularTags');
@@ -55,7 +61,10 @@ const menuToggle = document.getElementById('menuToggle');
 const leftbar = document.getElementById('leftbar');
 const minibar = document.getElementById('minibar');
 
-// ===== MINIBAR FUNCTIONALITY =====
+// =====================================================================
+// MINIBAR FUNCTIONALITY SECTION
+// =====================================================================
+
 function initMinibar() {
     const minibarItems = document.querySelectorAll('.minibar__item');
     
@@ -78,7 +87,10 @@ function initMinibar() {
     });
 }
 
-// ===== IMAGE ERROR HANDLING =====
+// =====================================================================
+// IMAGE HANDLING SECTION
+// =====================================================================
+
 function handleImageError(img) {
     console.warn('Failed to load profile image, using default');
     img.src = '/IMAGENES/default-avatar.png';
@@ -92,7 +104,10 @@ function setupImageErrorHandlers() {
     }
 }
 
-// ===== AUTHENTICATION FUNCTIONS =====
+// =====================================================================
+// AUTHENTICATION SECTION
+// =====================================================================
+
 async function checkAuth() {
     try {
         console.log('Checking authentication status...');
@@ -139,7 +154,7 @@ function showAuthenticatedState(user) {
         userAvatar.onerror = () => handleImageError(userAvatar);
     }
 
-    // ACTUALIZAR DROPDOWN DEL USUARIO - ESTA ES LA PARTE CRÍTICA
+    // Actualizar dropdown del usuario
     if (dropdownAvatar) {
         dropdownAvatar.src = profilePic;
         dropdownAvatar.alt = username;
@@ -189,7 +204,10 @@ function resetUserInfo() {
     }
 }
 
-// ===== USER DROPDOWN FUNCTIONS =====
+// =====================================================================
+// USER DROPDOWN SECTION
+// =====================================================================
+
 function initUserDropdown() {
     if (userAvatar) {
         userAvatar.addEventListener('click', (e) => {
@@ -209,7 +227,10 @@ function initUserDropdown() {
     }
 }
 
-// ===== TAGS FUNCTIONS =====
+// =====================================================================
+// TAGS SECTION
+// =====================================================================
+
 function renderTags() {
     if (!popularTagsEl) return;
     popularTagsEl.innerHTML = '';
@@ -231,7 +252,10 @@ function renderTags() {
     });
 }
 
-// ===== ARTICLE FUNCTIONS =====
+// =====================================================================
+// ARTICLES SECTION
+// =====================================================================
+
 function articleCard(article) {
     const articleEl = document.createElement('article');
     articleEl.className = 'article';
@@ -288,7 +312,10 @@ function incrementLike(id) {
     return art.likes;
 }
 
-// ===== DATA FETCHING =====
+// =====================================================================
+// DATA FETCHING SECTION
+// =====================================================================
+
 function fetchArticles({ sort = 'new' } = {}) {
     return new Promise(resolve => {
         setTimeout(() => {
@@ -311,7 +338,10 @@ async function loadFeed() {
     renderFeed(data);
 }
 
-// ===== SEARCH =====
+// =====================================================================
+// SEARCH SECTION
+// =====================================================================
+
 function doSearch() {
     const q = (searchInput ? searchInput.value.trim().toLowerCase() : '');
     if (!q) return loadFeed();
@@ -324,7 +354,10 @@ function doSearch() {
     renderFeed(filtered);
 }
 
-// ===== EVENT LISTENERS =====
+// =====================================================================
+// EVENT LISTENERS SECTION
+// =====================================================================
+
 function setupEventListeners() {
     if (searchInput) {
         searchInput.addEventListener('keydown', (e) => {
@@ -363,7 +396,10 @@ function setupEventListeners() {
     }
 }
 
-// ===== DEBUGGING =====
+// =====================================================================
+// DEBUGGING SECTION
+// =====================================================================
+
 async function debugAuth() {
     try {
         console.log('=== AUTH DEBUG ===');
@@ -382,7 +418,10 @@ async function debugAuth() {
     }
 }
 
-// ===== INITIALIZATION =====
+// =====================================================================
+// INITIALIZATION SECTION
+// =====================================================================
+
 function init() {
     console.log('Initializing DEV Community...');
     setupImageErrorHandlers();

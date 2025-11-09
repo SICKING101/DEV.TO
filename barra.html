@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg: #f5f5f5;
+            --card: #ffffff;
+            --muted: #6b6b6b;
+            --accent: #3b49df;
+            --accent-hover: #2f3ab2;
+            --border: #e6e6e6;
+            --text: #242424;
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* =====================================================================
+        MINIBAR STYLES SECTION - COMPLETAMENTE CORREGIDO
+        ===================================================================== */
+        .minibar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 64px;
+            height: 100vh;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            padding: 0.75rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .minibar__nav {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+        .minibar__nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .minibar__nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .minibar__nav::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .minibar__nav::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+
+        .minibar__list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .minibar__item {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .minibar__link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .minibar__link:hover {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .minibar__item--active .minibar__link {
+            background: #f5f6fd;
+            color: var(--accent);
+        }
+
+        .minibar__image {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .minibar__icon {
+            color: currentColor;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* PREVIEW COMPLETAMENTE CORREGIDO */
+        .minibar__preview {
+            position: fixed;
+            left: 76px;
+            width: 320px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 9999;
+            overflow: hidden;
+            pointer-events: auto;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .minibar__item:hover .minibar__preview {
+            display: block;
+        }
+
+        .preview__header {
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .preview__header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview__icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem 0 1rem;
+            background: #f8f9fa;
+        }
+
+        .preview__icon {
+            color: var(--accent);
+            width: 48px;
+            height: 48px;
+        }
+
+        .preview__content {
+            padding: 1.25rem;
+        }
+
+        .preview__title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .preview__description {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .preview__btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .preview__btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* BOTONES ADICIONALES */
+        .minibar__footer {
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .minibar__action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--muted);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .minibar__action-btn:hover {
+            background: #f5f5f5;
+            color: var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateX(-10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+
+        /* CONTENIDO DE DEMOSTRACIÓN */
+        .main-content {
+            margin-left: 64px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: var(--bg);
+            overflow-y: auto;
+        }
+
+        /* ESTILOS PARA IMÁGENES FALTANTES */
+        .preview__header-image[src*="image-no-exists"],
+        .minibar__image[src*="image-no-exists"] {
+            display: none;
+        }
+
+        .preview__header:has(.preview__header-image[src*="image-no-exists"]) {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .preview__header:has(.preview__header-image[src*="image-no-exists"])::before {
+            content: "Header Image";
+        }
+
+        .minibar__link:has(.minibar__image[src*="image-no-exists"]) {
+            background: #f5f5f5;
+            color: #666;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .minibar__link:has(.minibar__image[src*="image-no-exists"])::before {
+            content: "IMG";
+        }
+    </style>
+    <title>Dev.to Style Minibar - Corregido</title>
+</head>
+<body>
+<!-- =====================================================================
+    MINIBAR SECTION - COMPLETAMENTE FUNCIONAL
+    ===================================================================== -->
+    <aside class="minibar" id="minibar">
+        <nav class="minibar__nav">
+            <ul class="minibar__list">
+
+                <!-- Item 1 -->
+                <li class="minibar__item minibar__item--active">
+                    <a href="#" class="minibar__link" data-preview="DEV Community">
+                        <img src="/IMAGENES/forem-feed.png" alt="DEV Community" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">DEV Community</h3>
+                            <p class="preview__description">
+                                A space to discuss and keep up with software development and manage your software career.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 2 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="DEV Black">
+                        <img src="/IMAGENES/dev-black.png" alt="DEV Black" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/dev-header.png" alt="DEV Black Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">DEV Black</h3>
+                            <p class="preview__description">
+                                Community for developers interested in dark theme development and design.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 3 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Future">
+                        <img src="/IMAGENES/future-forem.png" alt="Future" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/future-header.png" alt="Future Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Future Tech</h3>
+                            <p class="preview__description">
+                                News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 4 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Open Source">
+                        <img src="/IMAGENES/open-forem.png" alt="Open Source" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/open-forem-header.png" alt="Open Source Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Open Source</h3>
+                            <p class="preview__description">
+                                Collaborative development and discussion around open source projects and technologies.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 5 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Gaming">
+                        <img src="/IMAGENES/gamers-forem.png" alt="Gaming" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/gamers-forem.png" alt="Gaming Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Gaming Community</h3>
+                            <p class="preview__description">
+                                Discuss games, development, and connect with fellow gamers worldwide.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 6 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Music">
+                        <img src="/IMAGENES/music-forem.png" alt="Music" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/music-forem-header.png" alt="Music Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Music Lovers</h3>
+                            <p class="preview__description">
+                                Share and discuss music, instruments, production and audio technology.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 7 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Vibe">
+                        <img src="/IMAGENES/vibe-forem.png" alt="Vibe" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/vibe-forem-header.png" alt="Vibe Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Vibe Community</h3>
+                            <p class="preview__description">
+                                Positive vibes, mindfulness, and community support for developers.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 8 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Popcorn">
+                        <img src="/IMAGENES/popcorn-forem.png" alt="Popcorn" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/popcorn-forem-header.png" alt="Popcorn Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Popcorn & Movies</h3>
+                            <p class="preview__description">
+                                Movie reviews, discussions and entertainment for developers.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 9 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Design">
+                        <img src="/IMAGENES/design-forem.png" alt="Design" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/design-forem-header.png" alt="Design Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Design Community</h3>
+                            <p class="preview__description">
+                                UI/UX design discussions, resources, tools and inspiration for developers.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 10 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Golf">
+                        <img src="/IMAGENES/golf-forem.png" alt="Golf" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/golf-forem-header.png" alt="Golf Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Golf Enthusiasts</h3>
+                            <p class="preview__description">
+                                For developers who love golf - tips, courses, and networking.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 11 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Funny">
+                        <img src="/IMAGENES/dumb-forem.png" alt="Funny" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/dumb-forem-header.png" alt="Funny Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Funny Developers</h3>
+                            <p class="preview__description">
+                                Humor, memes and lighthearted content for the developer community.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 12 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Security">
+                        <img src="/IMAGENES/segurity-forem.png" alt="Security" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/segurity-forem-header.png" alt="Security Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Security Experts</h3>
+                            <p class="preview__description">
+                                Cybersecurity discussions, best practices, and threat analysis.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 13 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Forem Core">
+                        <img src="/IMAGENES/forem-core.png" alt="Forem Core" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/forem-core-header.png" alt="Forem Core Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Forem Core</h3>
+                            <p class="preview__description">
+                                Core development discussions and contributions to the Forem platform.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 14 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Scale">
+                        <img src="/IMAGENES/scale-forem.png" alt="Scale" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/image-no-exists.png" alt="Scale Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Scale Community</h3>
+                            <p class="preview__description">
+                                Scaling applications, infrastructure and teams for growth.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 15 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Crypto">
+                        <img src="/IMAGENES/crypto-forem.png" alt="Crypto" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/image-no-exists.png" alt="Crypto Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Crypto & Blockchain</h3>
+                            <p class="preview__description">
+                                Cryptocurrency, blockchain technology and decentralized applications.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 16 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Parenting">
+                        <img src="/IMAGENES/parenting-forem.png" alt="Parenting" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/parenting-forem-header.png" alt="Parenting Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Developer Parents</h3>
+                            <p class="preview__description">
+                                Balancing tech careers with family life and parenting.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 17 -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Makers">
+                        <img src="/IMAGENES/image-no-exists.png" alt="Makers" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/maker-forem-header.png" alt="Makers Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Maker Community</h3>
+                            <p class="preview__description">
+                                DIY projects, hardware hacking and creative technology.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+                <!-- Item 18 - Future con icono SVG -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Future Tech">
+                        <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <article class="minibar__preview">
+                        <figure class="preview__icon-wrapper">
+                            <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </figure>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Future Tech</h3>
+                            <p class="preview__description">
+                                News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
+
+            </ul>
+        </nav>
+
+        <!-- BOTONES ADICIONALES -->
+        <div class="minibar__footer">
+            <button class="minibar__action-btn" title="Add community">
+                +
+            </button>
+            <button class="minibar__action-btn" title="More options">
+                ⋯
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <h1>Dev.to Style Minibar - Completamente Funcional</h1>
+        <p>Pasa el mouse sobre cualquier ícono de la barra lateral para ver los previews. El scroll funciona correctamente y los previews se muestran en la posición correcta.</p>
+        
+        <h2>Características implementadas:</h2>
+        <ul>
+            <li>✅ Preview que se ajusta automáticamente a la posición del mouse</li>
+            <li>✅ Funciona correctamente con scroll</li>
+            <li>✅ Botones + y ⋯ en la parte inferior</li>
+            <li>✅ Manejo de imágenes faltantes</li>
+            <li>✅ Comportamiento idéntico a dev.to</li>
+        </ul>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const minibarItems = document.querySelectorAll('.minibar__item');
+            let activePreview = null;
+            
+            function calculatePreviewPosition(link, preview) {
+                const linkRect = link.getBoundingClientRect();
+                const previewRect = preview.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                let topPosition = linkRect.top;
+                const previewHeight = 320; // Altura estimada del preview
+                
+                // Ajustar si el preview se sale por abajo
+                if (topPosition + previewHeight > viewportHeight - 20) {
+                    topPosition = viewportHeight - previewHeight - 20;
+                }
+                
+                // Ajustar si el preview se sale por arriba
+                if (topPosition < 20) {
+                    topPosition = 20;
+                }
+                
+                return topPosition;
+            }
+            
+            function showPreview(item) {
+                const preview = item.querySelector('.minibar__preview');
+                const link = item.querySelector('.minibar__link');
+                
+                if (preview && link) {
+                    // Ocultar preview anterior
+                    if (activePreview && activePreview !== preview) {
+                        activePreview.style.display = 'none';
+                    }
+                    
+                    // Calcular y establecer posición
+                    const topPosition = calculatePreviewPosition(link, preview);
+                    preview.style.top = topPosition + 'px';
+                    preview.style.display = 'block';
+                    
+                    activePreview = preview;
+                }
+            }
+            
+            function hidePreview(preview) {
+                if (preview) {
+                    preview.style.display = 'none';
+                }
+            }
+            
+            // Event listeners para cada item
+            minibarItems.forEach(item => {
+                const link = item.querySelector('.minibar__link');
+                const preview = item.querySelector('.minibar__preview');
+                
+                if (link && preview) {
+                    // Mostrar preview al entrar al item
+                    item.addEventListener('mouseenter', function() {
+                        showPreview(item);
+                    });
+                    
+                    // Ocultar preview al salir del item (con delay)
+                    item.addEventListener('mouseleave', function(e) {
+                        setTimeout(() => {
+                            if (!item.matches(':hover') && !preview.matches(':hover')) {
+                                hidePreview(preview);
+                            }
+                        }, 100);
+                    });
+                    
+                    // Mantener preview visible si el mouse está sobre él
+                    preview.addEventListener('mouseenter', function() {
+                        preview.style.display = 'block';
+                    });
+                    
+                    preview.addEventListener('mouseleave', function() {
+                        hidePreview(preview);
+                    });
+                }
+            });
+            
+            // Ocultar todos los previews al hacer scroll
+            window.addEventListener('scroll', function() {
+                if (activePreview) {
+                    hidePreview(activePreview);
+                }
+            });
+            
+            // Ocultar previews al hacer clic en cualquier parte
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.minibar__preview').forEach(preview => {
+                    hidePreview(preview);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

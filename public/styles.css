@@ -15,236 +15,354 @@
 }
 
 * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-        }
-        
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .login-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 10px;
-        }
-        
-        .login-header p {
-            color: #666;
-            font-size: 16px;
-        }
-        
-        .highlight {
-            color: #3b49df;
-            font-weight: 600;
-        }
-        
-        .login-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e5e5;
-        }
-        
-        .social-login {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 16px;
-            border: 1px solid #d6d6d7;
-            border-radius: 6px;
-            background-color: white;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .social-btn:hover {
-            background-color: #f9f9f9;
-        }
-        
-        .social-btn.apple {
-            color: #000;
-        }
-        
-        .social-btn.facebook {
-            color: #000000;
-        }
-        
-        .social-btn.forum {
-            color: #000000;
-        }
-        
-        .social-btn.github {
-            color: #000000;
-        }
-        
-        .social-btn.google {
-            color: #000000;
-            width: 100%;
-        }
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
 
-        .social-google {text-decoration: none;}
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background-color: #e5e5e5;
-        }
-        
-        .divider span {
-            padding: 0 16px;
-        }
-        
-        .form-section {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #242424;
-            font-size: 14px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d6d6d7;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3b49df;
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        
-        .remember-me input {
-            margin-right: 8px;
-        }
-        
-        .remember-me label {
-            font-size: 14px;
-            color: #242424;
-        }
-        
-        .login-btn {
-            width: 100%;
-            padding: 12px 16px;
-            background-color: #3b49df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-bottom: 16px;
-        }
-        
-        .login-btn:hover {
-            background-color: #2f3ab2;
-        }
-        
-        .register-link {
-            text-align: center;
-            margin-top: 16px;
-        }
-        
-        .register-link a {
-            color: #3b49df;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .terms {
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-            margin-top: 24px;
-        }
-        
-        .terms a {
-            color: #3b49df;
-            text-decoration: none;
-        }
-        
-        .terms a:hover {
-            text-decoration: underline;
-        }
-        
-        .message {
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+body {
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
 
-        /* ===== MINIBAR STYLES ===== */
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 10;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.login-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.highlight {
+    color: #3b49df;
+    font-weight: 600;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e5e5;
+}
+
+.social-login {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border: 1px solid #d6d6d7;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.social-btn:hover {
+    background-color: #f9f9f9;
+}
+
+.social-btn.apple {
+    color: #000;
+}
+
+.social-btn.facebook {
+    color: #000000;
+}
+
+.social-btn.forum {
+    color: #000000;
+}
+
+.social-btn.github {
+    color: #000000;
+}
+
+.social-btn.google {
+    color: #000000;
+    width: 100%;
+}
+
+.social-google {text-decoration: none;}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: #e5e5e5;
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+/* ===== CORRECCIONES CRÍTICAS PARA FORMULARIO ===== */
+.form-section {
+    margin-bottom: 24px;
+    position: relative;
+    border: none !important; /* Elimina bordes del fieldset */
+    padding: 0 !important; /* Elimina padding por defecto */
+    margin: 0 0 24px 0 !important; /* Reset de márgenes */
+    min-width: 0 !important; /* Elimina ancho mínimo */
+}
+
+/* Elimina estilos por defecto de fieldset */
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+/* Elimina el marker del li */
+.remember-me menu,
+.remember-me ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.remember-me li {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.remember-me li::before,
+.remember-me li::after,
+.remember-me li::marker {
+    display: none !important;
+    content: none !important;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #242424;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d6d6d7;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.2s;
+    background-color: white;
+    line-height: 1.5;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b49df;
+    box-shadow: 0 0 0 3px rgba(59, 73, 223, 0.1);
+}
+
+/* Enlace de olvidar contraseña */
+.password-section {
+    margin-bottom: 8px;
+}
+
+.forgot-password {
+    display: block;
+    text-align: right;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #3b49df;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Checkbox Recordarme - COMPLETAMENTE CORREGIDO */
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin: 16px 0 24px 0;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.remember-me menu {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.remember-me li {
+    display: flex;
+    align-items: center;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Elimina completamente cualquier marker o punto */
+.remember-me li::marker,
+.remember-me menu::marker,
+.remember-me *::marker {
+    display: none !important;
+    content: none !important;
+    font-size: 0 !important;
+}
+
+.remember-me input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #d6d6d7;
+    border-radius: 3px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+    background-color: white;
+    flex-shrink: 0;
+}
+
+.remember-me input[type="checkbox"]:checked {
+    background-color: #3b49df;
+    border-color: #3b49df;
+}
+
+.remember-me input[type="checkbox"]:checked::after {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.remember-me label {
+    font-size: 14px;
+    color: #242424;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: #3b49df;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 16px;
+}
+
+.login-btn:hover {
+    background-color: #2f3ab2;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.register-link a {
+    color: #3b49df;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+.terms {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-top: 24px;
+}
+
+.terms a {
+    color: #3b49df;
+    text-decoration: none;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+.message {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 14px;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* ===== MINIBAR STYLES ===== */
 .minibar {
     position: fixed;
     left: 0;
@@ -327,7 +445,6 @@
     pointer-events: auto;
 }
 
-/* Esto permite que el preview aparezca y se mantenga visible  es very important */
 .minibar__item:hover .minibar__preview {
     display: block;
 }
@@ -400,31 +517,40 @@
     background: var(--accent-hover);
 }
 
-/* Animacion */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== LAYOUT STYLES ===== */
 .layout {
     max-width: var(--maxw);
     margin: 0 auto;
     display: grid;
     grid-template-columns: 240px 1fr 320px;
     gap: 1.5rem;
-    padding: 2rem 1rem 2rem 5rem; /* Left padding for minibar */
+    padding: 2rem 1rem 2rem 5rem;
     min-height: calc(100vh - 56px);
-   /* margin-left: 60px; */ 
 }
-        
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 20px;
-            }
-            
-            .social-btn, .form-input, .login-btn {
-                padding: 10px 14px;
-                font-size: 15px;
-            }
-        }
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 20px;
+    }
+    
+    .social-btn, .form-input, .login-btn {
+        padding: 10px 14px;
+        font-size: 15px;
+    }
+    
+    .minibar {
+        display: none;
+    }
+    
+    /* Reset adicional para móviles */
+    fieldset {
+        border: none;
+        margin: 0;
+        padding: 0;
+        min-width: 0;
+    }
+}

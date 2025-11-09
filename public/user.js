@@ -12,28 +12,35 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        // No requerido si se usa OAuth (Google)
+        // No requerido si se usa OAuth (Google, Facebook, GitHub)
         validate: {
             validator: function(v) {
-                // La contraseña es requerida solo si no hay googleId
-                return this.googleId ? true : v && v.length >= 6;
+                // La contraseña es requerida solo si no hay ningún método OAuth
+                return (this.googleId || this.facebookId) ? true : v && v.length >= 6;
             },
             message: 'La contraseña debe tener al menos 6 caracteres para usuarios locales'
         }
     },
     googleId: {
         type: String,
-        sparse: true // Permite múltiples documentos sin GoogleId
+        sparse: true
+    },
+    facebookId: {
+        type: String,
+        sparse: true
     },
     profilePicture: {
         type: String,
         default: '/IMAGENES/default-avatar.png'
     },
+    avatar: {
+        type: String // Campo adicional para compatibilidad con Facebook
+    },
     email: {
         type: String,
         trim: true,
         lowercase: true,
-        sparse: true // Permite múltiples documentos sin email
+        sparse: true
     },
     displayName: {
         type: String,
@@ -52,7 +59,7 @@ const userSchema = new mongoose.Schema({
         default: true
     }
 }, {
-    timestamps: true // Agrega createdAt y updatedAt automáticamente
+    timestamps: true
 });
 
 // Middleware pre-save: solo cifrar si la contraseña fue modificada y existe
@@ -66,7 +73,7 @@ userSchema.pre('save', async function(next) {
     
     try {
         // Verificar longitud mínima para usuarios locales
-        if (!user.googleId && user.password.length < 6) {
+        if (!user.googleId && !user.facebookId && user.password.length < 6) {
             return next(new Error('La contraseña debe tener al menos 6 caracteres'));
         }
         
@@ -78,39 +85,9 @@ userSchema.pre('save', async function(next) {
     }
 });
 
-// Middleware pre-save alternativo (con callbacks) - manteniendo compatibilidad
-userSchema.pre('save', function(next) {
-    const user = this;
-    
-    // Si ya se procesó con async/await, continuar
-    if (user.password && user.password.startsWith('$2b$')) {
-        return next();
-    }
-    
-    // Solo proceder si la contraseña fue modificada y existe
-    if (!user.isModified('password') || !user.password) {
-        return next();
-    }
-    
-    // Verificar longitud mínima para usuarios locales
-    if (!user.googleId && user.password.length < 6) {
-        return next(new Error('La contraseña debe tener al menos 6 caracteres'));
-    }
-    
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) return next(err);
-        
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) return next(err);
-            user.password = hash;
-            next();
-        });
-    });
-});
-
 // Método para verificar contraseña (compatible con ambos enfoques)
 userSchema.methods.isCorrectPassword = function(password, callback) {
-    // Si no hay contraseña (usuario de Google) o no hay contraseña proporcionada
+    // Si no hay contraseña (usuario de OAuth) o no hay contraseña proporcionada
     if (!this.password || !password) {
         return callback(null, false);
     }
@@ -149,7 +126,7 @@ userSchema.methods.toPublicJSON = function() {
         id: this._id,
         username: this.username,
         displayName: this.displayName,
-        profilePicture: this.profilePicture,
+        profilePicture: this.profilePicture || this.avatar,
         createdAt: this.createdAt,
         lastLogin: this.lastLogin
     };
@@ -157,12 +134,12 @@ userSchema.methods.toPublicJSON = function() {
 
 // Virtual para verificar si es usuario de OAuth
 userSchema.virtual('isOAuthUser').get(function() {
-    return !!this.googleId;
+    return !!(this.googleId || this.facebookId);
 });
 
 // Virtual para verificar si es usuario local
 userSchema.virtual('isLocalUser').get(function() {
-    return !this.googleId && !!this.password;
+    return !this.googleId && !this.facebookId && !!this.password;
 });
 
 module.exports = mongoose.model('User', userSchema);

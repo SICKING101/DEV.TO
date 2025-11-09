@@ -1,29 +1,74 @@
 /******************************************************
- *          CONFIGURACIÓN DE AUTENTICACIÓN GOOGLE
+ *          CONFIGURACIÓN DE AUTENTICACIÓN 
  ******************************************************/
 
 // Importar dependencias principales
 const passport = require('passport');
+const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const User = require('./public/user'); // Modelo de usuario
 
 /******************************************************
- *             ESTRATEGIA DE GOOGLE (OAUTH 2.0)
+ *             ESTRATEGIA DE FACEBOOK - CORREGIDA
  ******************************************************/
-
-passport.use(new GoogleStrategy({
-    clientID: '326743051749-rkvj819e71mhkc2iifqt6dnjcnu2ssrg.apps.googleusercontent.com', // ID del cliente de Google Cloud
-    clientSecret: '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', // Secreto del cliente
-    callbackURL: '/auth/google/callback' // URL de retorno después del login
-}, 
-// Función que se ejecuta después de que Google autentica al usuario
+passport.use(new FacebookStrategy({
+    clientID: '809453415265716',
+    clientSecret: '464f18d7f4cdd7ea56879fdcbcd10d2d',
+    callbackURL: "http://localhost:3000/auth/facebook/callback",
+    profileFields: ['id', 'emails', 'name', 'displayName', 'photos'],
+    enableProof: true
+},
 async (accessToken, refreshToken, profile, done) => {
     try {
-        // Buscar si el usuario ya existe en la base de datos
+        console.log('Facebook Profile:', profile);
+        
+        let user = await User.findOne({ facebookId: profile.id });
+
+        if (!user) {
+            // Crear username único
+            const baseUsername = profile.displayName || 
+                               `${profile.name.givenName}${profile.name.familyName}`;
+            let username = baseUsername.replace(/\s+/g, '').toLowerCase();
+            let usernameExists = await User.findOne({ username });
+            let counter = 1;
+            
+            while (usernameExists) {
+                username = `${baseUsername.replace(/\s+/g, '').toLowerCase()}${counter}`;
+                usernameExists = await User.findOne({ username });
+                counter++;
+            }
+
+            user = new User({
+                facebookId: profile.id,
+                username: username,
+                email: profile.emails?.[0]?.value || null,
+                profilePicture: profile.photos?.[0]?.value || '/IMAGENES/default-avatar.png',
+                displayName: profile.displayName || `${profile.name.givenName} ${profile.name.familyName}`
+            });
+            await user.save();
+            console.log('Nuevo usuario de Facebook creado:', user.username);
+        }
+
+        return done(null, user);
+    } catch (err) {
+        console.error('Error en Facebook Strategy:', err);
+        return done(err, null);
+    }
+}));
+
+/******************************************************
+ *             ESTRATEGIA DE GOOGLE (OAUTH 2.0)
+ ******************************************************/
+passport.use(new GoogleStrategy({
+    clientID: '326743051749-rkvj819e71mhkc2iifqt6dnjcnu2ssrg.apps.googleusercontent.com',
+    clientSecret: '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',
+    callbackURL: '/auth/google/callback'
+}, 
+async (accessToken, refreshToken, profile, done) => {
+    try {
         let user = await User.findOne({ googleId: profile.id });
 
-        // Si no existe, crear uno nuevo con los datos del perfil de Google
         if (!user) {
             user = new User({
                 username: profile.displayName,
@@ -34,11 +79,9 @@ async (accessToken, refreshToken, profile, done) => {
             await user.save();
         }
 
-        // Enviar el usuario a la sesión
         return done(null, user);
 
     } catch (err) {
-        // Si ocurre un error durante el proceso
         return done(err, null);
     }
 }));
@@ -69,19 +112,6 @@ passport.use(new GitHubStrategy({
         return done(err, null);
     }
 }));
-
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findById(id);
-        done(null, user);
-    } catch (err) {
-        done(err, null);
-    }
-});
 
 /******************************************************
  *       SERIALIZACIÓN Y DESERIALIZACIÓN DE SESIÓN

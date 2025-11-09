@@ -1,0 +1,723 @@
+/* =====================================================================
+        CSS VARIABLES SECTION
+        ===================================================================== */
+        :root {
+            --brand-color: #400000;
+            --accent-color: #3b49df;
+            --text-primary: #242424;
+            --text-secondary: #595959;
+            --text-muted: #717171;
+            --border-color: #e5e5e5;
+            --bg-color: #ffffff;
+            --bg-secondary: #f9f9f9;
+
+            /* Colors */
+            --bg: #f5f5f5;
+            --card: #ffffff;
+            --muted: #6b6b6b;
+            --accent: #3b49df;
+            --accent-hover: #2f3ab2;
+            --border: #e6e6e6;
+            --text: #242424;
+
+            /* Spacing & Sizing */
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --maxw: 1200px;
+
+            --radius: 5px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+                0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+
+        /* =====================================================================
+        RESET & BASE STYLES SECTION
+        ===================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =====================================================================
+        LAYOUT STYLES SECTION
+        ===================================================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 30px;
+            flex: 1;
+            margin-left: 64px; /* Para compensar el minibar */
+        }
+
+        /* =====================================================================
+        SIDEBAR STYLES SECTION
+        ===================================================================== */
+        .sidebar {
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .sidebar a.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .sidebar a svg {
+            margin-right: 10px;
+        }
+
+        /* =====================================================================
+        MAIN CONTENT STYLES SECTION
+        ===================================================================== */
+        .main-content {
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* =====================================================================
+        FORM STYLES SECTION
+        ===================================================================== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .char-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input {
+            margin-right: 8px;
+        }
+
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius);
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+            border: 1px solid var(--border-color);
+        }
+
+        .brand-color-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-color-input input {
+            width: 100px;
+            margin-left: 10px;
+        }
+
+        /* =====================================================================
+        CONNECT ACCOUNTS STYLES SECTION
+        ===================================================================== */
+        .connect-accounts {
+            margin-top: 20px;
+        }
+
+        .connect-account {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .connect-account:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .connect-account svg {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* =====================================================================
+        PROFILE IMAGE STYLES SECTION
+        ===================================================================== */
+        .profile-image {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-image img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-image button {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .profile-image button:hover {
+            background-color: var(--border-color);
+        }
+
+        /* =====================================================================
+        BUTTON STYLES SECTION
+        ===================================================================== */
+        .save-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .save-button:hover {
+            background-color: #2a38c9;
+        }
+
+        /* =====================================================================
+        UTILITY STYLES SECTION
+        ===================================================================== */
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 20px 0;
+        }
+
+        .work-hours {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .work-hour {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background-color: var(--bg-secondary);
+        }
+
+        .work-hour input {
+            margin-right: 5px;
+        }
+
+        .pronouns-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .pronoun-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .pronoun-option input {
+            margin-right: 5px;
+        }
+
+        .learning-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+        }
+
+        .learning-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .learning-content {
+            flex: 1;
+        }
+
+        .learning-content textarea {
+            width: 100%;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--bg-secondary);
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .highlight {
+            background-color: #fff9db;
+            border-left: 3px solid #ffd43b;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        /* =====================================================================
+        MINIBAR STYLES SECTION - MEJORADA
+        ===================================================================== */
+        .minibar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 64px;
+            height: 100vh;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            padding: 0.75rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .minibar__nav {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+        .minibar__nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .minibar__nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .minibar__nav::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .minibar__nav::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+
+        .minibar__list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .minibar__item {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .minibar__link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .minibar__link:hover {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .minibar__item--active .minibar__link {
+            background: #f5f6fd;
+            color: var(--accent);
+        }
+
+        .minibar__image {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .minibar__icon {
+            color: currentColor;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* PREVIEW MEJORADO */
+        .minibar__preview {
+            position: fixed;
+            left: 76px;
+            width: 320px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 9999;
+            overflow: hidden;
+            pointer-events: auto;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .minibar__item:hover .minibar__preview {
+            display: block;
+        }
+
+        .preview__header {
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .preview__header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview__icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem 0 1rem;
+            background: #f8f9fa;
+        }
+
+        .preview__icon {
+            color: var(--accent);
+            width: 48px;
+            height: 48px;
+        }
+
+        .preview__content {
+            padding: 1.25rem;
+        }
+
+        .preview__title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .preview__description {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .preview__btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .preview__btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* BOTONES ADICIONALES */
+        .minibar__footer {
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .minibar__action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--muted);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .minibar__action-btn:hover {
+            background: #f5f5f5;
+            color: var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateX(-10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+
+        /* CONTENIDO DE DEMOSTRACIÓN */
+        .main-content {
+            margin-left: 64px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: var(--bg);
+            overflow-y: auto;
+        }
+
+        /* ESTILOS PARA DEMOSTRACIÓN */
+        .demo-section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .char-count {
+            font-size: 0.8rem;
+            color: #717171;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+
+        .brand-color-input {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: #3b49df;
+        }
+
+        /* =====================================================================
+        SEMANTIC ELEMENT STYLES SECTION
+        ===================================================================== */
+        /* Estilos para elementos semánticos que reemplazan divs */
+        fieldset {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        legend {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        figure {
+            margin: 0;
+        }
+
+        output {
+            display: block;
+        }
+
+        /* =====================================================================
+        ANIMATION STYLES SECTION
+        ===================================================================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =====================================================================
+        RESPONSIVE STYLES SECTION
+        ===================================================================== */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                margin-left: 0;
+                padding: 10px;
+            }
+            
+            .minibar {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .work-hours {
+                justify-content: center;
+            }
+            
+            .pronouns-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }

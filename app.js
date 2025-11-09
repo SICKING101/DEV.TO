@@ -153,7 +153,7 @@ app.get('/api/user', (req, res) => {
     if (req.session.user) {
         res.json({ user: req.session.user });
     } else if (req.isAuthenticated() && req.user) {
-        // Si Passport lo autenticó (Google/GitHub)
+        // Si Passport lo autenticó (Google/GitHub/Facebook)
         const { id, username, email, displayName, profilePicture, authProvider } = req.user;
         res.json({
             user: {
@@ -187,6 +187,31 @@ app.get('/auth/google/callback',
             email: req.user.email || `${req.user.username}@gmail.com`,
             profilePicture: req.user.profilePicture,
             authProvider: 'Google'
+        };
+        res.redirect('/index');
+    }
+);
+
+/******************************************************
+ *        AUTENTICACIÓN CON FACEBOOK (PASSPORT) - CORREGIDO
+ ******************************************************/
+app.get('/auth/facebook', 
+    passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
+);
+
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', { 
+        failureRedirect: '/Login.html',
+        session: true
+    }),
+    (req, res) => {
+        // Guardar usuario en sesión
+        req.session.user = {
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email || `${req.user.username}@facebook.com`,
+            profilePicture: req.user.profilePicture || req.user.avatar,
+            authProvider: 'Facebook'
         };
         res.redirect('/index');
     }

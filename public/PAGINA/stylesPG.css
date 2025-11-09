@@ -1,4 +1,7 @@
-/* ===== CSS VARIABLES ===== */
+/* =====================================================================
+CSS VARIABLES SECTION
+===================================================================== */
+
 :root {
     /* Colors */
     --bg: #f5f5f5;
@@ -15,7 +18,10 @@
     --maxw: 1200px;
 }
 
-/* ===== RESET & BASE STYLES ===== */
+/* =====================================================================
+RESET & BASE STYLES SECTION
+===================================================================== */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -31,7 +37,10 @@ body {
     padding-top: 56px; /* Space for fixed header */
 }
 
-/* ===== HEADER STYLES ===== */
+/* =====================================================================
+HEADER STYLES SECTION
+===================================================================== */
+
 .topbar {
     position: fixed;
     top: 0;
@@ -56,7 +65,7 @@ body {
     gap: 1.5rem;
 }
 
-/* Logo */
+/* Logo Styles */
 .brand {
     display: flex;
     align-items: center;
@@ -70,7 +79,7 @@ body {
     border-radius: 5px;
 }
 
-/* Search Bar */
+/* Search Bar Styles */
 .search {
     flex: 1;
     max-width: 420px;
@@ -104,7 +113,10 @@ body {
     box-shadow: 0 0 0 2px rgba(59, 73, 223, 0.1);
 }
 
-/* ===== BUTTON STYLES ===== */
+/* =====================================================================
+BUTTON STYLES SECTION
+===================================================================== */
+
 .btn {
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
@@ -152,14 +164,17 @@ body {
     background: #f5f5f5;
 }
 
-/* Authentication Actions */
+/* Authentication Actions Styles */
 .actions {
     display: flex;
     gap: 0.75rem;
     margin-left: auto;
 }
 
-/* ===== USER NAVIGATION STYLES ===== */
+/* =====================================================================
+USER NAVIGATION STYLES SECTION
+===================================================================== */
+
 .user-nav {
     display: flex;
     align-items: center;
@@ -167,7 +182,10 @@ body {
     margin-left: auto;
 }
 
-/* ===== USER DROPDOWN STYLES ===== */
+/* =====================================================================
+USER DROPDOWN STYLES SECTION
+===================================================================== */
+
 .user-info {
     padding: 12px 16px;
     display: flex;
@@ -353,7 +371,7 @@ body {
     margin: 0.5rem 0;
 }
 
-/* Mobile Menu */
+/* Mobile Menu Styles */
 .hambtn {
     display: none;
     background: none;
@@ -364,7 +382,10 @@ body {
     color: var(--text);
 }
 
-/* ===== MINIBAR STYLES ===== */
+/* =====================================================================
+MINIBAR STYLES SECTION
+===================================================================== */
+
 .minibar {
     position: fixed;
     left: 0;
@@ -518,13 +539,16 @@ body {
     background: var(--accent-hover);
 }
 
-/* Animacion */
+/* Animation Styles */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== LAYOUT STYLES ===== */
+/* =====================================================================
+LAYOUT STYLES SECTION
+===================================================================== */
+
 .layout {
     max-width: var(--maxw);
     margin: 0 auto;
@@ -533,17 +557,19 @@ body {
     gap: 1.5rem;
     padding: 2rem 1rem 2rem 5rem; /* Left padding for minibar */
     min-height: calc(100vh - 56px);
-   /* margin-left: 60px; */ 
 }
 
-/* ===== LEFT SIDEBAR STYLES ===== */
+/* =====================================================================
+LEFT SIDEBAR STYLES SECTION
+===================================================================== */
+
 .leftbar {
     position: sticky;
     top: 88px;
     height: fit-content;
 }
 
-/* Navigation Menu */
+/* Navigation Menu Styles */
 .section--navigation {
     padding: 0;
     background: var(--card);
@@ -602,7 +628,7 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Profile Card */
+/* Profile Card Styles */
 .profilecard {
     background: var(--card);
     padding: 1.5rem;
@@ -639,7 +665,7 @@ body {
     line-height: 1.4;
 }
 
-/* Sections */
+/* Section Styles */
 .section {
     background: var(--card);
     padding: 1.25rem;
@@ -657,7 +683,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Lists */
+/* List Styles */
 .taglist, .topiclist, .resourceList {
     list-style: none;
 }
@@ -700,12 +726,15 @@ body {
     color: var(--accent);
 }
 
-/* ===== MAIN CONTENT STYLES ===== */
+/* =====================================================================
+MAIN CONTENT STYLES SECTION
+===================================================================== */
+
 .content {
     min-height: 400px;
 }
 
-/* Hero Section */
+/* Hero Section Styles */
 .hero {
     background: var(--card);
     padding: 2rem;
@@ -730,7 +759,7 @@ body {
     line-height: 1.5;
 }
 
-/* Feed Controls */
+/* Feed Controls Styles */
 .feed-controls {
     display: flex;
     justify-content: space-between;
@@ -794,7 +823,10 @@ body {
     border-color: var(--accent);
 }
 
-/* ===== ARTICLE STYLES ===== */
+/* =====================================================================
+ARTICLE STYLES SECTION
+===================================================================== */
+
 .articles {
     display: flex;
     flex-direction: column;
@@ -920,7 +952,10 @@ body {
     font-weight: 500;
 }
 
-/* ===== RIGHT SIDEBAR STYLES ===== */
+/* =====================================================================
+RIGHT SIDEBAR STYLES SECTION
+===================================================================== */
+
 .rightbar {
     position: sticky;
     top: 88px;
@@ -942,7 +977,7 @@ body {
     color: var(--text);
 }
 
-/* Promo Card */
+/* Promo Card Styles */
 .promo {
     background: linear-gradient(135deg, #3b49df, #6a75e6);
     color: white;
@@ -982,7 +1017,7 @@ body {
     line-height: 1.4;
 }
 
-/* Small Lists */
+/* Small Lists Styles */
 .small-list {
     list-style: none;
 }
@@ -1023,7 +1058,10 @@ body {
     line-height: 1.4;
 }
 
-/* ===== FOOTER STYLES ===== */
+/* =====================================================================
+FOOTER STYLES SECTION
+===================================================================== */
+
 .sitefooter {
     margin-top: 3rem;
     padding: 2rem 1rem;
@@ -1057,7 +1095,10 @@ body {
     color: var(--accent);
 }
 
-/* ===== UTILITY STYLES ===== */
+/* =====================================================================
+UTILITY STYLES SECTION
+===================================================================== */
+
 .loading {
     text-align: center;
     padding: 3rem;
@@ -1068,7 +1109,10 @@ body {
     box-shadow: var(--shadow);
 }
 
-/* ===== RESPONSIVE STYLES ===== */
+/* =====================================================================
+RESPONSIVE STYLES SECTION
+===================================================================== */
+
 @media (max-width: 1024px) {
     .layout {
         grid-template-columns: 200px 1fr;
@@ -1200,45 +1244,48 @@ body {
     }
 }
 
-/*menu lateral*/
-    .contenedor {
-      display: flex;
-    }
-    
-    .subnav {
-      width: 220px;
-      background-color: #f5f5f5;
-      padding: 15px;
-      border-right: 1px solid #e9e9ff;
-      height: 100vh; /*para que ocupe toda la altura */
-      position: sticky; /* para que quede fij0 al hacer scroll */
-      top: 0;
-    }
-    
-    .subnav ul {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .subnav li {
-      margin-bottom: 10px;
-    }
-    
-    .subnav a {
-      text-decoration: none;
-      color: #333;
-      font-weight: 600;
-      display: block;
-      padding: 8px 10px;/*paqnoseveatanpegado*/
-      border-radius: 8px;
-      transition: background-color 0.2s;/*para que el cambio de color al pasar el mouse sea mas suave*/
-    }
-    
-    .subnav a:hover {
-      background-color: #3b49df1a;/*al pasar el mouse se cambia el color:))))))))))*/
-    }
-    
-    main {
-      flex: 1;
-      padding: 20px;
-    }
+/* =====================================================================
+LATERAL MENU STYLES SECTION
+===================================================================== */
+
+.contenedor {
+    display: flex;
+}
+
+.subnav {
+    width: 220px;
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-right: 1px solid #e9e9ff;
+    height: 100vh; /* Para que ocupe toda la altura */
+    position: sticky; /* Para que quede fijo al hacer scroll */
+    top: 0;
+}
+
+.subnav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.subnav li {
+    margin-bottom: 10px;
+}
+
+.subnav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    display: block;
+    padding: 8px 10px; /* Para que no se vea tan pegado */
+    border-radius: 8px;
+    transition: background-color 0.2s; /* Para que el cambio de color al pasar el mouse sea más suave */
+}
+
+.subnav a:hover {
+    background-color: #3b49df1a; /* Al pasar el mouse se cambia el color */
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+}

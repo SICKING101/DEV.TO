@@ -8,145 +8,145 @@
     <title>Iniciar Sesión</title>
 </head>
 <body>
-    <main>
     <!-- ===== MINIBAR ===== -->
-<aside class="minibar" id="minibar">
-    <nav class="minibar__nav">
-        <ul class="minibar__list">
+    <aside class="minibar" id="minibar">
+        <nav class="minibar__nav">
+            <ul class="minibar__list">
 
-            <!-- Item: DEV Community -->
-            <li class="minibar__item minibar__item--active">
-                <a href="#" class="minibar__link" data-preview="DEV Community">
-                    <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
-                </a>
-                <div class="minibar__preview">
-                    <div class="preview__header">
-                        <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
-                    </div>
-                    <div class="preview__content">
-                        <h3 class="preview__title">DEV Community</h3>
-                        <p class="preview__description">
-                            A space to discuss and keep up with software development and manage your software career.
-                        </p>
-                        <button class="preview__btn">Follow</button>
-                    </div>
-                </div>
-            </li>
+                <!-- Item: DEV Community -->
+                <li class="minibar__item minibar__item--active">
+                    <a href="#" class="minibar__link" data-preview="DEV Community">
+                        <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
+                    </a>
+                    <article class="minibar__preview">
+                        <header class="preview__header">
+                            <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
+                        </header>
+                        <section class="preview__content">
+                            <h3 class="preview__title">DEV Community</h3>
+                            <p class="preview__description">
+                                A space to discuss and keep up with software development and manage your software career.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
 
-            <!-- Item: Future -->
-            <li class="minibar__item">
-                <a href="#" class="minibar__link" data-preview="Future">
-                    <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </a>
-                <div class="minibar__preview">
-                    <div class="preview__icon-wrapper">
-                        <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                <!-- Item: Future -->
+                <li class="minibar__item">
+                    <a href="#" class="minibar__link" data-preview="Future">
+                        <svg class="minibar__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" />
                             <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                    </div>
-                    <div class="preview__content">
-                        <h3 class="preview__title">Future</h3>
-                        <p class="preview__description">
-                            News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
-                        </p>
-                        <button class="preview__btn">Follow</button>
-                    </div>
-                </div>
-            </li>
+                    </a>
+                    <article class="minibar__preview">
+                        <figure class="preview__icon-wrapper">
+                            <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </figure>
+                        <section class="preview__content">
+                            <h3 class="preview__title">Future</h3>
+                            <p class="preview__description">
+                                News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
+                            </p>
+                            <button class="preview__btn">Follow</button>
+                        </section>
+                    </article>
+                </li>
 
-        </ul>
-    </nav>
-</aside>
-</main>
-    <div class="login-container">
-        <div style="text-align: center; margin-bottom: 20px;">
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN LOGIN CONTENT ===== -->
+    <main class="login-container">
+        <figure style="text-align: center; margin-bottom: 20px;">
             <img src="/IMAGENES/dev-black.png" alt="DEV Logo" width="60" height="60">
-        </div>
+        </figure>
 
-        <div class="login-header">
+        <header class="login-header">
             <h1>Únete a nuestra Comunidad</h1>
             <p>Nuestra comunidad tiene más de <span class="highlight">3,152,305</span> desarrolladores increíbles</p>
-        </div>
+        </header>
 
-        <div class="login-card">
-            <div class="social-login">
+        <section class="login-card">
+            <section class="social-login">
                 <button type="button" class="social-btn apple">
-                    <i class="fab fa-apple" style="margin-right: 8px;"></i>
+                    <i class="fab fa-apple" aria-hidden="true" style="margin-right: 8px;"></i>
                     Continuar con Apple
                 </button>
-                <button type="button" class="social-btn facebook">
-                    <i class="fab fa-facebook" style="margin-right: 8px;"></i>
+                <button type="button" class="social-btn facebook" onclick="window.location.href='/auth/facebook'">
+                    <i class="fab fa-facebook" aria-hidden="true" style="margin-right: 8px;"></i>
                     Continuar con Facebook
                 </button>
                 <button type="button" class="social-btn github" onclick="window.location.href='/auth/github'">
-                    <i class="fab fa-github" style="margin-right: 8px;"></i>
+                    <i class="fab fa-github" aria-hidden="true" style="margin-right: 8px;"></i>
                     Continuar con GitHub
                 </button>
                 <button type="button" class="social-btn twitter">
-                    <i class="fab fa-twitter" style="margin-right: 8px;"></i>
+                    <i class="fab fa-twitter" aria-hidden="true" style="margin-right: 8px;"></i>
                     Continuar con Twitter
                 </button>
                 <a href="/auth/google" class="social-google">
-                <button type="button" class="social-btn google">
-                    <i class="fab fa-google" style="margin-right: 8px;"></i>
-                    Continuar con Google
-                </button>
-            </a>
+                    <button type="button" class="social-btn google">
+                        <i class="fab fa-google" aria-hidden="true" style="margin-right: 8px;"></i>
+                        Continuar con Google
+                    </button>
+                </a>
                 <button type="button" class="social-btn linkedin">
-                    <i class="fab fa-linkedin" style="margin-right: 8px;"></i>
+                    <i class="fab fa-linkedin" aria-hidden="true" style="margin-right: 8px;"></i>
                     Continuar con LinkedIn
                 </button>
-            </div>
+            </section>
 
-            <div class="divider">
-                <span>OR</span>
-            </div>
+            <hr class="divider">
 
             <form id="loginForm">
-                <div id="message" class="message"></div>
+                <output id="message" class="message"></output>
 
-                <div class="form-section">
+                <fieldset class="form-section">
                     <label class="form-label" for="username">USUARIO</label>
                     <input type="text" id="username" name="username" class="form-input" required>
-                </div>
+                </fieldset>
 
-                <div class="form-section">
+                <fieldset class="form-section">
                     <label class="form-label" for="password">CONTRASEÑA</label>
                     <input type="password" id="password" name="password" class="form-input" required>
-                </div>
+                </fieldset>
 
-                <div style="text-align: right; margin-bottom: 16px;">
+                <p style="text-align: right; margin-bottom: 16px;">
                     <a href="#" style="font-size: 14px; color: #3b49df; text-decoration: none;">¿Olvidaste tu contraseña?</a>
-                </div>
+                </p>
 
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Recordarme</label>
-                </div>
+                <menu class="remember-me">
+                    <li>
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Recordarme</label>
+                    </li>
+                </menu>
 
                 <button type="submit" class="login-btn">INICIAR SESIÓN</button>
 
-                <div class="register-link">
+                <nav class="register-link">
                     <a href="signup.html">¿No tienes una cuenta? Regístrate</a>
-                </div>
+                </nav>
             </form>
 
-            <div class="terms">
+            <footer class="terms">
                 Al iniciar sesión, aceptas nuestra <a href="#">política de privacidad</a> y <a href="#">términos de uso</a>
-            </div>
-        </div>
-    </div>
+            </footer>
+        </section>
+    </main>
 
-    <script src="/scripts"></script>
+    <script src="/scripts.js"></script>
 </body>
 </html>

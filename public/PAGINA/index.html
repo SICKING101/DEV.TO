@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <!-- =====================================================================
+    HEAD SECTION
+    ===================================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -10,7 +13,9 @@
 </head>
 
 <body>
-    <!-- ===== HEADER / NAVIGATION ===== -->
+    <!-- =====================================================================
+    HEADER / NAVIGATION SECTION
+    ===================================================================== -->
     <header class="topbar">
         <nav class="topbar__inner">
             <!-- Logo -->
@@ -20,62 +25,62 @@
 
             <!-- Search Bar -->
             <form class="search" role="search">
-                <i class="search__icon fas fa-search"></i>
+                <i class="search__icon fas fa-search" aria-hidden="true"></i>
                 <input class="search__input" id="searchInput" type="search" placeholder="Search...">
             </form>
 
             <!-- Authentication Actions (Logged Out) -->
-            <section class="actions" id="authActions">
+            <nav class="actions" id="authActions">
                 <a href="/Login.html" class="btn btn--outline">Log in</a>
                 <a href="signup.html" class="btn btn--primary">Create account</a>
-            </section>
+            </nav>
 
             <!-- User Navigation (Logged In) -->
-            <section class="user-nav" id="userNav" style="display: none;">
+            <nav class="user-nav" id="userNav" style="display: none;">
                 <button class="btn btn--primary btn--create-post" id="createPostBtn">
-                    <i class="fas fa-edit"></i> Create Post
+                    <i class="fas fa-edit" aria-hidden="true"></i> Create Post
                 </button>
-                <button class="icon-btn" id="notificationsBtn">
-                    <i class="fas fa-bell"></i>
+                <button class="icon-btn" id="notificationsBtn" aria-label="Notifications">
+                    <i class="fas fa-bell" aria-hidden="true"></i>
                 </button>
                 <nav class="user-menu">
                     <img id="userAvatar" src="/IMAGENES/default-avatar.png" alt="User Avatar" class="user-avatar">
-                    <menu class="user-dropdown" id="userDropdown">
-                        <!-- Información del usuario -->
+                    <ul class="user-dropdown" id="userDropdown">
+                        <!-- User Information -->
                         <li class="user-info">
-                            <div class="user-info__details">
-                                <div class="user-info__name" id="dropdownUsername">Username</div>
-                               <!-- <div class="user-info__email" id="dropdownEmail">user@example.com</div> -->
-                            </div>
+                            <section class="user-info__details">
+                                <span class="user-info__name" id="dropdownUsername">Username</span>
+                            </section>
                         </li>
                         <li class="dropdown-divider"></li>
 
-                        <!-- Opciones del menú -->
-                        <li><a href="/dashboard" class="dropdown-item"><i class="fas fa-chart-line"></i> Dashboard</a>
-                        </li>
-                        <li><a href="/createPost" class="dropdown-item"><i class="fas fa-edit"></i> Create Post</a></li>
-                        <li><a href="/readingList" class="dropdown-item"><i class="fas fa-bookmark"></i> Reading
-                                list</a></li>
-                        <li><a href="/PERFIL/settings.html" class="dropdown-item"><i class="fas fa-cog"></i>
-                                Settings</a></li>
+                        <!-- Menu Options -->
+                        <li><a href="/dashboard" class="dropdown-item"><i class="fas fa-chart-line" aria-hidden="true"></i> Dashboard</a></li>
+                        <li><a href="/createPost" class="dropdown-item"><i class="fas fa-edit" aria-hidden="true"></i> Create Post</a></li>
+                        <li><a href="/readingList" class="dropdown-item"><i class="fas fa-bookmark" aria-hidden="true"></i> Reading list</a></li>
+                        <li><a href="/PERFIL/settings.html" class="dropdown-item"><i class="fas fa-cog" aria-hidden="true"></i> Settings</a></li>
                         <li class="dropdown-divider"></li>
 
-                        <!-- Cerrar sesión -->
+                        <!-- Logout -->
                         <li><a href="/logout" class="dropdown-item dropdown-item--logout">
-                                <i class="fas fa-sign-out-alt"></i> Sign out
+                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sign out
                             </a></li>
-                    </menu>
+                    </ul>
                 </nav>
-            </section>
+            </nav>
 
             <!-- Mobile Menu Toggle -->
             <button class="hambtn" id="menuToggle" aria-label="menu">☰</button>
         </nav>
     </header>
 
-    <!-- ===== MAIN LAYOUT ===== -->
+    <!-- =====================================================================
+    MAIN LAYOUT SECTION
+    ===================================================================== -->
     <main class="layout">
-        <!-- ===== MINIBAR ===== -->
+        <!-- =====================================================================
+        MINIBAR SECTION
+        ===================================================================== -->
         <aside class="minibar" id="minibar">
             <nav class="minibar__nav">
                 <ul class="minibar__list">
@@ -85,20 +90,20 @@
                         <a href="#" class="minibar__link" data-preview="DEV Community">
                             <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
                         </a>
-                        <div class="minibar__preview">
-                            <div class="preview__header">
+                        <article class="minibar__preview">
+                            <header class="preview__header">
                                 <img src="/IMAGENES/dev-header.png" alt="DEV Community Header"
                                     class="preview__header-image">
-                            </div>
-                            <div class="preview__content">
+                            </header>
+                            <section class="preview__content">
                                 <h3 class="preview__title">DEV Community</h3>
                                 <p class="preview__description">
                                     A space to discuss and keep up with software development and manage your software
                                     career.
                                 </p>
                                 <button class="preview__btn">Follow</button>
-                            </div>
-                        </div>
+                            </section>
+                        </article>
                     </li>
 
                     <!-- Item: Future -->
@@ -112,8 +117,8 @@
                                     stroke-linejoin="round" />
                             </svg>
                         </a>
-                        <div class="minibar__preview">
-                            <div class="preview__icon-wrapper">
+                        <article class="minibar__preview">
+                            <figure class="preview__icon-wrapper">
                                 <svg class="preview__icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
@@ -121,48 +126,48 @@
                                     <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
-                            </div>
-                            <div class="preview__content">
+                            </figure>
+                            <section class="preview__content">
                                 <h3 class="preview__title">Future</h3>
                                 <p class="preview__description">
                                     News and discussion of science and technology such as AI, VR, cryptocurrency,
                                     quantum computing, and more.
                                 </p>
                                 <button class="preview__btn">Follow</button>
-                            </div>
-                        </div>
+                            </section>
+                        </article>
                     </li>
 
                 </ul>
             </nav>
         </aside>
 
-        <!-- ===== LEFT SIDEBAR CONTENT ===== -->
-        <!-- Left Sidebar -->
+        <!-- =====================================================================
+        LEFT SIDEBAR SECTION
+        ===================================================================== -->
         <aside class="leftbar" id="leftbar">
 
-            <!--menu lateral-->
-            <section class="contenedor">
-                <aside class="subnav">
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">DEV++</a></li>
-                        <li><a href="#">Podcast</a></li>
-                        <li><a href="#">Videos</a></li>
-                        <li><a href="#">DEV Education Tracks</a></li>
-                        <li><a href="#">DEV Challenges</a></li>
-                        <li><a href="#">DEV Help</a></li>
-                        <li><a href="#">Advertise on DEV</a></li>
-                        <li><a href="#">DEV Showcase</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Free Postgres Database</a></li>
-                        <li><a href="#">Software comparisons</a></li>
-                        <li><a href="#">Forem Shop</a></li>
-                    </ul>
-                </aside>
-            </section>
+            <!-- Lateral Menu -->
+            <nav class="contenedor">
+                <ul class="subnav">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">DEV++</a></li>
+                    <li><a href="#">Podcast</a></li>
+                    <li><a href="#">Videos</a></li>
+                    <li><a href="#">DEV Education Tracks</a></li>
+                    <li><a href="#">DEV Challenges</a></li>
+                    <li><a href="#">DEV Help</a></li>
+                    <li><a href="#">Advertise on DEV</a></li>
+                    <li><a href="#">DEV Showcase</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Free Postgres Database</a></li>
+                    <li><a href="#">Software comparisons</a></li>
+                    <li><a href="#">Forem Shop</a></li>
+                </ul>
+            </nav>
 
+            <!-- Popular Tags Section -->
             <section class="section">
                 <h3 class="section__title">Popular Tags</h3>
                 <ul class="taglist" id="popularTags">
@@ -170,6 +175,7 @@
                 </ul>
             </section>
 
+            <!-- Topics Section -->
             <section class="section">
                 <h3 class="section__title">Topics</h3>
                 <ul class="topiclist">
@@ -181,6 +187,7 @@
                 </ul>
             </section>
 
+            <!-- Resources Section -->
             <section class="section">
                 <h3 class="section__title">Resources</h3>
                 <ul class="resourceList">
@@ -191,7 +198,9 @@
             </section>
         </aside>
 
-        <!-- ===== MAIN CONTENT ===== -->
+        <!-- =====================================================================
+        MAIN CONTENT SECTION
+        ===================================================================== -->
         <section class="content">
             <!-- Hero Section -->
             <header class="hero">
@@ -202,13 +211,13 @@
                 </section>
             </header>
 
-            <!-- Feed Controls -->
-            <section class="feed-controls">
-                <nav class="tabs">
+            <!-- Feed Controls Section -->
+            <nav class="feed-controls">
+                <menu class="tabs">
                     <button class="tab tab--active" data-view="latest">Latest</button>
                     <button class="tab" data-view="top">Top</button>
                     <button class="tab" data-view="trending">Trending</button>
-                </nav>
+                </menu>
 
                 <label class="sort">
                     Sort:
@@ -217,7 +226,7 @@
                         <option value="popular">Most Popular</option>
                     </select>
                 </label>
-            </section>
+            </nav>
 
             <!-- Articles Section -->
             <section id="articles" class="articles">
@@ -225,9 +234,11 @@
             </section>
         </section>
 
-        <!-- ===== RIGHT SIDEBAR ===== -->
+        <!-- =====================================================================
+        RIGHT SIDEBAR SECTION
+        ===================================================================== -->
         <aside class="rightbar">
-            <!-- Promo Card -->
+            <!-- Promo Card Section -->
             <article class="card promo">
                 <p class="promo__tag">REGISTRATION OPEN • STARTS NOW TO</p>
                 <h3 class="promo__title">Kaggle G</h3>
@@ -262,7 +273,9 @@
         </aside>
     </main>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- =====================================================================
+    FOOTER SECTION
+    ===================================================================== -->
     <footer class="sitefooter">
         <section class="sitefooter__inner">
             <p>&copy; 2025 DEV Community</p>
@@ -274,7 +287,9 @@
         </section>
     </footer>
 
-    <!-- ===== JAVASCRIPT ===== -->
+    <!-- =====================================================================
+    JAVASCRIPT SECTION
+    ===================================================================== -->
     <script src="/PAGINA/scriptsPG.js"></script>
 </body>
 
