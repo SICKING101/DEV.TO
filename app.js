@@ -5,8 +5,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const passport = require('./passportConfig'); // Configuración de Passport (Google y GitHub)
-const bcrypt = require('bcrypt');
+const passport = require('./passportConfig');
 const mongoose = require('mongoose');
 const User = require('./public/user');
 const app = express();
@@ -14,30 +13,29 @@ const app = express();
 /******************************************************
  *             CONFIGURACIÓN DE MIDDLEWARES
  ******************************************************/
-// Analiza cuerpos JSON y formularios
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Configuración de sesiones (Importante para Passport)
+// Configuración de sesiones MEJORADA
 app.use(session({
-    secret: 'your-secret-key', // Cambia por una clave segura
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // Expira en 24 horas
+    secret: 'dev-community-secret-key-2024',
+    resave: true,
+    saveUninitialized: true,
+    cookie: { 
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true
+    }
 }));
 
-// Inicializar Passport (para Google y GitHub Login)
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Servir archivos estáticos desde la carpeta "public"
 app.use(express.static(path.join(__dirname, 'public')));
 
 /******************************************************
  *              CONEXIÓN A MONGODB
  ******************************************************/
 const mongo_url = 'mongodb://localhost/mongo1_curso';
-
 mongoose.connect(mongo_url)
     .then(() => console.log(`✅ Conectado a MongoDB en ${mongo_url}`))
     .catch((err) => console.error('❌ Error al conectar a MongoDB:', err));
@@ -45,17 +43,17 @@ mongoose.connect(mongo_url)
 /******************************************************
  *                RUTAS PRINCIPALES
  ******************************************************/
-// Ruta raíz: redirige según el estado de sesión
 app.get('/', (req, res) => {
-    if (req.session.user) {
+    console.log('🔵 Ruta / - Sesión:', req.session.user, 'Autenticado Passport:', req.isAuthenticated());
+    if (req.session.user || req.isAuthenticated()) {
         res.sendFile(path.join(__dirname, 'public', 'PAGINA', 'index.html'));
     } else {
         res.sendFile(path.join(__dirname, 'public', 'Login.html'));
     }
 });
 
-// Ruta directa al index
 app.get('/index', (req, res) => {
+    console.log('🔵 Ruta /index - Sesión:', req.session.user);
     res.sendFile(path.join(__dirname, 'public', 'PAGINA', 'index.html'));
 });
 
@@ -66,19 +64,16 @@ app.post('/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-        // Validaciones básicas
         if (!username || !password)
             return res.status(400).send('Usuario y contraseña son requeridos');
 
         if (password.length < 6)
             return res.status(400).send('La contraseña debe tener al menos 6 caracteres');
 
-        // Verificar si el usuario ya existe
         const existingUser = await User.findOne({ username });
         if (existingUser)
             return res.status(400).send('El usuario ya existe');
 
-        // Crear y guardar nuevo usuario
         const user = new User({ username, email, password });
         await user.save();
 
@@ -99,12 +94,10 @@ app.post('/authenticate', async (req, res) => {
         if (!username || !password)
             return res.status(400).send('Usuario y contraseña son requeridos');
 
-        // Buscar usuario
         const user = await User.findOne({ username });
         if (!user)
             return res.status(401).send('Usuario y/o contraseña incorrectos');
 
-        // Verificar contraseña
         user.isCorrectPassword(password, (err, result) => {
             if (err) {
                 console.error('Error al verificar contraseña:', err);
@@ -112,7 +105,6 @@ app.post('/authenticate', async (req, res) => {
             }
 
             if (result) {
-                // Guardar usuario en sesión
                 req.session.user = {
                     id: user._id,
                     username: user.username,
@@ -136,105 +128,196 @@ app.post('/authenticate', async (req, res) => {
 });
 
 /******************************************************
- *              CIERRE DE SESIÓN (LOGOUT)
+ *              CIERRE DE SESIÓN (COMPLETAMENTE CORREGIDO)
  ******************************************************/
 app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err)
-            return res.status(500).send('Error al cerrar sesión');
-        res.redirect('/');
+    console.log('🔵 Iniciando logout completo...');
+    
+    // 1. Cerrar sesión de Passport PRIMERO
+    req.logout(function(err) {
+        if (err) {
+            console.error('❌ Error en req.logout:', err);
+        }
+        console.log('✅ Passport logout completado');
+        
+        // 2. Destruir la sesión de Express
+        req.session.destroy(function(err) {
+            if (err) {
+                console.error('❌ Error al destruir sesión:', err);
+                return res.status(500).send('Error al cerrar sesión');
+            }
+            console.log('✅ Sesión Express destruida');
+            
+            // 3. Limpiar la cookie de sesión
+            res.clearCookie('connect.sid');
+            console.log('✅ Cookie limpiada');
+            
+            // 4. Redirigir al login
+            res.redirect('/');
+        });
     });
 });
 
 /******************************************************
- *         RUTA PARA OBTENER DATOS DEL USUARIO
+ *         RUTA PARA OBTENER DATOS DEL USUARIO (CORREGIDA)
  ******************************************************/
 app.get('/api/user', (req, res) => {
+    console.log('🔵 /api/user - Sesión:', req.session.user, 'Autenticado Passport:', req.isAuthenticated());
+    
+    // PRIORIDAD 1: Usuario en sesión Express
     if (req.session.user) {
-        res.json({ user: req.session.user });
-    } else if (req.isAuthenticated() && req.user) {
-        // Si Passport lo autenticó (Google/GitHub/Facebook)
-        const { id, username, email, displayName, profilePicture, authProvider } = req.user;
-        res.json({
-            user: {
-                id,
-                username,
-                email,
-                displayName,
-                profilePicture,
-                authProvider
-            }
-        });
-    } else {
-        res.json({ user: null });
+        console.log('✅ Retornando usuario de sesión Express');
+        return res.json({ user: req.session.user });
     }
+    
+    // PRIORIDAD 2: Usuario autenticado con Passport
+    if (req.isAuthenticated() && req.user) {
+        console.log('✅ Retornando usuario de Passport');
+        const userData = {
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email || `${req.user.username}@devcommunity.com`,
+            profilePicture: req.user.profilePicture || '/IMAGENES/default-avatar.png',
+            authProvider: req.user.authProvider || 'OAuth'
+        };
+        
+        // Sincronizar con sesión Express para consistencia
+        req.session.user = userData;
+        
+        return res.json({ user: userData });
+    }
+    
+    // PRIORIDAD 3: No autenticado
+    console.log('❌ Usuario no autenticado');
+    res.json({ user: null });
 });
 
 /******************************************************
- *        AUTENTICACIÓN CON GOOGLE (PASSPORT)
+ *        AUTENTICACIÓN CON GOOGLE (COMPLETAMENTE CORREGIDA)
  ******************************************************/
 app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
+    (req, res, next) => {
+        console.log('🔵 Iniciando autenticación Google...');
+        next();
+    },
+    passport.authenticate('google', { 
+        scope: ['profile', 'email']
+    })
 );
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/Login.html' }),
+    passport.authenticate('google', { 
+        failureRedirect: '/Login.html'
+    }),
     (req, res) => {
-        // Guardar usuario en sesión con correo
-        req.session.user = {
+        console.log('🔵 Autenticación Google exitosa, usuario:', req.user);
+        
+        if (!req.user) {
+            console.error('❌ No hay objeto usuario después de Google auth');
+            return res.redirect('/Login.html');
+        }
+
+        const userSessionData = {
             id: req.user._id,
             username: req.user.username,
             email: req.user.email || `${req.user.username}@gmail.com`,
-            profilePicture: req.user.profilePicture,
+            profilePicture: req.user.profilePicture || '/IMAGENES/default-avatar.png',
             authProvider: 'Google'
         };
-        res.redirect('/index');
+
+        console.log('🔵 Configurando sesión para Google:', userSessionData);
+        
+        // Guardar en sesión Express
+        req.session.user = userSessionData;
+        
+        // Redirigir con parámetro para que el frontend detecte el login
+        res.redirect('/index?oauth=google&t=' + Date.now());
     }
 );
 
 /******************************************************
- *        AUTENTICACIÓN CON FACEBOOK (PASSPORT) - CORREGIDO
+ *        AUTENTICACIÓN CON FACEBOOK (COMPLETAMENTE CORREGIDA)
  ******************************************************/
 app.get('/auth/facebook', 
-    passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
+    (req, res, next) => {
+        console.log('🔵 Iniciando autenticación Facebook...');
+        next();
+    },
+    passport.authenticate('facebook', { 
+        scope: ['email', 'public_profile']
+    })
 );
 
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { 
-        failureRedirect: '/Login.html',
-        session: true
+        failureRedirect: '/Login.html'
     }),
     (req, res) => {
-        // Guardar usuario en sesión
-        req.session.user = {
+        console.log('🔵 Autenticación Facebook exitosa, usuario:', req.user);
+        
+        if (!req.user) {
+            console.error('❌ No hay objeto usuario después de Facebook auth');
+            return res.redirect('/Login.html');
+        }
+
+        const userSessionData = {
             id: req.user._id,
             username: req.user.username,
             email: req.user.email || `${req.user.username}@facebook.com`,
-            profilePicture: req.user.profilePicture || req.user.avatar,
+            profilePicture: req.user.profilePicture || '/IMAGENES/default-avatar.png',
             authProvider: 'Facebook'
         };
-        res.redirect('/index');
+
+        console.log('🔵 Configurando sesión para Facebook:', userSessionData);
+        
+        // Guardar en sesión Express
+        req.session.user = userSessionData;
+        
+        // Redirigir con parámetro para que el frontend detecte el login
+        res.redirect('/index?oauth=facebook&t=' + Date.now());
     }
 );
 
 /******************************************************
- *        AUTENTICACIÓN CON GITHUB (PASSPORT)
+ *        AUTENTICACIÓN CON GITHUB (COMPLETAMENTE CORREGIDA)
  ******************************************************/
 app.get('/auth/github',
-    passport.authenticate('github', { scope: ['user:email'] })
+    (req, res, next) => {
+        console.log('🔵 Iniciando autenticación GitHub...');
+        next();
+    },
+    passport.authenticate('github', { 
+        scope: ['user:email']
+    })
 );
 
 app.get('/auth/github/callback',
-    passport.authenticate('github', { failureRedirect: '/Login.html' }),
+    passport.authenticate('github', { 
+        failureRedirect: '/Login.html'
+    }),
     (req, res) => {
-        req.session.user = {
+        console.log('🔵 Autenticación GitHub exitosa, usuario:', req.user);
+        
+        if (!req.user) {
+            console.error('❌ No hay objeto usuario después de GitHub auth');
+            return res.redirect('/Login.html');
+        }
+
+        const userSessionData = {
             id: req.user._id,
             username: req.user.username,
             email: req.user.email || `${req.user.username}@github.com`,
-            profilePicture: req.user.profilePicture,
+            profilePicture: req.user.profilePicture || '/IMAGENES/default-avatar.png',
             authProvider: 'GitHub'
         };
-        res.redirect('/index');
+
+        console.log('🔵 Configurando sesión para GitHub:', userSessionData);
+        
+        // Guardar en sesión Express
+        req.session.user = userSessionData;
+        
+        // Redirigir con parámetro para que el frontend detecte el login
+        res.redirect('/index?oauth=github&t=' + Date.now());
     }
 );
 
@@ -243,9 +326,10 @@ app.get('/auth/github/callback',
  ******************************************************/
 app.listen(3000, () => {
     console.log('🚀 Servidor iniciado en el puerto 3000');
+    console.log('📱 URLs de autenticación:');
+    console.log('   🔵 Facebook: http://localhost:3000/auth/facebook');
+    console.log('   🔵 Google: http://localhost:3000/auth/google');
+    console.log('   🔵 GitHub: http://localhost:3000/auth/github');
 });
 
-/******************************************************
- *                 EXPORTAR APP 
- ******************************************************/
 module.exports = app;

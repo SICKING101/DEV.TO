@@ -1,17 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-    <!-- =====================================================================
-    HEAD SECTION
-    ===================================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/PAGINA/stylesPG.css">
-    <title>DEV Community</title>
-</head>
+    <style>
+        /* =====================================================================
+   SECCION 2: MAIN CONTENT - DASHBOARD
+   ===================================================================== */
 
+/* Layout Principal */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 60px);
+    background-color: var(--bg);
+}
+
+.container {
+    flex: 1;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Dashboard Grid */
+.dashboard {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+}
+
+.sidebar-section {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.sidebar-section h3 {
+    padding: 16px 20px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+}
+
+.sidebar-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-list li {
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-list li:last-child {
+    border-bottom: none;
+}
+
+.sidebar-list a {
+    display: block;
+    padding: 12px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: var(--card);
+}
+
+.sidebar-list a:hover {
+    background: #f8f9fa;
+    color: var(--accent);
+}
+
+/* Main Content */
+.main-content {
+    min-height: 600px;
+}
+
+/* Stats Grid */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+}
+
+/* Content Section */
+.content-section {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 0;
+    overflow: hidden;
+}
+
+.content-section h2 {
+    padding: 16px 24px;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+}
+
+/* Empty State */
+.empty-state {
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.empty-state p {
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Botones */
+.btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .sidebar {
+        position: static;
+        order: 2;
+    }
+    
+    .main-content {
+        order: 1;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-value {
+        font-size: 28px;
+    }
+    
+    .empty-state {
+        padding: 32px 16px;
+    }
+}
+    </style>
+    <title>Dashboard - Dev.to Clone</title>
+</head>
 <body>
     <!-- =====================================================================
     SECCION 1: HEADER / NAVEGACION (TOPBAR)
@@ -423,172 +627,62 @@
         </section>
     </aside>
 
-        <!-- =====================================================================
-         SECCION 3: LEFTBAR
-        ===================================================================== -->
-        <aside class="leftbar" id="leftbar">
-
-            <!-- Lateral Menu -->
-            <nav class="contenedor">
-    <ul class="subnav">
-        <li><a href="#"><span class="emoji">🏠</span> Home</a></li>
-        <li><a href="#"><span class="emoji">🛠️</span> DEV++</a></li>
-        <li><a href="#"><span class="emoji">📚</span> Reading List</a></li>
-        <li><a href="#"><span class="emoji">🎙️</span> Podcasts</a></li>
-        <li><a href="#"><span class="emoji">📹</span> Videos</a></li>
-        <li><a href="#"><span class="emoji">🎓</span> DEV Education Tracks</a></li>
-        <li><a href="#"><span class="emoji">🏆</span> DEV Challenges</a></li>
-        <li><a href="#"><span class="emoji">❓</span> DEV Help</a></li>
-        <li><a href="#"><span class="emoji">📢</span> Advertise on DEV</a></li>
-        <li><a href="#"><span class="emoji">⭐</span> DEV Showcase</a></li>
-        <li><a href="#"><span class="emoji">ℹ️</span> About</a></li>
-        <li><a href="#"><span class="emoji">📧</span> Contact</a></li>
-        <li><a href="#"><span class="emoji">🛒</span> Forem Shop</a></li>
-    </ul>
-</nav>
-
-            <!-- Popular Tags Section -->
-            <section class="section">
-                <h3 class="section__title">Popular Tags</h3>
-                <ul class="taglist" id="popularTags">
-                    <!-- Tags will be populated by JS -->
-                </ul>
-            </section>
-
-            <!-- Topics Section -->
-            <section class="section">
-                <h3 class="section__title">Topics</h3>
-                <ul class="topiclist">
-                    <li class="topiclist__item"><a href="#" class="topiclist__link">#javascript</a></li>
-                    <li class="topiclist__item"><a href="#" class="topiclist__link">#webdev</a></li>
-                    <li class="topiclist__item"><a href="#" class="topiclist__link">#python</a></li>
-                    <li class="topiclist__item"><a href="#" class="topiclist__link">#devops</a></li>
-                    <li class="topiclist__item"><a href="#" class="topiclist__link">#machinelearning</a></li>
-                </ul>
-            </section>
-
-            <!-- Resources Section -->
-            <section class="section">
-                <h3 class="section__title">Resources</h3>
-                <ul class="resourceList">
-                    <li class="resourceList__item"><a href="#" class="resourceList__link">Style Guide</a></li>
-                    <li class="resourceList__item"><a href="#" class="resourceList__link">Community Rules</a></li>
-                    <li class="resourceList__item"><a href="#" class="resourceList__link">Advertising</a></li>
-                </ul>
-            </section>
-        </aside>
-
-        <!-- =====================================================================
-        SECCION 4: CONTENT 
-        ===================================================================== -->
-        <section class="content">
-            <!-- Hero Section -->
-            <header class="hero">
-                <section class="hero__inner">
-                    <h1 class="hero__title">DEV Community is a community of 3,555,904 amazing developers</h1>
-                    <p class="hero__description">We're a place where coders share, stay up-to-date and grow their
-                        careers.</p>
+    <!-- Contenedor Principal del Dashboard -->
+    <section class="container">
+        <article class="dashboard">
+            <!-- Sidebar de Navegación -->
+            <aside class="sidebar">
+                <section class="sidebar-section">
+                    <h3>Posts</h3>
+                    <nav aria-label="Post management navigation">
+                        <ul class="sidebar-list">
+                            <li><a href="#series">Series</a></li>
+                            <li><a href="#followers">Followers</a></li>
+                            <li><a href="#following-tags">Following tags</a></li>
+                            <li><a href="#following-users">Following users</a></li>
+                            <li><a href="#following-organizations">Following organizations</a></li>
+                            <li><a href="#following-podcasts">Following podcasts</a></li>
+                            <li><a href="#analytics">Analytics</a></li>
+                            <li><a href="#hidden-tags">Hidden tags</a></li>
+                        </ul>
+                    </nav>
                 </section>
-            </header>
+            </aside>
 
-            <!-- Feed Controls Section -->
-            <nav class="feed-controls">
-                <menu class="tabs">
-                    <button class="tab tab--active" data-view="latest">Latest</button>
-                    <button class="tab" data-view="top">Top</button>
-                    <button class="tab" data-view="trending">Trending</button>
-                </menu>
+            <!-- Contenido Principal -->
+            <section class="main-content">
+                <!-- Estadísticas -->
+                <section class="stats" aria-label="Post statistics">
+                    <article class="stat-card">
+                        <h4 class="stat-value">0</h4>
+                        <p class="stat-label">Total post reactions</p>
+                    </article>
+                    
+                    <article class="stat-card">
+                        <h4 class="stat-value">0</h4>
+                        <p class="stat-label">Total post comments</p>
+                    </article>
+                    
+                    <article class="stat-card">
+                        <h4 class="stat-value">&lt; 500</h4>
+                        <p class="stat-label">Total post views</p>
+                    </article>
+                </section>
 
-                <label class="sort">
-                    Sort:
-                    <select class="sort__select" id="sortSelect">
-                        <option value="new">Newest</option>
-                        <option value="popular">Most Popular</option>
-                    </select>
-                </label>
-            </nav>
-
-            <!-- Articles Section -->
-            <section id="articles" class="articles">
-                <p class="loading" id="loading">Loading articles...</p>
+                <!-- Sección de Posts -->
+                <section class="content-section">
+                    <header>
+                        <h2>Posts</h2>
+                    </header>
+                    
+                    <section class="empty-state">
+                        <p>This is where you can manage your posts, but you haven't written anything yet.</p>
+                        <button class="btn" aria-label="Write your first post">Write your first post now</button>
+                    </section>
+                </section>
             </section>
-        </section>
-
-        <!-- =====================================================================
-        SECCION 5: RIGHTBAR
-        ===================================================================== -->
-        <aside class="rightbar">
-            <!-- Promo Card Section -->
-            <article class="card promo">
-                <p class="promo__tag">REGISTRATION OPEN • STARTS NOW TO</p>
-                <h3 class="promo__title">Kaggle G</h3>
-                <p class="promo__desc">AI Agents Intensive Course Writing Challenge</p>
-                <button class="btn btn--white">Learn More</button>
-            </article>
-
-            <!-- Challenges Section -->
-            <section class="card">
-                <h4 class="card__title">Challenges</h4>
-                <ul class="small-list">
-                    <li class="small-list__item">
-                        <p><strong>Just Launched!</strong></p>
-                        <a href="#" class="small-list__link">Agentic Postgres Challenge with Tiger Data: $3,000 in
-                            Prizes!</a>
-                        <p class="challenge-desc">Build something experimental that showcases Agentic Postgres in a
-                            creative way.</p>
-                    </li>
-                </ul>
-            </section>
-
-            <!-- Happening Now Section -->
-            <section class="card">
-                <h4 class="card__title">Happening Now</h4>
-                <ul class="small-list">
-                    <li class="small-list__item"><a href="#" class="small-list__link">Frontend Challenge: Halloween
-                            Edition</a></li>
-                    <li class="small-list__item"><a href="#" class="small-list__link">Frontend Challenge: Halloween
-                            Edition</a></li>
-                </ul>
-            </section>
-        </aside>
-    </main>
-
-    <!-- =====================================================================
-    FOOTER SECTION
-    ===================================================================== -->
-    <footer class="sitefooter">
-        <section class="sitefooter__inner">
-            <p>&copy; 2025 DEV Community</p>
-            <nav class="sitefooter__nav">
-                <a href="#" class="sitefooter__link">About</a>
-                <a href="#" class="sitefooter__link">Privacy</a>
-                <a href="#" class="sitefooter__link">Terms</a>
-            </nav>
-        </section>
-    </footer>
-
-        <!-- =====================================================================
-    SECCION 6: LOGOUT CONFIRMATION MODAL 
-    ===================================================================== -->
-    <dialog class="modal" id="logoutModal">
-        <article class="modal__content">
-            <header class="modal__header">
-                <h3 class="modal__title">Sign out</h3>
-            </header>
-            <section class="modal__body">
-                <p class="modal__text">Are you sure you want to sign out?</p>
-            </section>
-            <footer class="modal__footer">
-                <button class="btn btn--outline" id="cancelLogout">Cancel</button>
-                <button class="btn btn--primary" id="confirmLogout">Yes, sign out</button>
-            </footer>
         </article>
-    </dialog>
-
-    <!-- =====================================================================
-    JAVASCRIPT SECTION
-    ===================================================================== -->
-    <script src="/PAGINA/scriptsPG.js"></script>
+    </section>
+    <script src="/PERFIL/JAVASCRIPT/scriptsPF.js"></script>
 </body>
-
 </html>

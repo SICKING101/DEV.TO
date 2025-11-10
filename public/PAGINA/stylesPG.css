@@ -1,5 +1,5 @@
 /* =====================================================================
-CSS VARIABLES SECTION
+SECCION 1: CSS VARIABLES
 ===================================================================== */
 
 :root {
@@ -19,7 +19,7 @@ CSS VARIABLES SECTION
 }
 
 /* =====================================================================
-RESET & BASE STYLES SECTION
+SECCION 2: RESET & BASE STYLES
 ===================================================================== */
 
 * {
@@ -38,7 +38,7 @@ body {
 }
 
 /* =====================================================================
-HEADER STYLES SECTION
+SECCION 3: HEADER STYLES
 ===================================================================== */
 
 .topbar {
@@ -114,7 +114,7 @@ HEADER STYLES SECTION
 }
 
 /* =====================================================================
-BUTTON STYLES SECTION
+SECCION 4: BUTTON STYLES
 ===================================================================== */
 
 .btn {
@@ -172,7 +172,7 @@ BUTTON STYLES SECTION
 }
 
 /* =====================================================================
-USER NAVIGATION STYLES SECTION
+SECCION 5: USER NAVIGATION
 ===================================================================== */
 
 .user-nav {
@@ -183,7 +183,7 @@ USER NAVIGATION STYLES SECTION
 }
 
 /* =====================================================================
-USER DROPDOWN STYLES SECTION
+SECCION 6: USER DROPDOWN
 ===================================================================== */
 
 .user-info {
@@ -383,170 +383,231 @@ USER DROPDOWN STYLES SECTION
 }
 
 /* =====================================================================
-MINIBAR STYLES SECTION
+    SECCION 7: MINIBAR STYLES
 ===================================================================== */
+        .minibar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 64px;
+            height: 100vh;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            padding: 0.75rem 0;
+            display: flex;
+            flex-direction: column;
+        }
 
-.minibar {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 60px;
-    height: 100%;
-    background: #fff;
-    border-right: 1px solid var(--border);
-    z-index: 2;
-    padding: 1rem 0;
-}
+        .minibar__nav {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
 
-.minibar__nav {
-    height: 100%;
-}
+        .minibar__nav::-webkit-scrollbar {
+            width: 4px;
+        }
 
-.minibar__list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-}
+        .minibar__nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-.minibar__item {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
+        .minibar__nav::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
 
-.minibar__link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius);
-    transition: all 0.2s ease;
-    text-decoration: none;
-    position: relative;
-    color: inherit;
-}
+        .minibar__nav::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
 
-.minibar__link:hover {
-    background: #f5f5f5;
-    transform: scale(1.05);
-}
+        .minibar__list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0;
+            padding: 0;
+        }
 
-.minibar__item--active .minibar__link {
-    background: #f5f6fd;
-    color: var(--accent);
-}
+        .minibar__item {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
 
-.minibar__image {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    object-fit: cover;
-}
+        .minibar__link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            color: inherit;
+            cursor: pointer;
+        }
 
-.minibar__icon {
-    color: currentColor;
-    width: 24px;
-    height: 24px;
-}
+        .minibar__link:hover {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
 
-.minibar__preview {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    width: 320px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    display: none;
-    z-index: 950;
-    margin-left: 8px;
-    overflow: hidden;
-    animation: fadeIn 0.2s ease-in-out;
-}
+        .minibar__item--active .minibar__link {
+            background: #f5f6fd;
+            color: var(--accent);
+        }
 
-.minibar__item--preview .minibar__preview {
-    display: block;
-}
+        .minibar__image {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
 
-.preview__header {
-    width: 100%;
-    height: 160px;
-    overflow: hidden;
-    border-radius: var(--radius) var(--radius) 0 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+        .minibar__icon {
+            color: currentColor;
+            width: 24px;
+            height: 24px;
+        }
 
-.preview__header-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
+        /* PREVIEW */
+        .minibar__preview {
+            position: fixed;
+            left: 76px;
+            width: 320px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 9999;
+            overflow: hidden;
+            pointer-events: auto;
+            animation: fadeIn 0.2s ease-out;
+        }
 
-.preview__icon-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem 0 1rem;
-    background: #f8f9fa;
-}
+        .minibar__item:hover .minibar__preview {
+            display: block;
+        }
 
-.preview__icon {
-    color: var(--accent);
-    width: 64px;
-    height: 64px;
-}
+        .preview__header {
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
 
-.preview__content {
-    padding: 1.5rem;
-}
+        .preview__header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
-.preview__title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text);
-}
+        .preview__icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem 0 1rem;
+            background: #f8f9fa;
+        }
 
-.preview__description {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    line-height: 1.4;
-}
+        .preview__icon {
+            color: var(--accent);
+            width: 48px;
+            height: 48px;
+        }
 
-.preview__btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-size: 0.9rem;
-}
+        .preview__content {
+            padding: 1.25rem;
+        }
 
-.preview__btn:hover {
-    background: var(--accent-hover);
-}
+        .preview__title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
 
-/* Animation Styles */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        .preview__description {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .preview__btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .preview__btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* BOTONES ADICIONALES */
+        .minibar__footer {
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .minibar__action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--muted);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .minibar__action-btn:hover {
+            background: #f5f5f5;
+            color: var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateX(-10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
 
 /* =====================================================================
-LAYOUT STYLES SECTION
+SECCION 8: LAYOUT STYLES
 ===================================================================== */
 
 .layout {
@@ -560,7 +621,7 @@ LAYOUT STYLES SECTION
 }
 
 /* =====================================================================
-LEFT SIDEBAR STYLES SECTION
+SECCION 9: LEFTBAR STYLES
 ===================================================================== */
 
 .leftbar {
@@ -727,7 +788,7 @@ LEFT SIDEBAR STYLES SECTION
 }
 
 /* =====================================================================
-MAIN CONTENT STYLES SECTION
+SECCION 10: CONTENT STYLES
 ===================================================================== */
 
 .content {
@@ -824,7 +885,7 @@ MAIN CONTENT STYLES SECTION
 }
 
 /* =====================================================================
-ARTICLE STYLES SECTION
+SECCION 11: ARTICLE STYLES
 ===================================================================== */
 
 .articles {
@@ -953,7 +1014,7 @@ ARTICLE STYLES SECTION
 }
 
 /* =====================================================================
-RIGHT SIDEBAR STYLES SECTION
+SECCION 12: RIGHTBAR STYLES
 ===================================================================== */
 
 .rightbar {
@@ -1059,7 +1120,7 @@ RIGHT SIDEBAR STYLES SECTION
 }
 
 /* =====================================================================
-FOOTER STYLES SECTION
+SECCION 13: FOOTER STYLES
 ===================================================================== */
 
 .sitefooter {
@@ -1096,7 +1157,7 @@ FOOTER STYLES SECTION
 }
 
 /* =====================================================================
-UTILITY STYLES SECTION
+SECCION 14: UTILITY STYLES
 ===================================================================== */
 
 .loading {
@@ -1110,7 +1171,7 @@ UTILITY STYLES SECTION
 }
 
 /* =====================================================================
-RESPONSIVE STYLES SECTION
+SECCION 15: RESPONSIVE STYLES - BASIC
 ===================================================================== */
 
 @media (max-width: 1024px) {
@@ -1245,7 +1306,7 @@ RESPONSIVE STYLES SECTION
 }
 
 /* =====================================================================
-LATERAL MENU STYLES SECTION
+SECCION 16: LATERAL MENU STYLES
 ===================================================================== */
 
 .contenedor {
@@ -1260,6 +1321,15 @@ LATERAL MENU STYLES SECTION
     height: 100vh; /* Para que ocupe toda la altura */
     position: sticky; /* Para que quede fijo al hacer scroll */
     top: 0;
+    list-style: none;
+}
+
+.subnav .emoji {
+    font-size: 18px;
+    width: 20px;
+    display: inline-block;
+    text-align: center;
+    margin-right: 8px;
 }
 
 .subnav ul {
@@ -1288,4 +1358,87 @@ LATERAL MENU STYLES SECTION
 main {
     flex: 1;
     padding: 20px;
+}
+
+/* =====================================================================
+SECCION 17: MODAL STYLES
+===================================================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+}
+
+.modal[open] {
+    display: flex;
+}
+
+.modal__content {
+    background: var(--card);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-width: 420px;
+    width: 100%;
+    border: 1px solid var(--border);
+    animation: modalFadeIn 0.15s ease-out;
+}
+
+.modal__header {
+    padding: 1.25rem 1.5rem 0;
+    border: none;
+}
+
+.modal__title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+    text-align: center;
+}
+
+.modal__body {
+    padding: 0 1.5rem;
+    border: none;
+}
+
+.modal__text {
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.modal__footer {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    border: none;
+}
+
+.modal__footer .btn {
+    min-width: 80px;
+    height: 36px;
+    font-weight: 500;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
