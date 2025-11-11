@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - DEV Community</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/PERFIL/CSS/stylesCP.css">
+</head>
+<body>
+    <main class="create-post-container">
+        <header class="header">
+            <h1>Create Post</h1>
+            <nav class="actions">
+                <button class="btn btn--outline" id="saveDraftBtn">Save draft</button>
+                <button class="btn btn--primary" id="publishBtn">Publish</button>
+            </nav>
+        </header>
+
+        <form id="postForm" enctype="multipart/form-data">
+            <!-- Cover Image Section -->
+            <section class="form-group">
+                <label class="form-label">Add a cover image</label>
+                <figure class="cover-image-section" id="coverImageSection">
+                    <i class="fas fa-image"></i>
+                    <figcaption>Click to upload a cover image</figcaption>
+                    <input type="file" id="coverImageInput" accept="image/*" class="hidden">
+                    <img id="coverImagePreview" class="cover-image-preview" alt="Cover image preview">
+                </figure>
+            </section>
+
+            <!-- Title Section -->
+            <section class="form-group">
+                <label for="postTitle" class="form-label">Post Title</label>
+                <input type="text" id="postTitle" class="form-input" placeholder="Write your post title here..." required>
+            </section>
+
+            <!-- Content Section -->
+            <section class="form-group">
+                <label for="postContent" class="form-label">Write your post content here...</label>
+                <nav class="editor-toolbar">
+                    <button type="button" class="toolbar-btn" data-command="bold" title="Bold"><i class="fas fa-bold"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="italic" title="Italic"><i class="fas fa-italic"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="insertOrderedList" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="createLink" title="Link"><i class="fas fa-link"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="formatBlock" data-value="pre" title="Code Block"><i class="fas fa-code"></i></button>
+                </nav>
+                <textarea id="postContent" class="form-textarea" placeholder="Start writing your post content here... You can use Markdown formatting." required></textarea>
+            </section>
+
+            <!-- Tags Section -->
+            <section class="form-group">
+                <label for="postTags" class="form-label">Add up to 4 tags...</label>
+                <input type="text" id="postTags" class="form-tags" placeholder="Add tags (separated by commas)">
+                <output class="tags-container" id="tagsContainer"></output>
+            </section>
+
+            <!-- Messages -->
+            <section id="errorMessage" class="error-message hidden" role="alert"></section>
+            <section id="successMessage" class="success-message hidden" role="status"></section>
+
+            <!-- Loading -->
+            <section id="loading" class="loading hidden">
+                <i class="fas fa-spinner fa-spin"></i> Publishing...
+            </section>
+        </form>
+
+        <!-- Publishing Tips -->
+        <aside class="publishing-tips">
+            <h3>Publishing Tips</h3>
+            <ul>
+                <li>Ensure your post has a cover image set to make the most of the home feed and social media platforms.</li>
+                <li>Share your post on social media platforms or with your co-workers or local communities.</li>
+                <li>Ask people to leave questions for you in the comments. It's a great way to spark additional discussion.</li>
+                <li>Consider describing personally why you wrote it or why people might find it helpful.</li>
+            </ul>
+        </aside>
+    </main>
+
+    <script src="/PERFIL/JAVASCRIPT/scriptsCP.js"></script>
+</body>
+</html>
