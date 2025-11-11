@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - DEV Community</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #242424;
+            line-height: 1.6;
+        }
+
+        .create-post-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn--outline {
+            background: white;
+            border: 1px solid #3b49df;
+            color: #3b49df;
+        }
+
+        .btn--primary {
+            background: #3b49df;
+            color: white;
+        }
+
+        .btn--primary:hover {
+            background: #2f3ab2;
+        }
+
+        .btn--outline:hover {
+            background: #f5f5ff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-input, .form-textarea, .form-tags {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-tags:focus {
+            outline: none;
+            border-color: #3b49df;
+        }
+
+        .form-textarea {
+            min-height: 400px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .cover-image-section {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .cover-image-section:hover {
+            border-color: #3b49df;
+        }
+
+        .cover-image-section i {
+            font-size: 48px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .cover-image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .toolbar-btn {
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: #e9ecef;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            color: #666;
+        }
+
+        .tag-remove:hover {
+            color: #ff0000;
+        }
+
+        .publishing-tips {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #3b49df;
+        }
+
+        .publishing-tips h3 {
+            margin-bottom: 10px;
+            color: #3b49df;
+        }
+
+        .publishing-tips ul {
+            list-style-position: inside;
+            color: #666;
+        }
+
+        .publishing-tips li {
+            margin-bottom: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="create-post-container">
+        <header class="header">
+            <h1>Create Post</h1>
+            <div class="actions">
+                <button class="btn btn--outline" id="saveDraftBtn">Save draft</button>
+                <button class="btn btn--primary" id="publishBtn">Publish</button>
+            </div>
+        </header>
+
+        <form id="postForm" enctype="multipart/form-data">
+            <!-- Cover Image Section -->
+            <div class="form-group">
+                <label class="form-label">Add a cover image</label>
+                <div class="cover-image-section" id="coverImageSection">
+                    <i class="fas fa-image"></i>
+                    <p>Click to upload a cover image</p>
+                    <input type="file" id="coverImageInput" accept="image/*" class="hidden">
+                    <img id="coverImagePreview" class="cover-image-preview">
+                </div>
+            </div>
+
+            <!-- Title Section -->
+            <div class="form-group">
+                <label for="postTitle" class="form-label">Post Title</label>
+                <input type="text" id="postTitle" class="form-input" placeholder="Write your post title here..." required>
+            </div>
+
+            <!-- Content Section -->
+            <div class="form-group">
+                <label for="postContent" class="form-label">Write your post content here...</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="toolbar-btn" data-command="bold" title="Bold"><i class="fas fa-bold"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="italic" title="Italic"><i class="fas fa-italic"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="insertOrderedList" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="createLink" title="Link"><i class="fas fa-link"></i></button>
+                    <button type="button" class="toolbar-btn" data-command="formatBlock" data-value="pre" title="Code Block"><i class="fas fa-code"></i></button>
+                </div>
+                <textarea id="postContent" class="form-textarea" placeholder="Start writing your post content here... You can use Markdown formatting." required></textarea>
+            </div>
+
+            <!-- Tags Section -->
+            <div class="form-group">
+                <label for="postTags" class="form-label">Add up to 4 tags...</label>
+                <input type="text" id="postTags" class="form-tags" placeholder="Add tags (separated by commas)">
+                <div class="tags-container" id="tagsContainer"></div>
+            </div>
+
+            <!-- Messages -->
+            <div id="errorMessage" class="error-message hidden"></div>
+            <div id="successMessage" class="success-message hidden"></div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading hidden">
+                <i class="fas fa-spinner fa-spin"></i> Publishing...
+            </div>
+        </form>
+
+        <!-- Publishing Tips -->
+        <aside class="publishing-tips">
+            <h3>Publishing Tips</h3>
+            <ul>
+                <li>Ensure your post has a cover image set to make the most of the home feed and social media platforms.</li>
+                <li>Share your post on social media platforms or with your co-workers or local communities.</li>
+                <li>Ask people to leave questions for you in the comments. It's a great way to spark additional discussion.</li>
+                <li>Consider describing personally why you wrote it or why people might find it helpful.</li>
+            </ul>
+        </aside>
+    </div>
+
+    <script>
+        class CreatePost {
+            constructor() {
+                this.currentTags = [];
+                this.maxTags = 4;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.checkAuthentication();
+            }
+
+            checkAuthentication() {
+                fetch('/api/user')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.user) {
+                            window.location.href = '/';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking authentication:', error);
+                        window.location.href = '/';
+                    });
+            }
+
+            bindEvents() {
+                // Cover image
+                document.getElementById('coverImageSection').addEventListener('click', () => {
+                    document.getElementById('coverImageInput').click();
+                });
+
+                document.getElementById('coverImageInput').addEventListener('change', (e) => {
+                    this.handleCoverImage(e.target.files[0]);
+                });
+
+                // Tags
+                document.getElementById('postTags').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        this.addTag();
+                    }
+                });
+
+                document.getElementById('postTags').addEventListener('blur', () => {
+                    this.addTag();
+                });
+
+                // Toolbar buttons
+                document.querySelectorAll('.toolbar-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.handleToolbarClick(e.target.closest('button'));
+                    });
+                });
+
+                // Form actions
+                document.getElementById('saveDraftBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.savePost(false);
+                });
+
+                document.getElementById('publishBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.savePost(true);
+                });
+            }
+
+            handleCoverImage(file) {
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        this.showMessage('Please select an image file', 'error');
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        this.showMessage('Image size must be less than 5MB', 'error');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = document.getElementById('coverImagePreview');
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        document.querySelector('#coverImageSection i').style.display = 'none';
+                        document.querySelector('#coverImageSection p').style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            addTag() {
+                const input = document.getElementById('postTags');
+                const tagText = input.value.trim().toLowerCase();
+
+                if (tagText && tagText.length > 0) {
+                    if (this.currentTags.length >= this.maxTags) {
+                        this.showMessage(`Maximum ${this.maxTags} tags allowed`, 'error');
+                        return;
+                    }
+
+                    if (this.currentTags.includes(tagText)) {
+                        this.showMessage('Tag already added', 'error');
+                        return;
+                    }
+
+                    this.currentTags.push(tagText);
+                    this.renderTags();
+                    input.value = '';
+                }
+            }
+
+            removeTag(tag) {
+                this.currentTags = this.currentTags.filter(t => t !== tag);
+                this.renderTags();
+            }
+
+            renderTags() {
+                const container = document.getElementById('tagsContainer');
+                container.innerHTML = '';
+
+                this.currentTags.forEach(tag => {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag';
+                    tagElement.innerHTML = `
+                        ${tag}
+                        <span class="tag-remove" onclick="createPost.removeTag('${tag}')">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    container.appendChild(tagElement);
+                });
+            }
+
+            handleToolbarClick(button) {
+                const command = button.dataset.command;
+                const value = button.dataset.value;
+                
+                document.getElementById('postContent').focus();
+                
+                try {
+                    if (command === 'formatBlock' && value) {
+                        document.execCommand(command, false, value);
+                    } else {
+                        document.execCommand(command, false, null);
+                    }
+                } catch (error) {
+                    console.error('Error executing command:', error);
+                }
+            }
+
+            async savePost(publish = false) {
+                const title = document.getElementById('postTitle').value.trim();
+                const content = document.getElementById('postContent').value.trim();
+                const coverImage = document.getElementById('coverImageInput').files[0];
+
+                if (!title) {
+                    this.showMessage('Post title is required', 'error');
+                    return;
+                }
+
+                if (!content) {
+                    this.showMessage('Post content is required', 'error');
+                    return;
+                }
+
+                if (title.length > 200) {
+                    this.showMessage('Title must be less than 200 characters', 'error');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+                formData.append('published', publish);
+                formData.append('tags', this.currentTags.join(','));
+
+                if (coverImage) {
+                    formData.append('coverImage', coverImage);
+                }
+
+                this.showLoading(true);
+                this.hideMessages();
+
+                try {
+                    const response = await fetch('/api/posts', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        this.showMessage(result.message, 'success');
+                        
+                        if (publish) {
+                            setTimeout(() => {
+                                window.location.href = '/index';
+                            }, 1500);
+                        }
+                    } else {
+                        this.showMessage(result.error || 'Error creating post', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showMessage('Network error. Please try again.', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            showMessage(message, type) {
+                const errorDiv = document.getElementById('errorMessage');
+                const successDiv = document.getElementById('successMessage');
+
+                if (type === 'error') {
+                    errorDiv.textContent = message;
+                    errorDiv.classList.remove('hidden');
+                    successDiv.classList.add('hidden');
+                } else {
+                    successDiv.textContent = message;
+                    successDiv.classList.remove('hidden');
+                    errorDiv.classList.add('hidden');
+                }
+
+                if (type === 'success') {
+                    setTimeout(() => {
+                        successDiv.classList.add('hidden');
+                    }, 5000);
+                }
+            }
+
+            hideMessages() {
+                document.getElementById('errorMessage').classList.add('hidden');
+                document.getElementById('successMessage').classList.add('hidden');
+            }
+
+            showLoading(show) {
+                const loading = document.getElementById('loading');
+                const publishBtn = document.getElementById('publishBtn');
+                const saveDraftBtn = document.getElementById('saveDraftBtn');
+
+                if (show) {
+                    loading.classList.remove('hidden');
+                    publishBtn.disabled = true;
+                    saveDraftBtn.disabled = true;
+                } else {
+                    loading.classList.add('hidden');
+                    publishBtn.disabled = false;
+                    saveDraftBtn.disabled = false;
+                }
+            }
+        }
+
+        const createPost = new CreatePost();
+    </script>
+</body>
+</html>
