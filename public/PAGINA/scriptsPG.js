@@ -2544,7 +2544,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(init, 100);
 });
 
-// Inicialización adicional para el dropdown del usuario
+// Inicialización adicional para el dropdown del usuariou
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM cargado. Inicializando dropdown...");
   initUserDropdown();
