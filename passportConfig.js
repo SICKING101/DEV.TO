@@ -1,5 +1,5 @@
 /******************************************************
- *          CONFIGURACIÓN DE AUTENTICACIÓN 
+ *          CONFIGURACION DE AUTENTICACION 
  ******************************************************/
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -62,6 +62,10 @@ async (req, accessToken, refreshToken, profile, done) => {
             }
         }
 
+        // 🔥 GENERAR Y GUARDAR TOKEN JWT
+        const token = await user.generateAuthToken('facebook');
+        console.log('🔑 Token JWT generado y guardado en BD:', token);
+
         console.log('✅ Usuario retornado por Facebook strategy:', user);
         return done(null, user);
     } catch (err) {
@@ -69,6 +73,7 @@ async (req, accessToken, refreshToken, profile, done) => {
         return done(err, null);
     }
 }));
+
 
 /******************************************************
  *             ESTRATEGIA DE GOOGLE (MEJORADA)
@@ -86,7 +91,6 @@ async (req, accessToken, refreshToken, profile, done) => {
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {
-            // Buscar por email también
             if (profile.emails && profile.emails[0]) {
                 user = await User.findOne({ email: profile.emails[0].value });
             }
@@ -108,12 +112,15 @@ async (req, accessToken, refreshToken, profile, done) => {
                 console.log('✅ Usuario existente vinculado con Google:', user.username);
             }
         } else {
-            // Usuario encontrado, asegurar que tenga authProvider
             if (!user.authProvider) {
                 user.authProvider = 'Google';
                 await user.save();
             }
         }
+
+        // 🔥 GENERAR Y GUARDAR TOKEN JWT
+        const token = await user.generateAuthToken('google');
+        console.log('🔑 Token JWT generado y guardado en BD:', token);
 
         console.log('✅ Usuario retornado por Google strategy:', user);
         return done(null, user);
@@ -122,6 +129,7 @@ async (req, accessToken, refreshToken, profile, done) => {
         return done(err, null);
     }
 }));
+
 
 /******************************************************
  *             ESTRATEGIA DE GITHUB (MEJORADA)
@@ -164,6 +172,10 @@ async (req, accessToken, refreshToken, profile, done) => {
             }
         }
 
+        // 🔥 GENERAR Y GUARDAR TOKEN JWT
+        const token = await user.generateAuthToken('github');
+        console.log('🔑 Token JWT generado y guardado en BD:', token);
+
         console.log('✅ Usuario retornado por GitHub strategy:', user);
         return done(null, user);
     } catch (err) {
@@ -172,8 +184,9 @@ async (req, accessToken, refreshToken, profile, done) => {
     }
 }));
 
+
 /******************************************************
- *       SERIALIZACIÓN Y DESERIALIZACIÓN
+ *       SERIALIZACION Y DESERIALIZACION
  ******************************************************/
 passport.serializeUser((user, done) => {
     console.log('🔵 Serializando usuario ID:', user._id);
@@ -185,7 +198,9 @@ passport.deserializeUser(async (id, done) => {
         console.log('🔵 Deserializando usuario ID:', id);
         const user = await User.findById(id);
         if (!user) {
-            console.error('❌ Usuario no encontrado en deserializeUser');
+            console.error('❌ Usuario no encontrado. ID recibido:', id);
+            const allUsers = await User.find({});
+            console.log('📋 Usuarios actuales en BD:', allUsers.map(u => u._id));
             return done(new Error('Usuario no encontrado'), null);
         }
         done(null, user);

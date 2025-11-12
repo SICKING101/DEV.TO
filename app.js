@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const User = require('./public/user');
 const Post = require('./public/post');
 const multer = require('multer');
+const { authenticateJWT } = require('./config/jwtConfig');
 const app = express();
 
 /******************************************************
@@ -69,12 +70,25 @@ app.use(session({
     cookie: { 
         secure: false,
         maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true
-    }
+        httpOnly: true,
+        sameSite: 'lax'
+    },
+    name: 'devcommunity.sid'
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// 🔥 MIDDLEWARE PARA DEBUGGING DE SESIONES
+app.use((req, res, next) => {
+    console.log('🔍 Middleware de sesión - Estado:');
+    console.log('   - Session ID:', req.sessionID);
+    console.log('   - req.session.user:', req.session.user ? req.session.user.username : 'No');
+    console.log('   - req.isAuthenticated():', req.isAuthenticated());
+    console.log('   - req.user:', req.user ? req.user.username : 'No');
+    next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 /******************************************************
@@ -84,6 +98,52 @@ const mongo_url = 'mongodb://localhost/mongo1_curso';
 mongoose.connect(mongo_url)
     .then(() => console.log(`✅ Conectado a MongoDB en ${mongo_url}`))
     .catch((err) => console.error('❌ Error al conectar a MongoDB:', err));
+
+/******************************************************
+ *         MIDDLEWARE DE AUTENTICACIÓN HÍBRIDO
+ ******************************************************/
+const requireAuthHybrid = (req, res, next) => {
+    console.log('🔐 Middleware de autenticación híbrido ejecutándose...');
+    
+    // Primero verificar JWT
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const { verifyToken } = require('/config/jwtConfig');
+        
+        try {
+            const decoded = verifyToken(token);
+            req.user = decoded;
+            req.jwtToken = token;
+            req.authMethod = 'jwt';
+            console.log('✅ Autenticado via JWT:', decoded.username);
+            return next();
+        } catch (error) {
+            console.log('❌ JWT inválido, probando otros métodos...');
+        }
+    }
+    
+    // Si no hay JWT válido, verificar sesión
+    if (req.session.user) {
+        req.user = req.session.user;
+        req.authMethod = 'session';
+        console.log('✅ Autenticado via Session:', req.session.user.username);
+        return next();
+    }
+    
+    // Si no hay sesión, verificar Passport
+    if (req.isAuthenticated() && req.user) {
+        req.authMethod = 'passport';
+        console.log('✅ Autenticado via Passport:', req.user.username);
+        return next();
+    }
+    
+    console.log('❌ No autenticado - Sin JWT, sesión ni Passport');
+    return res.status(401).json({ 
+        success: false,
+        error: 'No autenticado. Por favor inicia sesión.' 
+    });
+};
 
 /******************************************************
  *                RUTAS PRINCIPALES
@@ -100,39 +160,303 @@ app.get('/index', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'PAGINA', 'index.html'));
 });
 
-app.get('/createPost', (req, res) => {
-    if (!req.session.user && !req.isAuthenticated()) {
-        return res.redirect('/');
-    }
+app.get('/createPost', requireAuthHybrid, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'PERFIL', 'createPost.html'));
 });
 
 /******************************************************
- *              RUTAS DE POSTS
+ *              RUTAS DE AUTENTICACIÓN CON JWT
  ******************************************************/
-
-// Crear nuevo post
-app.post('/api/posts', upload.single('coverImage'), async (req, res) => {
+app.post('/register', async (req, res) => {
     try {
-        console.log('=== INICIANDO CREACIÓN DE POST ===');
-        
-        if (!req.session.user && !req.isAuthenticated()) {
-            console.log('❌ Usuario no autenticado');
-            return res.status(401).json({ 
+        console.log('📝 === INICIANDO REGISTRO DE USUARIO ===');
+        const { username, email, password } = req.body;
+
+        console.log('📋 Datos recibidos:', { 
+            username, 
+            email: email || 'No proporcionado', 
+            password: password ? '***' : 'No proporcionada' 
+        });
+
+        if (!username || !password) {
+            console.log('❌ Faltan campos requeridos');
+            return res.status(400).json({ 
                 success: false,
-                error: 'Debes iniciar sesión para crear un post' 
+                error: 'Usuario y contraseña son requeridos' 
             });
         }
 
+        if (password.length < 6) {
+            console.log('❌ Contraseña muy corta');
+            return res.status(400).json({ 
+                success: false,
+                error: 'La contraseña debe tener al menos 6 caracteres' 
+            });
+        }
+
+        console.log('🔍 Verificando si el usuario existe...');
+        const existingUser = await User.findOne({ 
+            $or: [
+                { username: username },
+                { email: email }
+            ]
+        });
+
+        if (existingUser) {
+            console.log('❌ Usuario ya existe:', existingUser.username);
+            return res.status(400).json({ 
+                success: false,
+                error: 'El usuario o email ya están registrados. Por favor inicia sesión.' 
+            });
+        }
+
+        console.log('✅ Usuario no existe, creando nuevo usuario...');
+        const user = new User({ 
+            username, 
+            email: email || `${username}@devcommunity.com`, 
+            password 
+        });
+
+        await user.save();
+        console.log('✅ Usuario registrado exitosamente:', user.username);
+
+        res.status(200).json({
+            success: true,
+            message: 'Usuario registrado exitosamente. Ahora puedes iniciar sesión.'
+        });
+
+    } catch (err) {
+        console.error('❌ ERROR AL REGISTRAR USUARIO:', err);
+        
+        if (err.code === 11000) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'El usuario o email ya están registrados' 
+            });
+        }
+        
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ 
+                success: false,
+                error: 'Datos de usuario inválidos',
+                details: Object.values(err.errors).map(e => e.message)
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            error: 'Error interno del servidor al registrar usuario'
+        });
+    }
+});
+
+app.post('/authenticate', async (req, res) => {
+    try {
+        console.log('🔐 === INICIANDO AUTENTICACIÓN LOCAL CON JWT ===');
+        const { username, password, device = 'web' } = req.body;
+
+        console.log('📋 Datos de login:', { 
+            username, 
+            password: password ? '***' : 'No proporcionada',
+            device
+        });
+
+        if (!username || !password) {
+            console.log('❌ Faltan credenciales');
+            return res.status(400).json({ 
+                success: false,
+                error: 'Usuario y contraseña son requeridos' 
+            });
+        }
+
+        console.log('🔍 Buscando usuario en la base de datos...');
+        const user = await User.findOne({
+            $or: [
+                { username: username },
+                { email: username }
+            ]
+        });
+
+        if (!user) {
+            console.log('❌ Usuario no encontrado:', username);
+            return res.status(401).json({ 
+                success: false,
+                error: 'Usuario y/o contraseña incorrectos' 
+            });
+        }
+
+        console.log('✅ Usuario encontrado:', user.username);
+        console.log('🔑 Verificando contraseña...');
+
+        const isPasswordCorrect = await user.isCorrectPassword(password);
+        
+        if (!isPasswordCorrect) {
+            console.log('❌ Contraseña incorrecta para usuario:', user.username);
+            return res.status(401).json({ 
+                success: false,
+                error: 'Usuario y/o contraseña incorrectos' 
+            });
+        }
+
+        console.log('✅ Contraseña correcta, generando tokens...');
+
+        // Actualizar último login
+        await user.updateLastLogin();
+
+        // 🔥 GENERAR TOKEN JWT
+        const jwtToken = await user.generateAuthToken(device);
+        
+        // Configurar sesión (para compatibilidad)
+        req.session.user = {
+            id: user._id,
+            username: user.username,
+            email: user.email || `${user.username}@devcommunity.com`,
+            profilePicture: user.profilePicture || '/IMAGENES/default-avatar.png',
+            authProvider: 'local',
+            lastLogin: user.lastLogin
+        };
+
+        // Autenticar con Passport (para compatibilidad)
+        req.login(user, (err) => {
+            if (err) {
+                console.error('❌ Error en req.login:', err);
+                return res.status(500).json({ 
+                    success: false,
+                    error: 'Error al iniciar sesión' 
+                });
+            }
+
+            console.log('✅ Autenticación completa - Sesión, Passport y JWT configurados');
+            console.log('🔄 Redirigiendo a /index...');
+
+            res.json({
+                success: true,
+                message: 'Usuario autenticado correctamente',
+                user: req.session.user,
+                token: jwtToken, // 🔥 NUEVO: Incluir token JWT
+                expiresIn: '24h',
+                redirect: '/index'
+            });
+        });
+
+    } catch (err) {
+        console.error('❌ ERROR EN AUTENTICACIÓN:', err);
+        res.status(500).json({ 
+            success: false,
+            error: 'Error interno del servidor al autenticar usuario',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+});
+
+/******************************************************
+ *         ENDPOINTS JWT - NUEVOS
+ ******************************************************/
+app.get('/api/auth/verify', authenticateJWT, (req, res) => {
+    res.json({
+        success: true,
+        user: req.user,
+        message: 'Token JWT válido'
+    });
+});
+
+app.post('/api/auth/refresh', authenticateJWT, async (req, res) => {
+    try {
+        const oldToken = req.jwtToken;
+        const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'Usuario no encontrado'
+            });
+        }
+
+        await user.revokeToken(oldToken);
+        const newToken = await user.generateAuthToken(req.body.device || 'web');
+        
+        res.json({
+            success: true,
+            token: newToken,
+            expiresIn: '24h',
+            message: 'Token refrescado exitosamente'
+        });
+        
+    } catch (error) {
+        console.error('❌ Error refrescando token:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al refrescar token'
+        });
+    }
+});
+
+app.post('/api/auth/logout', authenticateJWT, async (req, res) => {
+    try {
+        const token = req.jwtToken;
+        const user = await User.findById(req.user.id);
+        
+        if (user) {
+            await user.revokeToken(token);
+        }
+        
+        req.session.destroy(() => {
+            req.logout(() => {
+                res.json({
+                    success: true,
+                    message: 'Sesión cerrada y token revocado exitosamente'
+                });
+            });
+        });
+        
+    } catch (error) {
+        console.error('❌ Error en logout JWT:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al cerrar sesión'
+        });
+    }
+});
+
+/******************************************************
+ *         RUTA PARA OBTENER DATOS DEL USUARIO
+ ******************************************************/
+app.get('/api/user', requireAuthHybrid, (req, res) => {
+    console.log('🔍 Estado de autenticación:');
+    console.log('   - Método:', req.authMethod);
+    console.log('   - User:', req.user.username);
+    
+    res.json({ 
+        user: req.user,
+        authMethod: req.authMethod
+    });
+});
+
+/******************************************************
+ *              RUTAS DE POSTS CON AUTENTICACIÓN HÍBRIDA
+ ******************************************************/
+// Crear nuevo post
+app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (req, res) => {
+    try {
+        console.log('=== INICIANDO CREACIÓN DE POST ===');
+        
         const { title, content, tags, published } = req.body;
-        const userId = req.session.user ? req.session.user.id : req.user._id;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
+        }
 
         console.log('📝 Datos recibidos:', {
             title: title ? `${title.substring(0, 50)}...` : 'Vacío',
             contentLength: content ? content.length : 0,
             tags: tags || 'No tags',
             published: published || 'false',
-            userId: userId
+            userId: userId,
+            authMethod: req.authMethod
         });
 
         if (!title || !title.trim()) {
@@ -179,10 +503,8 @@ app.post('/api/posts', upload.single('coverImage'), async (req, res) => {
         }
 
         console.log('💾 Guardando post en la base de datos...');
-
         const post = new Post(postData);
         await post.save();
-
         await post.populate('author', 'username profilePicture');
 
         console.log('✅ Post creado exitosamente - ID:', post._id);
@@ -214,6 +536,70 @@ app.post('/api/posts', upload.single('coverImage'), async (req, res) => {
             success: false,
             error: 'Error interno del servidor al crear el post',
             details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// Agregar reacción a post
+app.post('/api/posts/:id/reactions', requireAuthHybrid, async (req, res) => {
+    try {
+        console.log('🎭 === INICIANDO AGREGADO DE REACCIÓN ===');
+        
+        const { reactionType } = req.body;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
+        }
+        
+        const postId = req.params.id;
+
+        console.log('📝 Datos de reacción:', { 
+            userId, 
+            postId, 
+            reactionType,
+            authMethod: req.authMethod
+        });
+
+        const validReactions = ['like', 'unicorn', 'exploding_head', 'fire', 'heart', 'rocket'];
+        if (!validReactions.includes(reactionType)) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'Tipo de reacción inválido' 
+            });
+        }
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ 
+                success: false,
+                error: 'Post no encontrado' 
+            });
+        }
+
+        post.addReaction(userId, reactionType);
+        await post.save();
+
+        const reactionCounts = post.getReactionCounts();
+        const hasReacted = post.hasUserReacted(userId);
+
+        console.log('✅ Reacción agregada exitosamente');
+
+        res.json({
+            success: true,
+            reactionCounts,
+            hasReacted,
+            userReaction: reactionType
+        });
+    } catch (error) {
+        console.error('❌ Error al agregar reacción:', error);
+        res.status(500).json({ 
+            success: false,
+            error: 'Error al agregar reacción',
+            details: error.message 
         });
     }
 });
@@ -319,86 +705,29 @@ app.get('/api/posts/:id', async (req, res) => {
     }
 });
 
-// Agregar reacción a post
-app.post('/api/posts/:id/reactions', async (req, res) => {
-    try {
-        if (!req.session.user && !req.isAuthenticated()) {
-            return res.status(401).json({ 
-                success: false,
-                error: 'No autenticado' 
-            });
-        }
-
-        const { reactionType } = req.body;
-        const userId = req.session.user ? req.session.user.id : req.user._id;
-        const postId = req.params.id;
-
-        console.log('🎭 Agregando reacción:', { userId, postId, reactionType });
-
-        const validReactions = ['like', 'unicorn', 'exploding_head', 'fire', 'heart', 'rocket'];
-        if (!validReactions.includes(reactionType)) {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Tipo de reacción inválido' 
-            });
-        }
-
-        const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({ 
-                success: false,
-                error: 'Post no encontrado' 
-            });
-        }
-
-        post.addReaction(userId, reactionType);
-        await post.save();
-
-        const reactionCounts = post.getReactionCounts();
-        const hasReacted = post.hasUserReacted(userId);
-
-        res.json({
-            success: true,
-            reactionCounts,
-            hasReacted,
-            userReaction: reactionType
-        });
-    } catch (error) {
-        console.error('Error al agregar reacción:', error);
-        res.status(500).json({ 
-            success: false,
-            error: 'Error al agregar reacción',
-            details: error.message 
-        });
-    }
-});
-
-// =============================================
-// ENDPOINTS DE COMENTARIOS - CORREGIDOS
-// =============================================
-
-// Agregar comentario - VERSIÓN MEJORADA
-app.post('/api/posts/:id/comments', async (req, res) => {
+// Agregar comentario
+app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
     try {
         console.log('💬 === INICIANDO AGREGADO DE COMENTARIO ===');
         
-        if (!req.session.user && !req.isAuthenticated()) {
-            console.log('❌ Usuario no autenticado para comentar');
-            return res.status(401).json({ 
-                success: false,
-                error: 'Debes iniciar sesión para comentar' 
-            });
-        }
-
         const { content } = req.body;
-        const userId = req.session.user ? req.session.user.id : req.user._id;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
+        }
+        
         const postId = req.params.id;
 
         console.log('📝 Datos del comentario:', {
             postId,
             userId,
             contentLength: content ? content.length : 0,
-            contentPreview: content ? content.substring(0, 50) + '...' : 'Vacío'
+            contentPreview: content ? content.substring(0, 50) + '...' : 'Vacío',
+            authMethod: req.authMethod
         });
 
         if (!content || content.trim().length === 0) {
@@ -426,7 +755,6 @@ app.post('/api/posts/:id/comments', async (req, res) => {
 
         console.log('✅ Post encontrado, agregando comentario...');
 
-        // Crear el comentario
         const newComment = {
             userId: userId,
             content: content.trim(),
@@ -434,13 +762,11 @@ app.post('/api/posts/:id/comments', async (req, res) => {
             updatedAt: new Date()
         };
 
-        // Agregar el comentario al array de comentarios del post
         post.comments.push(newComment);
         await post.save();
 
         console.log('✅ Comentario guardado en la base de datos');
 
-        // Obtener el comentario recién agregado con información del usuario
         const savedPost = await Post.findById(postId)
             .populate('comments.userId', 'username profilePicture');
         
@@ -505,7 +831,6 @@ app.get('/api/posts/:id/comments', async (req, res) => {
         
         console.log(`✅ Encontrados ${comments.length} comentarios para post ${id}`);
 
-        // Formatear comentarios para el frontend
         const formattedComments = comments.map(comment => ({
             _id: comment._id,
             content: comment.content,
@@ -517,7 +842,7 @@ app.get('/api/posts/:id/comments', async (req, res) => {
                 profilePicture: comment.userId.profilePicture || '/IMAGENES/default-avatar.png'
             },
             likesCount: comment.likesCount || 0,
-            hasLiked: false // Por defecto, se puede implementar lógica de likes después
+            hasLiked: false
         }));
 
         res.json({
@@ -535,22 +860,21 @@ app.get('/api/posts/:id/comments', async (req, res) => {
     }
 });
 
-// Eliminar comentario - VERSIÓN DEFINITIVA
-app.delete('/api/comments/:id', async (req, res) => {
+// Eliminar comentario
+app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
     try {
-        if (!req.session.user && !req.isAuthenticated()) {
-            return res.status(401).json({ 
-                success: false,
-                error: 'No autenticado' 
-            });
+        const commentId = req.params.id;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
         }
 
-        const commentId = req.params.id;
-        const userId = req.session.user ? req.session.user.id : req.user._id;
+        console.log('🗑️ Intentando eliminar comentario:', { commentId, userId, authMethod: req.authMethod });
 
-        console.log('🗑️ Intentando eliminar comentario:', { commentId, userId });
-
-        // Encontrar el post que contiene el comentario
         const post = await Post.findOne({ 
             'comments._id': new mongoose.Types.ObjectId(commentId) 
         });
@@ -563,7 +887,6 @@ app.delete('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Encontrar el comentario específico
         const comment = post.comments.find(c => 
             c._id.toString() === commentId
         );
@@ -576,7 +899,6 @@ app.delete('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Verificar que el usuario sea el dueño del comentario
         if (comment.userId.toString() !== userId.toString()) {
             console.log('❌ Usuario no autorizado para eliminar comentario');
             return res.status(403).json({ 
@@ -585,7 +907,6 @@ app.delete('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Eliminar el comentario usando $pull (forma correcta)
         const result = await Post.updateOne(
             { _id: post._id },
             { $pull: { comments: { _id: new mongoose.Types.ObjectId(commentId) } } }
@@ -614,21 +935,21 @@ app.delete('/api/comments/:id', async (req, res) => {
     }
 });
 
-// Actualizar comentario - VERSIÓN DEFINITIVA
-app.put('/api/comments/:id', async (req, res) => {
+// Actualizar comentario
+app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
     try {
-        if (!req.session.user && !req.isAuthenticated()) {
-            return res.status(401).json({ 
-                success: false,
-                error: 'No autenticado' 
-            });
-        }
-
         const commentId = req.params.id;
         const { content } = req.body;
-        const userId = req.session.user ? req.session.user.id : req.user._id;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
+        }
 
-        console.log('✏️ Intentando actualizar comentario:', { commentId, userId });
+        console.log('✏️ Intentando actualizar comentario:', { commentId, userId, authMethod: req.authMethod });
 
         if (!content || content.trim().length === 0) {
             return res.status(400).json({ 
@@ -644,7 +965,6 @@ app.put('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Encontrar el post que contiene el comentario
         const post = await Post.findOne({ 
             'comments._id': new mongoose.Types.ObjectId(commentId) 
         });
@@ -657,7 +977,6 @@ app.put('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Encontrar el comentario específico
         const comment = post.comments.find(c => 
             c._id.toString() === commentId
         );
@@ -670,7 +989,6 @@ app.put('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Verificar que el usuario sea el dueño del comentario
         if (comment.userId.toString() !== userId.toString()) {
             console.log('❌ Usuario no autorizado para editar comentario');
             return res.status(403).json({ 
@@ -679,7 +997,6 @@ app.put('/api/comments/:id', async (req, res) => {
             });
         }
 
-        // Actualizar el comentario usando $set
         const result = await Post.updateOne(
             { 
                 _id: post._id, 
@@ -701,7 +1018,6 @@ app.put('/api/comments/:id', async (req, res) => {
 
         console.log('✅ Comentario actualizado exitosamente en la base de datos');
 
-        // Obtener el comentario actualizado
         const updatedPost = await Post.findOne({ 
             'comments._id': new mongoose.Types.ObjectId(commentId) 
         }).populate('comments.userId', 'username profilePicture');
@@ -736,19 +1052,19 @@ app.put('/api/comments/:id', async (req, res) => {
 });
 
 // Toggle favorito
-app.post('/api/posts/:id/favorite', async (req, res) => {
+app.post('/api/posts/:id/favorite', requireAuthHybrid, async (req, res) => {
     try {
-        if (!req.session.user && !req.isAuthenticated()) {
-            return res.status(401).json({ 
-                success: false,
-                error: 'No autenticado' 
-            });
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
         }
 
-        const userId = req.session.user ? req.session.user.id : req.user._id;
         const postId = req.params.id;
 
-        console.log('🔖 Toggle favorito:', { userId, postId });
+        console.log('🔖 Toggle favorito:', { userId, postId, authMethod: req.authMethod });
 
         const post = await Post.findById(postId);
         if (!post) {
@@ -778,79 +1094,11 @@ app.post('/api/posts/:id/favorite', async (req, res) => {
 });
 
 /******************************************************
- *              REGISTRO DE USUARIOS
- ******************************************************/
-app.post('/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-
-        if (!username || !password)
-            return res.status(400).send('Usuario y contraseña son requeridos');
-
-        if (password.length < 6)
-            return res.status(400).send('La contraseña debe tener al menos 6 caracteres');
-
-        const existingUser = await User.findOne({ username });
-        if (existingUser)
-            return res.status(400).send('El usuario ya existe');
-
-        const user = new User({ username, email, password });
-        await user.save();
-
-        res.status(200).send('Usuario registrado exitosamente');
-    } catch (err) {
-        console.error('Error al registrar usuario:', err);
-        res.status(500).send('Error al registrar usuario');
-    }
-});
-
-/******************************************************
- *             AUTENTICACIÓN DE USUARIOS
- ******************************************************/
-app.post('/authenticate', async (req, res) => {
-    try {
-        const { username, password } = req.body;
-
-        if (!username || !password)
-            return res.status(400).send('Usuario y contraseña son requeridos');
-
-        const user = await User.findOne({ username });
-        if (!user)
-            return res.status(401).send('Usuario y/o contraseña incorrectos');
-
-        user.isCorrectPassword(password, (err, result) => {
-            if (err) {
-                console.error('Error al verificar contraseña:', err);
-                return res.status(500).send('Error al autenticar');
-            }
-
-            if (result) {
-                req.session.user = {
-                    id: user._id,
-                    username: user.username,
-                    email: user.email || `${user.username}@devcommunity.com`,
-                    profilePicture: user.profilePicture || '/IMAGENES/default-avatar.png',
-                    authProvider: 'local'
-                };
-                res.status(200).json({
-                    success: true,
-                    message: 'Usuario autenticado correctamente',
-                    user: req.session.user
-                });
-            } else {
-                res.status(401).send('Usuario y/o contraseña incorrectos');
-            }
-        });
-    } catch (err) {
-        console.error('Error en autenticación:', err);
-        res.status(500).send('Error al autenticar al usuario');
-    }
-});
-
-/******************************************************
  *              CIERRE DE SESIÓN
  ******************************************************/
 app.get('/logout', (req, res) => {
+    console.log('🚪 Cerrando sesión para usuario:', req.session.user?.username);
+    
     req.logout(function(err) {
         if (err) {
             console.error('❌ Error en req.logout:', err);
@@ -859,38 +1107,21 @@ app.get('/logout', (req, res) => {
         req.session.destroy(function(err) {
             if (err) {
                 console.error('❌ Error al destruir sesión:', err);
-                return res.status(500).send('Error al cerrar sesión');
+                return res.status(500).json({ 
+                    success: false,
+                    error: 'Error al cerrar sesión' 
+                });
             }
             
             res.clearCookie('connect.sid');
-            res.redirect('/');
+            console.log('✅ Sesión cerrada exitosamente');
+            res.json({
+                success: true,
+                message: 'Sesión cerrada exitosamente',
+                redirect: '/'
+            });
         });
     });
-});
-
-/******************************************************
- *         RUTA PARA OBTENER DATOS DEL USUARIO
- ******************************************************/
-app.get('/api/user', (req, res) => {
-    if (req.session.user) {
-        return res.json({ user: req.session.user });
-    }
-    
-    if (req.isAuthenticated() && req.user) {
-        const userData = {
-            id: req.user._id,
-            username: req.user.username,
-            email: req.user.email || `${req.user.username}@devcommunity.com`,
-            profilePicture: req.user.profilePicture || '/IMAGENES/default-avatar.png',
-            authProvider: req.user.authProvider || 'OAuth'
-        };
-        
-        req.session.user = userData;
-        
-        return res.json({ user: userData });
-    }
-    
-    res.json({ user: null });
 });
 
 /******************************************************
@@ -993,6 +1224,11 @@ app.listen(3000, () => {
     console.log('🚀 Servidor iniciado en el puerto 3000');
     console.log('📝 Create Post: http://localhost:3000/createPost');
     console.log('🏠 Index: http://localhost:3000/index');
+    console.log('🔐 Endpoints JWT disponibles:');
+    console.log('   POST /authenticate');
+    console.log('   GET  /api/auth/verify');
+    console.log('   POST /api/auth/refresh');
+    console.log('   POST /api/auth/logout');
     console.log('💬 Endpoints de comentarios disponibles:');
     console.log('   POST /api/posts/:id/comments');
     console.log('   GET  /api/posts/:id/comments');

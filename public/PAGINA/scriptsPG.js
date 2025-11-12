@@ -27,6 +27,237 @@ const minibar = document.getElementById('minibar');
 // =====================================================================
 // SECCIÓN 2: FUNCIONALIDAD DE LA MINIBAR (BARRA LATERAL)
 // =====================================================================
+// public/PAGINA/scriptsPG.js
+
+// 🔥 AGREGAR AL INICIO DEL ARCHIVO
+class AuthManager {
+    constructor() {
+        this.token = localStorage.getItem('jwtToken');
+        this.isAuthenticated = !!this.token;
+    }
+
+    getAuthHeaders() {
+        if (this.token) {
+            return {
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+        return { 'Content-Type': 'application/json' };
+    }
+
+    async verifyToken() {
+        if (!this.token) return false;
+        try {
+            const response = await fetch('/api/auth/verify', {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('Error verificando token:', error);
+            return false;
+        }
+    }
+
+    setToken(token) {
+        this.token = token;
+        this.isAuthenticated = true;
+        localStorage.setItem('jwtToken', token);
+    }
+
+    clearToken() {
+        this.token = null;
+        this.isAuthenticated = false;
+        localStorage.removeItem('jwtToken');
+    }
+
+async logout() {
+    try {
+        console.log('Ejecutando logout completo...');
+        
+        // 1. Limpiar TODO el estado local primero
+        this.clearToken();
+        this.clearAllUserData();
+        
+        // 2. Intentar logout en el servidor (pero no es crítico)
+        if (this.token) {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log('Respuesta del servidor:', response.status);
+            } catch (error) {
+                console.log('Logout del servidor falló, pero continuando...');
+            }
+        }
+
+        // 3. 🔥 LIMPIAR CACHE Y REDIRIGIR INMEDIATAMENTE
+        this.clearAllCache();
+        window.location.href = '/login.html';
+        
+    } catch (error) {
+        console.error('Error en logout:', error);
+        // Forzar limpieza completa y redirección
+        this.clearAllUserData();
+        window.location.href = '/login.html';
+    }
+}
+
+/**
+ * Limpia TODOS los datos del usuario
+ */
+clearAllUserData() {
+    console.log('Limpiando todos los datos del usuario...');
+    
+    // Limpiar token
+    localStorage.removeItem('jwtToken');
+    
+    // Limpiar cualquier otro dato de usuario que puedas tener
+    localStorage.removeItem('userData');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userProfile');
+    
+    // Limpiar sessionStorage por si acaso
+    sessionStorage.clear();
+    
+    // Limpiar cookies relacionadas con autenticación
+    this.clearAuthCookies();
+    
+    this.token = null;
+    this.isAuthenticated = false;
+    
+    console.log('Todos los datos de usuario eliminados');
+}
+
+/**
+ * Limpia cookies de autenticación
+ */
+clearAuthCookies() {
+    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+/**
+ * Limpia toda la cache de la aplicación
+ */
+clearAllCache() {
+    // Limpiar cache de comentarios
+    if (window.devCommunity && window.devCommunity.commentSystem) {
+        window.devCommunity.commentSystem.commentsCache.clear();
+    }
+    
+    // Limpiar cualquier variable global
+    window.currentUser = null;
+    window.userData = null;
+    
+    console.log('Cache de la aplicación limpiada');
+}
+
+}
+
+// =====================================================================
+// SECCIÓN 2.1: FUNCIÓN GLOBAL DE LOGOUT
+// =====================================================================
+
+/**
+ * Función global para cerrar sesión - llamada desde el HTML
+ */
+
+window.handleLogout = function(event) {
+    if (event) event.preventDefault();
+    
+    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        // Limpiar token inmediatamente
+        localStorage.removeItem('jwtToken');
+        // Redirigir inmediatamente
+        window.location.href = '/login.html';
+    }
+};
+
+const authManager = new AuthManager();
+
+// 🔥 FUNCIÓN HELPER PARA REQUEST AUTENTICADOS
+async function makeAuthenticatedRequest(url, options = {}) {
+    const authHeaders = authManager.getAuthHeaders();
+    
+    const config = {
+        ...options,
+        headers: {
+            ...authHeaders,
+            ...options.headers
+        }
+    };
+
+    try {
+        const response = await fetch(url, config);
+        
+        if (response.status === 401 && authManager.token) {
+            console.log('Token expirado, intentando refresh...');
+            const refreshed = await refreshToken();
+            if (refreshed) {
+                config.headers.Authorization = `Bearer ${authManager.token}`;
+                return await fetch(url, config);
+            }
+        }
+        
+        return response;
+    } catch (error) {
+        console.error('Error en request autenticado:', error);
+        throw error;
+    }
+}
+
+async function refreshToken() {
+    try {
+        const response = await fetch('/api/auth/refresh', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authManager.token}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            authManager.setToken(data.token);
+            return true;
+        }
+    } catch (error) {
+        console.error('Error refrescando token:', error);
+    }
+    
+    authManager.clearToken();
+    window.location.href = '/';
+    return false;
+}
+
+// 🔥 MODIFICAR LA FUNCIÓN DE REACCIONES (línea 1571 aproximadamente)
+async function addReaction(postId, reactionType) {
+    try {
+        const response = await makeAuthenticatedRequest(`/api/posts/${postId}/reactions`, {
+            method: 'POST',
+            body: JSON.stringify({ reactionType })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al agregar reacción');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+// 🔥 MODIFICAR OTRAS FUNCIONES QUE USEN FETCH PARA USAR makeAuthenticatedRequest
+// Buscar todas las funciones que hagan POST, PUT, DELETE y cambiar fetch por makeAuthenticatedRequest
 
 /**
  * Inicializa la funcionalidad de la minibar (barra lateral con íconos)
@@ -90,29 +321,58 @@ function setupImageErrorHandlers() {
  * Verifica el estado de autenticación del usuario
  * @returns {Object|null} Datos del usuario o null si no está autenticado
  */
+/**
+ * Verifica el estado de autenticación del usuario
+ * @returns {Object|null} Datos del usuario o null si no está autenticado
+ */
 async function checkAuth() {
     try {
-        console.log('Checking authentication status...');
+        console.log('🔐 Verificando estado de autenticación...');
+        
+        // Verificar si hay token en localStorage
+        const token = localStorage.getItem('jwtToken');
+        
+        if (!token) {
+            console.log('❌ No hay token encontrado');
+            this.showUnauthenticatedState();
+            return null;
+        }
+
+        console.log('✅ Token encontrado, verificando con servidor...');
         const response = await fetch('/api/user', {
             method: 'GET',
             credentials: 'include',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
         });
         
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            console.log('❌ Token inválido o expirado');
+            // Token inválido, limpiar todo
+            this.clearAllUserData();
+            this.showUnauthenticatedState();
+            return null;
+        }
+        
         const data = await response.json();
         console.log('Auth response:', data);
         
         if (data.user && data.user.id) {
-            showAuthenticatedState(data.user);
+            console.log('✅ Usuario autenticado correctamente');
+            this.showAuthenticatedState(data.user);
             return data.user;
         } else {
-            showUnauthenticatedState();
+            console.log('❌ No hay datos de usuario en la respuesta');
+            this.clearAllUserData();
+            this.showUnauthenticatedState();
             return null;
         }
     } catch (error) {
-        console.error('Error checking auth:', error);
-        showUnauthenticatedState();
+        console.error('❌ Error checking auth:', error);
+        this.clearAllUserData();
+        this.showUnauthenticatedState();
         return null;
     }
 }

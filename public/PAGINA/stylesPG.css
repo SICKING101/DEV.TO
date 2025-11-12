@@ -1453,7 +1453,7 @@ SECCION 17: MODAL STYLES
     border: 1px solid #e0e0e0;
     opacity: 1;
     position: relative;
-    z-index: 1;
+    z-index: 0;
 }
 
 .article-card__inner {

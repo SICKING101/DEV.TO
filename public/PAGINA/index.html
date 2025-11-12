@@ -55,14 +55,18 @@
                         <li class="dropdown-divider"></li>
 
                         <!-- Menu Options -->
-                        <li><a href="/PERFIL/dashboard.html" class="dropdown-item"><i class="fas fa-chart-line" aria-hidden="true"></i> Dashboard</a></li>
-                        <li><a href="/PERFIL/createPost.html" class="dropdown-item"><i class="fas fa-edit" aria-hidden="true"></i> Create Post</a></li>
-                        <li><a href="/readingList" class="dropdown-item"><i class="fas fa-bookmark" aria-hidden="true"></i> Reading list</a></li>
-                        <li><a href="/PERFIL/settings.html" class="dropdown-item"><i class="fas fa-cog" aria-hidden="true"></i> Settings</a></li>
+                        <li><a href="/PERFIL/dashboard.html" class="dropdown-item"><i class="fas fa-chart-line"
+                                    aria-hidden="true"></i> Dashboard</a></li>
+                        <li><a href="/PERFIL/createPost.html" class="dropdown-item"><i class="fas fa-edit"
+                                    aria-hidden="true"></i> Create Post</a></li>
+                        <li><a href="/readingList" class="dropdown-item"><i class="fas fa-bookmark"
+                                    aria-hidden="true"></i> Reading list</a></li>
+                        <li><a href="/PERFIL/settings.html" class="dropdown-item"><i class="fas fa-cog"
+                                    aria-hidden="true"></i> Settings</a></li>
                         <li class="dropdown-divider"></li>
 
                         <!-- Logout -->
-                        <li><a href="/logout" class="dropdown-item dropdown-item--logout">
+                        <li><a href="#" onclick="handleLogout()" class="dropdown-item dropdown-item--logout">
                                 <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sign out
                             </a></li>
                     </ul>
@@ -78,350 +82,375 @@
     SECCION 2: MAIN SECCION LAYOUT
     ===================================================================== -->
     <main class="layout">
-    <!-- =====================================================================
+        <!-- =====================================================================
     SECCION 2.1: MINIBAR 
     ===================================================================== -->
-    <aside class="minibar" id="minibar">
-        <nav class="minibar__nav">
-            <ul class="minibar__list">
+        <aside class="minibar" id="minibar">
+            <nav class="minibar__nav">
+                <ul class="minibar__list">
 
-                <!-- Item: DEV Community 1 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/image-no-exists.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Forem Feed</h3>
-                            <p class="preview__description">
-                                A space to discuss and keep up with software development and manage your software
-                                career.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 1 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/image-no-exists.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/dev-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Forem Feed</h3>
+                                <p class="preview__description">
+                                    A space to discuss and keep up with software development and manage your software
+                                    career.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 2 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/dev-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">DEV Community</h3>
-                            <p class="preview__description">
-                                A space to discuss and keep up with software development and manage your software
-                                career.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 2 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/dev-black.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/dev-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">DEV Community</h3>
+                                <p class="preview__description">
+                                    A space to discuss and keep up with software development and manage your software
+                                    career.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 3 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/open-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/open-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Open Forem</h3>
-                            <p class="preview__description">
-                                A general discussion space for the Forem community. If it doesn't have a home elsewhere, it belongs here
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 3 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/open-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/open-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Open Forem</h3>
+                                <p class="preview__description">
+                                    A general discussion space for the Forem community. If it doesn't have a home
+                                    elsewhere, it belongs here
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 4 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/future-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/future-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Future</h3>
-                            <p class="preview__description">
-                                News and discussion of science and technology such as AI, VR, cryptocurrency, quantum computing, and more.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 4 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/future-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/future-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Future</h3>
+                                <p class="preview__description">
+                                    News and discussion of science and technology such as AI, VR, cryptocurrency,
+                                    quantum computing, and more.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 5 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/gamers-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/gamers-forem.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Gamers Forem</h3>
-                            <p class="preview__description">
-                                An inclusive community for gaming enthusiasts.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 5 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/gamers-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/gamers-forem.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Gamers Forem</h3>
+                                <p class="preview__description">
+                                    An inclusive community for gaming enthusiasts.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 6 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/music-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/music-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Music Forem</h3>
-                            <p class="preview__description">
-                                From composing and gigging to gear, hot music takes, and everything in between.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 6 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/music-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/music-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Music Forem</h3>
+                                <p class="preview__description">
+                                    From composing and gigging to gear, hot music takes, and everything in between.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 7 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/vibe-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/vibe-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Vibe Coding Forem</h3>
-                            <p class="preview__description">
-                                Discussing AI software development, and showing off your what we're building.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 7 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/vibe-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/vibe-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Vibe Coding Forem</h3>
+                                <p class="preview__description">
+                                    Discussing AI software development, and showing off your what we're building.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 8 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/popcorn-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/popcorn-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Popcorn Movies and TV</h3>
-                            <p class="preview__description">
-                                Movie and TV enthusiasm, criticism and everything in-between.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 8 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/popcorn-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/popcorn-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Popcorn Movies and TV</h3>
+                                <p class="preview__description">
+                                    Movie and TV enthusiasm, criticism and everything in-between.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 9 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/design-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/design-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Design Community</h3>
-                            <p class="preview__description">
-                                Web design, graphic design and everything in-between.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 9 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/design-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/design-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Design Community</h3>
+                                <p class="preview__description">
+                                    Web design, graphic design and everything in-between.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 10 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/golf-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/golf-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Golf Forem</h3>
-                            <p class="preview__description">
-                                A community of golfers and golfing enthusiasts
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 10 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/golf-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/golf-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Golf Forem</h3>
+                                <p class="preview__description">
+                                    A community of golfers and golfing enthusiasts
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 11 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/dumb-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/dumb-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">DUMB DEV Community</h3>
-                            <p class="preview__description">
-                                Memes and software development shitposting.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 11 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/dumb-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/dumb-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">DUMB DEV Community</h3>
+                                <p class="preview__description">
+                                    Memes and software development shitposting.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 12 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/segurity-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/segurity-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Security Forem</h3>
-                            <p class="preview__description">
-                                Your central hub for all things security. From ethical hacking and CTFs to GRC and career development, for beginners and pros alike.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 12 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/segurity-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/segurity-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Security Forem</h3>
+                                <p class="preview__description">
+                                    Your central hub for all things security. From ethical hacking and CTFs to GRC and
+                                    career development, for beginners and pros alike.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 13 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/scale-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/image-no-exists.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Scale Forem</h3>
-                            <p class="preview__description">
-                                For engineers building software at scale. We discuss architecture, cloud-native, and SRE--the hard won lessons you can't just Google.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 13 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/scale-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/image-no-exists.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Scale Forem</h3>
+                                <p class="preview__description">
+                                    For engineers building software at scale. We discuss architecture, cloud-native, and
+                                    SRE--the hard won lessons you can't just Google.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 14 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/forem-core.png" alt="DEV Community" class="minibar__image"> 
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/forem-core-header.png" alt="DEV Community Header" class="preview__header-image"> 
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Forem Core</h3>
-                            <p class="preview__description">
-                                Discussing the core forem open source software project -- features, bugs, perfomance, self-hosting.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 14 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/forem-core.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/forem-core-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Forem Core</h3>
+                                <p class="preview__description">
+                                    Discussing the core forem open source software project -- features, bugs,
+                                    perfomance, self-hosting.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 15 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/crypto-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/image-no-exists.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Crypto Forem</h3>
-                            <p class="preview__description">
-                                A collaborative community for all things Crypto--from Bitcoin to protocol development and DeFi to NFTs and market analysis.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 15 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/crypto-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/image-no-exists.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Crypto Forem</h3>
+                                <p class="preview__description">
+                                    A collaborative community for all things Crypto--from Bitcoin to protocol
+                                    development and DeFi to NFTs and market analysis.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 16 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/parenting-forem.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/parenting-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Parenting</h3>
-                            <p class="preview__description">
-                                A place for parents to the share the joys, challenges, and wisdom that come from raising kids. We're here for them and for each other.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
+                    <!-- Item: DEV Community 16 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/parenting-forem.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/parenting-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Parenting</h3>
+                                <p class="preview__description">
+                                    A place for parents to the share the joys, challenges, and wisdom that come from
+                                    raising kids. We're here for them and for each other.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
 
-                <!-- Item: DEV Community 17 -->
-                <li class="minibar__item minibar__item--active">
-                    <a href="#" class="minibar__link" data-preview="DEV Community">
-                        <img src="/IMAGENES/image-no-exists.png" alt="DEV Community" class="minibar__image">
-                    </a>
-                    <article class="minibar__preview">
-                        <header class="preview__header">
-                            <img src="/IMAGENES/maker-forem-header.png" alt="DEV Community Header" class="preview__header-image">
-                        </header>
-                        <section class="preview__content">
-                            <h3 class="preview__title">Maker Forem</h3>
-                            <p class="preview__description">
-                                A community for makers, hobbyists, and professionals to discuss Arduino, Raspberry Pi, 3D printing, and much more.
-                            </p>
-                            <button class="preview__btn">Follow</button>
-                        </section>
-                    </article>
-                </li>
-            </ul>
-        </nav>
+                    <!-- Item: DEV Community 17 -->
+                    <li class="minibar__item minibar__item--active">
+                        <a href="#" class="minibar__link" data-preview="DEV Community">
+                            <img src="/IMAGENES/image-no-exists.png" alt="DEV Community" class="minibar__image">
+                        </a>
+                        <article class="minibar__preview">
+                            <header class="preview__header">
+                                <img src="/IMAGENES/maker-forem-header.png" alt="DEV Community Header"
+                                    class="preview__header-image">
+                            </header>
+                            <section class="preview__content">
+                                <h3 class="preview__title">Maker Forem</h3>
+                                <p class="preview__description">
+                                    A community for makers, hobbyists, and professionals to discuss Arduino, Raspberry
+                                    Pi, 3D printing, and much more.
+                                </p>
+                                <button class="preview__btn">Follow</button>
+                            </section>
+                        </article>
+                    </li>
+                </ul>
+            </nav>
 
-        <!-- BOTONES ADICIONALES -->
-        <section class="minibar__footer">
-            <button class="minibar__action-btn" title="Add community">
-                +
-            </button>
-            <button class="minibar__action-btn" title="More options">
-                ⋯
-            </button>
-        </section>
-    </aside>
+            <!-- BOTONES ADICIONALES -->
+            <section class="minibar__footer">
+                <button class="minibar__action-btn" title="Add community">
+                    +
+                </button>
+                <button class="minibar__action-btn" title="More options">
+                    ⋯
+                </button>
+            </section>
+        </aside>
 
         <!-- =====================================================================
          SECCION 3: LEFTBAR
@@ -430,22 +459,22 @@
 
             <!-- Lateral Menu -->
             <nav class="contenedor">
-    <ul class="subnav">
-        <li><a href="#"><span class="emoji">🏠</span> Home</a></li>
-        <li><a href="#"><span class="emoji">🛠️</span> DEV++</a></li>
-        <li><a href="#"><span class="emoji">📚</span> Reading List</a></li>
-        <li><a href="#"><span class="emoji">🎙️</span> Podcasts</a></li>
-        <li><a href="#"><span class="emoji">📹</span> Videos</a></li>
-        <li><a href="#"><span class="emoji">🎓</span> DEV Education Tracks</a></li>
-        <li><a href="#"><span class="emoji">🏆</span> DEV Challenges</a></li>
-        <li><a href="#"><span class="emoji">❓</span> DEV Help</a></li>
-        <li><a href="#"><span class="emoji">📢</span> Advertise on DEV</a></li>
-        <li><a href="#"><span class="emoji">⭐</span> DEV Showcase</a></li>
-        <li><a href="#"><span class="emoji">ℹ️</span> About</a></li>
-        <li><a href="#"><span class="emoji">📧</span> Contact</a></li>
-        <li><a href="#"><span class="emoji">🛒</span> Forem Shop</a></li>
-    </ul>
-</nav>
+                <ul class="subnav">
+                    <li><a href="#"><span class="emoji">🏠</span> Home</a></li>
+                    <li><a href="#"><span class="emoji">🛠️</span> DEV++</a></li>
+                    <li><a href="#"><span class="emoji">📚</span> Reading List</a></li>
+                    <li><a href="#"><span class="emoji">🎙️</span> Podcasts</a></li>
+                    <li><a href="#"><span class="emoji">📹</span> Videos</a></li>
+                    <li><a href="#"><span class="emoji">🎓</span> DEV Education Tracks</a></li>
+                    <li><a href="#"><span class="emoji">🏆</span> DEV Challenges</a></li>
+                    <li><a href="#"><span class="emoji">❓</span> DEV Help</a></li>
+                    <li><a href="#"><span class="emoji">📢</span> Advertise on DEV</a></li>
+                    <li><a href="#"><span class="emoji">⭐</span> DEV Showcase</a></li>
+                    <li><a href="#"><span class="emoji">ℹ️</span> About</a></li>
+                    <li><a href="#"><span class="emoji">📧</span> Contact</a></li>
+                    <li><a href="#"><span class="emoji">🛒</span> Forem Shop</a></li>
+                </ul>
+            </nav>
 
             <!-- Popular Tags Section -->
             <section class="section">
@@ -566,25 +595,6 @@
             </nav>
         </section>
     </footer>
-
-        <!-- =====================================================================
-    SECCION 6: LOGOUT CONFIRMATION MODAL 
-    ===================================================================== -->
-    <dialog class="modal" id="logoutModal">
-        <article class="modal__content">
-            <header class="modal__header">
-                <h3 class="modal__title">Sign out</h3>
-            </header>
-            <section class="modal__body">
-                <p class="modal__text">Are you sure you want to sign out?</p>
-            </section>
-            <footer class="modal__footer">
-                <button class="btn btn--outline" id="cancelLogout">Cancel</button>
-                <button class="btn btn--primary" id="confirmLogout">Yes, sign out</button>
-            </footer>
-        </article>
-    </dialog>
-
     <!-- =====================================================================
     JAVASCRIPT SECTION
     ===================================================================== -->
