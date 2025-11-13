@@ -187,3 +187,373 @@ if (colorInput && colorPreview) {
     // Esto asegura que el preview muestre el color actual desde el inicio
     colorInput.dispatchEvent(new Event('input'));
 }
+
+        // =====================================================================
+        // SECCION 4: LOGIN FUNCTIONALITY - Funcionalidad de Login Mejorada CON JWT
+        // =====================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const messageOutput = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            console.log('🔧 Inicializando sistema de login con JWT...');
+
+            // FUNCIÓN: Mostrar mensajes al usuario
+            function showMessage(message, type = 'error') {
+                messageOutput.textContent = message;
+                messageOutput.className = `message ${type}`;
+                messageOutput.style.display = 'block';
+                
+                // Auto-ocultar mensajes de éxito después de 3 segundos
+                if (type === 'success') {
+                    setTimeout(() => {
+                        messageOutput.style.display = 'none';
+                    }, 3000);
+                }
+            }
+
+            // FUNCIÓN: Validar formulario antes del envío
+            function validateForm(formData) {
+                const username = formData.get('username');
+                const password = formData.get('password');
+
+                if (!username || !username.trim()) {
+                    showMessage('Por favor, ingresa tu usuario o email');
+                    return false;
+                }
+
+                if (!password || !password.trim()) {
+                    showMessage('Por favor, ingresa tu contraseña');
+                    return false;
+                }
+
+                if (password.length < 6) {
+                    showMessage('La contraseña debe tener al menos 6 caracteres');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // FUNCIÓN: Habilitar/deshabilitar botón de envío
+            function setLoadingState(loading) {
+                if (loading) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Iniciando sesión...';
+                    submitBtn.style.opacity = '0.7';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'INICIAR SESIÓN';
+                    submitBtn.style.opacity = '1';
+                }
+            }
+
+            // EVENTO: Envío del formulario de login
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('📤 Enviando formulario de login con JWT...');
+
+                // Ocultar mensajes anteriores
+                messageOutput.style.display = 'none';
+
+                // Obtener datos del formulario
+                const formData = new FormData(loginForm);
+                
+                // Validar formulario
+                if (!validateForm(formData)) {
+                    return;
+                }
+
+                // Mostrar loading en el botón
+                setLoadingState(true);
+
+                try {
+                    console.log('🔄 Enviando solicitud de autenticación con JWT...');
+                    
+                    const response = await fetch('/authenticate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: formData.get('username').trim(),
+                            password: formData.get('password'),
+                            device: 'web'
+                        })
+                    });
+
+                    const result = await response.json();
+                    console.log('📥 Respuesta del servidor:', result);
+
+                    if (result.success) {
+                        // 🔥 GUARDAR TOKEN JWT EN LOCALSTORAGE
+                        if (result.token) {
+                            localStorage.setItem('jwtToken', result.token);
+                            console.log('✅ Token JWT guardado en localStorage:', result.token.substring(0, 20) + '...');
+                        }
+                        
+                        showMessage('✅ ' + result.message, 'success');
+                        console.log('🔄 Redirigiendo a /index...');
+                        
+                        // Redirigir después de un breve delay para mostrar el mensaje
+                        setTimeout(() => {
+                            window.location.href = result.redirect || '/index';
+                        }, 1000);
+                    } else {
+                        showMessage('❌ ' + result.error);
+                        console.error('Error de autenticación:', result.error);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error en la solicitud:', error);
+                    showMessage('❌ Error de conexión. Intenta nuevamente.');
+                } finally {
+                    // Restaurar botón
+                    setLoadingState(false);
+                }
+            });
+
+            // EVENTO: Limpiar mensajes cuando el usuario empiece a escribir
+            const inputs = loginForm.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    messageOutput.style.display = 'none';
+                    // Validación en tiempo real
+                    if (input.type === 'password' && input.value.length > 0 && input.value.length < 6) {
+                        input.style.borderColor = '#ff6b6b';
+                    } else if (input.value.length > 0) {
+                        input.style.borderColor = '#3b49df';
+                    }
+                });
+            });
+
+            // EVENTO: Prevenir envío múltiple
+            let isSubmitting = false;
+            loginForm.addEventListener('submit', function(e) {
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return;
+                }
+                isSubmitting = true;
+                setTimeout(() => {
+                    isSubmitting = false;
+                }, 2000);
+            });
+
+            // Verificar si ya hay un token guardado
+            const existingToken = localStorage.getItem('jwtToken');
+            if (existingToken) {
+                console.log('🔑 Token JWT encontrado en localStorage');
+                // Opcional: Verificar si el token es válido
+                fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${existingToken}`
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ Token JWT válido encontrado');
+                        // El usuario ya está autenticado, podrías redirigir automáticamente
+                        // window.location.href = '/index';
+                    } else {
+                        console.log('❌ Token JWT inválido, limpiando...');
+                        localStorage.removeItem('jwtToken');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verificando token:', error);
+                    localStorage.removeItem('jwtToken');
+                });
+            }
+
+            console.log('✅ Sistema de login con JWT inicializado correctamente');
+        });
+
+        // =====================================================================
+        // SECCION 5: REGISTER FUNCTIONALITY - Funcionalidad de Registro Mejorada
+        // =====================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('registerForm');
+            const messageOutput = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+            
+            console.log('🔧 Inicializando sistema de registro...');
+
+            // FUNCIÓN: Mostrar mensajes al usuario
+            function showMessage(message, type = 'error') {
+                messageOutput.textContent = message;
+                messageOutput.className = `message ${type}`;
+                messageOutput.style.display = 'block';
+                
+                // Auto-ocultar mensajes de éxito después de 3 segundos
+                if (type === 'success') {
+                    setTimeout(() => {
+                        messageOutput.style.display = 'none';
+                    }, 3000);
+                }
+            }
+
+            // FUNCIÓN: Validar contraseñas
+            function validatePasswords(password, confirmPassword) {
+                if (password && confirmPassword) {
+                    if (password !== confirmPassword) {
+                        passwordMatchMessage.textContent = '❌ Las contraseñas no coinciden';
+                        passwordMatchMessage.className = 'form-help password-mismatch';
+                        return false;
+                    } else {
+                        passwordMatchMessage.textContent = '✅ Las contraseñas coinciden';
+                        passwordMatchMessage.className = 'form-help password-match';
+                        return true;
+                    }
+                }
+                passwordMatchMessage.textContent = '';
+                return false;
+            }
+
+            // FUNCIÓN: Validar formulario antes del envío
+            function validateForm(formData) {
+                const username = formData.get('username');
+                const password = formData.get('password');
+                const confirmPassword = formData.get('confirmPassword');
+
+                if (!username || !username.trim()) {
+                    showMessage('Por favor, ingresa un nombre de usuario');
+                    return false;
+                }
+
+                if (username.length < 3) {
+                    showMessage('El usuario debe tener al menos 3 caracteres');
+                    return false;
+                }
+
+                if (username.length > 30) {
+                    showMessage('El usuario no puede tener más de 30 caracteres');
+                    return false;
+                }
+
+                // Validar formato de username
+                const usernameRegex = /^[a-zA-Z0-9_]+$/;
+                if (!usernameRegex.test(username)) {
+                    showMessage('El usuario solo puede contener letras, números y guiones bajos');
+                    return false;
+                }
+
+                if (!password || !password.trim()) {
+                    showMessage('Por favor, ingresa una contraseña');
+                    return false;
+                }
+
+                if (password.length < 6) {
+                    showMessage('La contraseña debe tener al menos 6 caracteres');
+                    return false;
+                }
+
+                if (!confirmPassword || !confirmPassword.trim()) {
+                    showMessage('Por favor, confirma tu contraseña');
+                    return false;
+                }
+
+                if (!validatePasswords(password, confirmPassword)) {
+                    showMessage('Las contraseñas no coinciden');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // FUNCIÓN: Habilitar/deshabilitar botón de envío
+            function setLoadingState(loading) {
+                if (loading) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Registrando...';
+                    submitBtn.style.opacity = '0.7';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'REGISTRARSE';
+                    submitBtn.style.opacity = '1';
+                }
+            }
+
+            // EVENTO: Envío del formulario de registro
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('📤 Enviando formulario de registro...');
+
+                // Ocultar mensajes anteriores
+                messageOutput.style.display = 'none';
+
+                // Obtener datos del formulario
+                const formData = new FormData(registerForm);
+                
+                // Validar formulario
+                if (!validateForm(formData)) {
+                    return;
+                }
+
+                // Mostrar loading en el botón
+                setLoadingState(true);
+
+                try {
+                    console.log('🔄 Enviando solicitud de registro...');
+                    
+                    const response = await fetch('/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: formData.get('username').trim(),
+                            email: formData.get('email')?.trim() || '',
+                            password: formData.get('password')
+                        })
+                    });
+
+                    const result = await response.json();
+                    console.log('📥 Respuesta del servidor:', result);
+
+                    if (result.success) {
+                        showMessage('✅ ' + result.message, 'success');
+                        console.log('🔄 Redirigiendo a Login...');
+                        
+                        // Redirigir después de un breve delay para mostrar el mensaje
+                        setTimeout(() => {
+                            window.location.href = 'Login.html';
+                        }, 2000);
+                    } else {
+                        showMessage('❌ ' + result.error);
+                        console.error('Error de registro:', result.error);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error en la solicitud:', error);
+                    showMessage('❌ Error de conexión. Intenta nuevamente.');
+                } finally {
+                    // Restaurar botón
+                    setLoadingState(false);
+                }
+            });
+
+            // EVENTO: Validar contraseñas en tiempo real
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            function validatePasswordsRealTime() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                validatePasswords(password, confirmPassword);
+            }
+
+            passwordInput.addEventListener('input', validatePasswordsRealTime);
+            confirmPasswordInput.addEventListener('input', validatePasswordsRealTime);
+
+            // EVENTO: Limpiar mensajes cuando el usuario empiece a escribir
+            const inputs = registerForm.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    messageOutput.style.display = 'none';
+                });
+            });
+
+            console.log('✅ Sistema de registro inicializado correctamente');
+        });

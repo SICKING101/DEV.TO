@@ -1,8 +1,9 @@
-// config/jwtConfig.js
+// Dependencia del JWT
 const jwt = require('jsonwebtoken');
 
+// Configuracion del JWT
 const JWT_CONFIG = {
-    secret: 'dev-community-jwt-secret-key-2024-super-segura',
+    secret: 'navidad123',
     expiresIn: '24h',
     issuer: 'dev-community',
     audience: 'dev-community-users'

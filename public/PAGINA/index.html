@@ -457,24 +457,67 @@
         ===================================================================== -->
         <aside class="leftbar" id="leftbar">
 
-            <!-- Lateral Menu -->
-            <nav class="contenedor">
-                <ul class="subnav">
-                    <li><a href="#"><span class="emoji">🏠</span> Home</a></li>
-                    <li><a href="#"><span class="emoji">🛠️</span> DEV++</a></li>
-                    <li><a href="#"><span class="emoji">📚</span> Reading List</a></li>
-                    <li><a href="#"><span class="emoji">🎙️</span> Podcasts</a></li>
-                    <li><a href="#"><span class="emoji">📹</span> Videos</a></li>
-                    <li><a href="#"><span class="emoji">🎓</span> DEV Education Tracks</a></li>
-                    <li><a href="#"><span class="emoji">🏆</span> DEV Challenges</a></li>
-                    <li><a href="#"><span class="emoji">❓</span> DEV Help</a></li>
-                    <li><a href="#"><span class="emoji">📢</span> Advertise on DEV</a></li>
-                    <li><a href="#"><span class="emoji">⭐</span> DEV Showcase</a></li>
-                    <li><a href="#"><span class="emoji">ℹ️</span> About</a></li>
-                    <li><a href="#"><span class="emoji">📧</span> Contact</a></li>
-                    <li><a href="#"><span class="emoji">🛒</span> Forem Shop</a></li>
-                </ul>
-            </nav>
+    <!-- Lateral Menu -->
+    <nav class="contenedor">
+        <ul class="subnav">
+            <li><a href="#"><span class="emoji">🏠</span> Home</a></li>
+            <li><a href="#"><span class="emoji">🛠️</span> DEV++</a></li>
+            <li><a href="#"><span class="emoji">📚</span> Reading List</a></li>
+            <li><a href="#"><span class="emoji">🎙️</span> Podcasts</a></li>
+            <li><a href="#"><span class="emoji">📹</span> Videos</a></li>
+            <li><a href="#"><span class="emoji">🎓</span> DEV Education Tracks</a></li>
+            <li><a href="#"><span class="emoji">🏆</span> DEV Challenges</a></li>
+            <li><a href="#"><span class="emoji">💡</span> DEV Help</a></li>
+            <li><a href="#"><span class="emoji">❤️</span> Advertise on DEV</a></li>
+            <li><a href="#"><span class="emoji">✨</span> DEV Showcase</a></li>
+            <li><a href="#"><span class="emoji">😎</span> About</a></li>
+            <li><a href="#"><span class="emoji">📧</span> Contact</a></li>
+            <li><a href="#"><span class="emoji">🛍️</span> Forem Shop</a></li>
+
+            <!-- Sección Other -->
+            <li class="section-divider">
+                <span class="section-title">Other</span>
+            </li>
+            <li><a href="#"><span class="emoji">📜</span> Code of Conduct</a></li>
+            <li><a href="#"><span class="emoji">🔒</span> Privacy Policy</a></li>
+            <li><a href="#"><span class="emoji">📝</span> Terms of Use</a></li>
+
+            <!-- Sección Redes Sociales -->
+            <li class="section-divider social-section">
+                <span class="section-title">Social</span>
+            </li>
+            <li class="social-icons-container">
+                <div class="social-icons">
+                    <!-- Primera fila: 5 iconos -->
+                    <a href="https://x.com/thepracticaldev" class="social-icon" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://www.facebook.com/thepracticaldev" class="social-icon" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://github.com/forem" class="social-icon" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://www.instagram.com/thepracticaldev/" class="social-icon" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.twitch.tv/thepracticaldev" class="social-icon" title="Twitch">
+                        <i class="fab fa-twitch"></i>
+                    </a>
+                    <!-- Segunda fila: 2 iconos -->
+                    <a href="https://fosstodon.org/@thepracticaldev" class="social-icon" title="Mastodon">
+                        <i class="fab fa-mastodon"></i>
+                    </a>
+                    <a href="https://bsky.app/profile/dev.to" class="social-icon" title="Bluesky">
+                        <svg class="bsky-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87 1.556 6.87 1.556h.001c.001 0 1.858 3.635 6.861 1.555 4.556-5.072 1.081-6.497-2.831-7.078a9.1 9.1 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.296 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/>
+                        </svg>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
 
             <!-- Popular Tags Section -->
             <section class="section">
@@ -582,6 +625,25 @@
         </aside>
     </main>
 
+<!-- =====================================================================
+MODAL DE CONFIRMACIÓN DE CIERRE DE SESIÓN - ESTILO DEV.TO COMPLETO
+===================================================================== -->
+<div id="logoutModal" class="modal" style="display: none;">
+    <div class="modal__overlay"></div>
+    <div class="modal__content">
+        <div class="modal__center">
+            <p class="modal__text">Are you sure you want to sign out?</p>
+            <div class="modal__actions">
+                <button type="button" class="btn btn--outline" id="logoutCancel">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn--primary" id="logoutConfirm">
+                    Yes, sign out
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- =====================================================================
     FOOTER SECTION
     ===================================================================== -->

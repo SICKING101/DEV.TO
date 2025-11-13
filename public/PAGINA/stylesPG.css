@@ -1171,161 +1171,27 @@ SECCION 14: UTILITY STYLES
 }
 
 /* =====================================================================
-SECCION 15: RESPONSIVE STYLES - BASIC
-===================================================================== */
-
-@media (max-width: 1024px) {
-    .layout {
-        grid-template-columns: 200px 1fr;
-        padding-left: 5rem;
-    }
-    
-    .rightbar {
-        display: none;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding-top: 56px;
-    }
-    
-    .layout {
-        grid-template-columns: 1fr;
-        padding: 1rem;
-        margin-top: 0;
-    }
-    
-    .minibar {
-        display: none;
-    }
-    
-    .search {
-        display: none;
-    }
-    
-    .actions {
-        display: none;
-    }
-    
-    .hambtn {
-        display: block;
-    }
-    
-    .leftbar {
-        display: none;
-        position: fixed;
-        top: 56px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: white;
-        z-index: 800;
-        padding: 1rem;
-        overflow-y: auto;
-    }
-    
-    .leftbar.open {
-        display: block;
-    }
-    
-    .hero__title {
-        font-size: 1.4rem;
-    }
-    
-    .hero__description {
-        font-size: 1rem;
-    }
-    
-    .feed-controls {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    
-    .tabs {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .sort {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .user-nav {
-        gap: 8px;
-    }
-    
-    .btn--create-post span {
-        display: none;
-    }
-    
-    .btn--create-post {
-        padding: 0.5rem;
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .topbar__inner {
-        padding: 0 0.5rem;
-        gap: 1rem;
-    }
-    
-    .layout {
-        padding: 0.5rem;
-    }
-    
-    .hero {
-        padding: 1.5rem;
-    }
-    
-    .hero__title {
-        font-size: 1.3rem;
-    }
-    
-    .article {
-        padding: 1rem;
-    }
-    
-    .article__title {
-        font-size: 1.1rem;
-    }
-    
-    .sitefooter__inner {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-    
-    .sitefooter__nav {
-        gap: 1rem;
-    }
-}
-
-/* =====================================================================
-SECCION 16: LATERAL MENU STYLES
+SECCION 15: LATERAL MENU STYLES
 ===================================================================== */
 
 .contenedor {
-    display: flex;
+    display: block;
+    margin-bottom: 1.5rem;
 }
 
 .subnav {
-    width: 220px;
-    background-color: #f5f5f5;
-    padding: 15px;
-    border-right: 1px solid #e9e9ff;
-    height: 100vh; /* Para que ocupe toda la altura */
-    position: sticky; /* Para que quede fijo al hacer scroll */
+    width: 100%;
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    height: auto;
+    position: relative;
     top: 0;
     list-style: none;
 }
 
 .subnav .emoji {
-    font-size: 18px;
+    font-size: 16px;
     width: 20px;
     display: inline-block;
     text-align: center;
@@ -1335,33 +1201,251 @@ SECCION 16: LATERAL MENU STYLES
 .subnav ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .subnav li {
-    margin-bottom: 10px;
+    margin-bottom: 4px;
 }
 
 .subnav a {
     text-decoration: none;
     color: #333;
-    font-weight: 600;
+    font-weight: 500;
     display: block;
-    padding: 8px 10px; /* Para que no se vea tan pegado */
-    border-radius: 8px;
-    transition: background-color 0.2s; /* Para que el cambio de color al pasar el mouse sea más suave */
+    padding: 8px 0;
+    border-radius: 0;
+    transition: color 0.2s;
+    font-size: 14px;
 }
 
 .subnav a:hover {
-    background-color: #3b49df1a; /* Al pasar el mouse se cambia el color */
+    background-color: transparent;
+    color: #3b49df;
 }
 
-main {
-    flex: 1;
-    padding: 20px;
+/* Estilos para la sección Other */
+.section-divider {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #e9e9ff;
+}
+
+.section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Estilos para las redes sociales */
+.social-section {
+    margin-top: 16px;
+}
+
+.social-icons-container {
+    margin: 8px 0;
+}
+
+.social-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Organización: 5 iconos arriba, 2 abajo */
+.social-icons {
+    width: 152px; /* (28px + 8px) * 4 + 28px */
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    background-color: transparent;
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.social-icon:hover {
+    color: #3b49df;
+    background-color: #3b49df1a;
+    transform: translateY(-1px);
+}
+
+.bsky-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* Ajustes para las secciones que siguen al menú */
+.leftbar .section {
+    background: #ffffff;
+    padding: 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    border: 1px solid #e9e9ff;
+}
+
+.leftbar .section__title {
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.taglist, .topiclist, .resourceList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.taglist__item, .topiclist__item, .resourceList__item {
+    margin-bottom: 0.5rem;
+}
+
+.taglist__link, .topiclist__link, .resourceList__link {
+    color: #3b49df;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+.taglist__link:hover, .topiclist__link:hover, .resourceList__link:hover {
+    color: #2f3ab2;
+}
+
+.taglist__link {
+    padding: 0.35rem 0.75rem;
+    background: #f3f5ff;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+.topiclist__link {
+    font-size: 0.85rem;
+}
+
+.resourceList__link {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.resourceList__link:hover {
+    color: #3b49df;
 }
 
 /* =====================================================================
-SECCION 17: MODAL STYLES
+MODAL STYLES - ESTILO COMPLETO DEV.TO
+===================================================================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(235, 235, 235);
+    backdrop-filter: blur(2px);
+}
+
+.modal__content {
+    position: relative;
+    background: rgb(235, 235, 235);
+    border-radius: 8px;
+    padding: 0;
+    width: auto;
+    min-width: 300px;
+    z-index: 10001;
+    border: 1px solid #e0e0e0;
+}
+
+.modal__center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    gap: 20px;
+}
+
+.modal__text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #242424;
+    text-align: center;
+    font-weight: 400;
+}
+
+.modal__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Botones específicos del modal - IDÉNTICOS A DEV.TO */
+.modal__actions .btn {
+    min-width: 100px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+}
+
+.modal__actions .btn--outline {
+    background: transparent;
+    color: #3b49df;
+    border: 1px solid #3b49df;
+}
+
+.modal__actions .btn--outline:hover {
+    background: #3b49df;
+    color: white;
+}
+
+.modal__actions .btn--primary {
+    background: #3b49df;
+    color: white;
+    border: 1px solid #3b49df;
+}
+
+.modal__actions .btn--primary:hover {
+    background: #2f3ab2;
+    border-color: #2f3ab2;
+}
+
+/* =====================================================================
+SECCION 16: MODAL STYLES
 ===================================================================== */
 
 .modal {
@@ -1766,36 +1850,1056 @@ SECCION 17: MODAL STYLES
     color: #666;
 }
 
-/* Mobile Responsive */
+/* =====================================================================
+SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
+===================================================================== */
+
+/* Mobile Breakpoint: 768px y menores */
 @media (max-width: 768px) {
-    .article-card {
+    
+    /* =====================================================================
+    SECCION 17.1: AJUSTES GENERALES Y BODY
+    ===================================================================== */
+    
+    body {
+        overflow-x: hidden;
+    }
+    
+    body.menu-open {
+        overflow: hidden;
+    }
+
+    .user-nav .btn--create-post {
+        display: none !important;
+    }
+    
+    /* =====================================================================
+    SECCION 17.2: HEADER MOBILE - ESTILO DEV.TO
+    ===================================================================== */
+    
+    .topbar {
+        height: 50px;
+        margin-left: 0;
+        padding: 0;
+        border-bottom: 1px solid #e0e0e0;
+        background: #fff;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    
+    .topbar__inner {
+        width: 100%;
+        padding: 0 16px;
+        gap: 12px;
+        justify-content: space-between;
+        height: 100%;
+        align-items: center;
+    }
+    
+    /* Logo centrado */
+    .brand {
+        order: 2;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+    }
+    
+    .brand img {
+        width: 40px;
+        height: 30px;
+        margin-right: 300px;
+    }
+    
+    /* Búsqueda oculta en móvil por defecto */
+    .search {
+        display: none;
+    }
+    
+    /* Botones de auth - estilo DEV.TO */
+    .actions {
+        gap: 8px;
+        margin-left: 0;
+        order: 3;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+        height: 36px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    
+    .btn--outline {
+        display: none; /* Ocultar Login en móvil como DEV.TO */
+    }
+    
+    .btn--primary {
+        background: #3b49df;
+        font-weight: 600;
+    }
+    
+    /* Hamburguesa estilo DEV.TO */
+    .hambtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+        order: 1;
+    }
+    
+    .hambtn:hover {
+        background: #f5f5f5;
+    }
+    
+    /* User nav para móvil cuando está logueado */
+    .user-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 0;
+        order: 3;
+    }
+    
+    /* Ocultar texto en botones de user-nav en móvil */
+    .user-nav .btn--create-post span {
+        display: none;
+    }
+    
+    .user-nav .btn--create-post {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .user-nav .icon-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    /* =====================================================================
+    SECCION 17.3: MINIBAR MOBILE - COMPORTAMIENTO DEV.TO
+    ===================================================================== */
+    
+    .minibar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 60px;
+        z-index: 1001;
+        top: 50px;
+        height: calc(100vh - 50px);
+    }
+    
+    .minibar--open {
+        transform: translateX(0);
+    }
+    
+    /* =====================================================================
+    SECCION 17.4: LAYOUT MOBILE - UNA COLUMNA
+    ===================================================================== */
+    
+    .layout {
+        grid-template-columns: 1fr;
         padding: 16px;
+        gap: 16px;
+        margin-left: 0;
+        max-width: 100%;
+        padding-top: 16px;
+    }
+    
+    /* =====================================================================
+    SECCION 17.5: LEFTBAR MOBILE - MENÚ DESPLEGABLE ESTILO DEV.TO
+    ===================================================================== */
+    
+    .leftbar {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        width: 280px;
+        height: calc(100vh - 50px);
+        background: #fff;
+        z-index: 1000;
+        transform: translateX(-100%);
+        overflow-y: auto;
+        padding: 0;
+        box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+        border-right: 1px solid #e0e0e0;
+        transition: transform 0.3s ease;
+    }
+    
+    .leftbar.open {
+        transform: translateX(0);
+    }
+    
+    /* Contenedor del menú */
+    .contenedor {
+        padding: 16px;
+        margin-bottom: 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    /* Items del menú estilo DEV.TO */
+    .subnav li {
+        margin-bottom: 0;
+    }
+    
+    .subnav a {
+        padding: 12px 0;
+        font-size: 16px;
+        color: #333;
+        font-weight: 400;
+        border-radius: 0;
+        transition: none;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    
+    .subnav a:hover {
+        background: transparent;
+        color: #3b49df;
+    }
+    
+    .emoji {
+        font-size: 18px;
+        width: 24px;
+        margin-right: 12px;
+    }
+    
+    /* Secciones del menú */
+    .section-divider {
+        margin-top: 20px;
+        margin-bottom: 12px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .section-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Redes sociales estilo DEV.TO */
+    .social-icons {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+    
+    .social-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        background: #f5f5f5;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    
+    .social-icon:hover {
+        background: #3b49df;
+        color: white;
+    }
+    
+    /* Overlay corregido */
+    .mobile-overlay {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 50px);
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        display: none;
+        backdrop-filter: blur(2px);
+    }
+    
+    .mobile-overlay.active {
+        display: block;
+    }
+    
+    /* Secciones adicionales del leftbar */
+    .leftbar .section {
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        border-bottom: 1px solid #f0f0f0;
+        background: #fafafa;
+        padding: 16px;
+    }
+    
+    .leftbar .section:last-child {
+        border-bottom: none;
+    }
+    
+    .section__title {
+        font-size: 12px;
         margin-bottom: 12px;
     }
     
-    .article-card__footer {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
+    .taglist__link, .topiclist__link, .resourceList__link {
+        font-size: 14px;
     }
     
-    .article-card__reactions {
-        flex-wrap: wrap;
-    }
+    /* =====================================================================
+    SECCION 17.6: CONTENT MOBILE - ESTILO DEV.TO CORREGIDO
+    ===================================================================== */
     
-    .article-card__title a {
-        font-size: 18px;
-    }
-    
-    .article-card__meta {
+    .content {
         width: 100%;
+        padding: 0;
+    }
+    
+    /* Hero section móvil - CORREGIDO */
+    .hero {
+        padding: 24px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        background: #fff;
+        color: #242424;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e0e0e0;
+    }
+    
+    .hero__title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #242424;
+        line-height: 1.4;
+    }
+    
+    .hero__description {
+        font-size: 16px;
+        color: #666;
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    /* Feed controls móvil */
+    .feed-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        padding: 16px;
+        margin-bottom: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .tabs {
+        display: flex;
+        width: 100%;
+        background: #f5f5f5;
+        border-radius: 8px;
+        padding: 4px;
+    }
+    
+    .tab {
+        flex: 1;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 6px;
+        color: #666;
+    }
+    
+    .tab--active {
+        background: white;
+        color: #3b49df;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .sort {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        gap: 8px;
+        color: #666;
+    }
+    
+    .sort__select {
+        padding: 6px 8px;
+        font-size: 14px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        background: white;
+    }
+    
+    /* Artículos móvil - CORREGIDO */
+    .articles {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .article {
+        padding: 20px;
+        margin-bottom: 0;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #f0f0f0;
+    }
+    
+    .article__header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+    
+    .article__avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    
+    .article__author {
+        font-weight: 600;
+        font-size: 14px;
+        color: #242424;
+    }
+    
+    .article__date {
+        color: #666;
+        font-size: 12px;
+    }
+    
+    .article__title {
+        font-size: 18px;
+        line-height: 1.4;
+        margin-bottom: 12px;
+        color: #242424;
+        font-weight: 700;
+    }
+    
+    .article__content {
+        color: #444;
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+    
+    .article__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .article__tag {
+        background: #f5f6fd;
+        color: #3b49df;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .article__footer {
+        display: flex;
         justify-content: space-between;
+        align-items: center;
+        padding-top: 16px;
+        margin-top: 16px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .reactions {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .reaction {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 4px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+    }
+    
+    .reaction:hover {
+        background: #f9f9f9;
+        color: #3b49df;
+    }
+    
+    .meta-right {
+        color: #666;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    /* =====================================================================
+    SECCION 17.7: RIGHTBAR MOBILE - OCULTO
+    ===================================================================== */
+    
+    .rightbar {
+        display: none;
+    }
+    
+    /* =====================================================================
+    SECCION 17.8: FOOTER MOBILE
+    ===================================================================== */
+    
+    .sitefooter {
+        margin-top: 40px;
+        padding: 24px 16px;
+        background: #fff;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .sitefooter__inner {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        max-width: 100%;
+    }
+    
+    .sitefooter__nav {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    
+    .sitefooter__link {
+        font-size: 14px;
+        color: #666;
+        text-decoration: none;
     }
 }
 
-.btn--create-post {
+/* =====================================================================
+SECCION 18: SMALL MOBILE (480px y menores) - CORREGIDO
+===================================================================== */
+
+@media (max-width: 480px) {
+    
+    .topbar__inner {
+        padding: 0 12px;
+    }
+    
+    .brand img {
+        width: 35px;
+        height: 26px;
+    }
+    
+    /* Botón Create Account más pequeño */
+    .btn--primary {
+        padding: 6px 12px;
+        font-size: 13px;
+        height: 32px;
+    }
+    
+    /* Menú lateral */
+    .leftbar {
+        width: 85%;
+        max-width: 300px;
+    }
+
+    .mobile-overlay {
+        left: 0;
+        width: 100%;
+    }
+    
+    /* Layout más compacto */
+    .layout {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .hero {
+        padding: 20px 16px;
+        margin-bottom: 16px;
+    }
+    
+    .hero__title {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    
+    .hero__description {
+        font-size: 14px;
+    }
+    
+    .article {
+        padding: 16px;
+    }
+    
+    .article__title {
+        font-size: 16px;
+    }
+    
+    /* Feed controls más compactos */
+    .feed-controls {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .tab {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    
+    /* User nav más compacto */
+    .user-nav {
+        gap: 4px;
+    }
+    
+    .user-nav .btn--create-post,
+    .user-nav .icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* =====================================================================
+SECCION 19: TABLET (769px - 1024px)
+===================================================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    
+    .layout {
+        grid-template-columns: 200px 1fr;
+        padding: 20px;
+        gap: 20px;
+        padding-left: 76px; /* Ajuste para minibar */
+    }
+    
+    .rightbar {
+        display: none;
+    }
+    
+    .topbar__inner {
+        width: 100%;
+        max-width: none;
+        padding: 0 20px;
+        margin-left: 60px; /* Compensar minibar */
+    }
+    
+    /* Search bar más pequeña en tablet */
+    .search {
+        max-width: 300px;
+    }
+    
+    /* Ajustes de contenido para tablet */
+    .content {
+        min-width: 0; /* Permite que se reduzca */
+    }
+    
+    .hero__title {
+        font-size: 24px;
+    }
+    
+    /* Ajustar leftbar para tablet */
+    .leftbar {
+        position: sticky;
+        top: 76px; /* header + margen */
+        height: fit-content;
+    }
+    
+    /* Mostrar hamburger en tablet si es necesario */
+    .hambtn {
+        display: none; /* Ocultar en tablet */
+    }
+}
+
+/* =====================================================================
+SECCION 20: UTILIDADES RESPONSIVE
+===================================================================== */
+
+/* Prevenir zoom en inputs en iOS */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Mejorar scrolling en móvil */
+@media (max-width: 768px) {
+    .leftbar {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Ajustes para modo landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+    .leftbar {
+        height: calc(100vh - 40px);
+    }
+    
+    .mobile-overlay {
+        height: calc(100vh - 40px);
+    }
+    
+    .minibar {
+        height: calc(100vh - 40px);
+    }
+}
+
+/* =====================================================================
+SECCION 21: ESTILOS PARA ESTADO LOGUEADO/NO LOGUEADO
+===================================================================== */
+
+/* Cuando el usuario está logueado - ocultar actions */
+body.user-logged-in .actions {
+    display: none;
+}
+
+body.user-logged-in .user-nav {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-right: 12px;
+}
+
+/* Cuando el usuario NO está logueado - ocultar user-nav */
+body:not(.user-logged-in) .user-nav {
+    display: none;
+}
+
+body:not(.user-logged-in) .actions {
+    display: flex;
+}
+
+/* En desktop, restaurar estilos normales */
+@media (min-width: 769px) {
+    .hambtn {
+        display: none;
+    }
+    
+    .brand {
+        order: 1;
+        position: static;
+        transform: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .search {
+        display: block;
+        order: 2;
+    }
+    
+    .actions {
+        order: 3;
+        margin-left: auto;
+    }
+    
+    .user-nav {
+        order: 3;
+        margin-left: auto;
+    }
+    
+    .user-nav .btn--create-post span {
+        display: inline;
+    }
+    
+    .user-nav .btn--create-post {
+        width: auto;
+        height: 36px;
+        padding: 8px 16px;
+        border-radius: 4px;
+    }
+    
+    .minibar {
+        transform: translateX(0);
+    }
+    
+    .leftbar {
+        position: sticky;
+        top: 76px;
+        transform: translateX(0);
+        width: auto;
+        height: auto;
+        box-shadow: none;
+        border-right: none;
+        background: transparent;
+    }
+    
+    .mobile-overlay {
+        display: none !important;
+    }
+}
+
+/* =====================================================================
+USER MENU - RESPONSIVE MOBILE (768px y menores) - CORREGIDO
+===================================================================== */
+
+@media (max-width: 768px) {
+    
+    /* User Menu Container */
+    .user-menu {
+        position: static;
+    }
+    
+    /* Avatar más pequeño en móvil */
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-width: 1px;
+    }
+    
+    /* DROPDOWN CENTRADO - CORREGIDO */
+.user-dropdown {
+        position: fixed !important;
+        top: 60px !important;
+        left: 50% !important; /* Centrado horizontal */
+        right: auto !important;
+        transform: translateX(-100%) !important; /* Compensación para centrado perfecto */
+        width: 280px !important;
+        max-width: calc(100vw - 32px);
+        margin-top: 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        z-index: 1001;
+        animation: mobileDropdownFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: none;
+    }
+
+    .user-dropdown.show {
+        display: block;
+    }
+    
+    @keyframes mobileDropdownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+    }
+    
+    /* User Info más compacto en móvil */
+    .user-info {
+        padding: 16px;
+        margin-bottom: 0;
+        border-radius: 12px 12px 0 0;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .user-info__name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #24292f;
+    }
+    
+    /* Dropdown items más grandes para touch */
+    .dropdown-item {
+        padding: 14px 16px;
+        font-size: 16px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        color: #24292f;
+        gap: 12px;
+        text-decoration: none;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+    }
+    
+    .dropdown-item i {
+        width: 24px;
+        font-size: 16px;
+        color: #6c757d;
+    }
+    
+    .dropdown-item:hover {
+        background: #f8f9fa;
+        color: var(--accent);
+    }
+    
+    .dropdown-item--logout {
+        color: #d1242f;
+    }
+    
+    .dropdown-item--logout:hover {
+        background: #fff0f0;
+        color: #d1242f;
+    }
+    
+    .dropdown-item--logout i {
+        color: #d1242f;
+    }
+    
+    /* Overlay para fondo cuando el dropdown está abierto */
+    .user-dropdown-overlay {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 50px);
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: none;
+        backdrop-filter: blur(2px);
+    }
+    
+    .user-dropdown-overlay.active {
+        display: block;
+    }
+    
+    /* Asegurar que el dropdown tenga suficiente espacio en móvil */
+    .user-dropdown {
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Dividers mejorados para móvil */
+    .dropdown-divider {
+        background-color: #e9ecef;
+        margin: 8px 0;
+        height: 1px;
+        border: none;
+        list-style: none;
+    }
+}
+
+/* =====================================================================
+USER MENU - SMALL MOBILE (480px y menores) - CORREGIDO
+===================================================================== */
+
+@media (max-width: 480px) {
+    
+        /* DROPDOWN CENTRADO - CORREGIDO */
+.user-dropdown {
+        position: fixed !important;
+        top: 60px !important;
+        left: 50% !important; /* Centrado horizontal */
+        right: auto !important;
+        transform: translateX(-100%) !important; /* Compensación para centrado perfecto */
+        width: 280px !important;
+        max-width: calc(100vw - 32px);
+        margin-top: 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        z-index: 1001;
+        animation: mobileDropdownFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: none;
+    }
+    
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .dropdown-item {
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+    
+    .user-info {
+        padding: 14px 16px;
+    }
+    
+    .user-info__name {
+        font-size: 15px;
+    }
+    
+    /* User nav más compacto */
+    .user-nav {
+        gap: 4px;
+    }
+    
+    .user-nav .icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal__content {
+        margin: 20px;
+        width: calc(100% - 40px);
+        max-width: none;
+    }
+    
+    .modal__center {
+        padding: 24px;
+        gap: 16px; /* Reducir el gap para móvil */
+    }
+    
+    .modal__actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .modal__actions .btn {
+        min-width: auto;
+        width: 100%;
+        margin: 0; /* Asegurar que no tenga márgenes */
+    }
+    
+    /* Asegurar que ambos botones sean visibles */
+    .modal__actions .btn--outline,
+    .modal__actions .btn--primary {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+    }
 }

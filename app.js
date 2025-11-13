@@ -9,6 +9,7 @@ const passport = require('./passportConfig');
 const mongoose = require('mongoose');
 const User = require('./public/user');
 const Post = require('./public/post');
+const router = express.Router();
 const multer = require('multer');
 const { authenticateJWT } = require('./config/jwtConfig');
 const app = express();
@@ -1218,6 +1219,86 @@ app.get('/auth/github/callback',
 );
 
 /******************************************************
+ *              ELIMINAR POST
+ ******************************************************/
+app.delete('/api/posts/:id', requireAuthHybrid, async (req, res) => {
+    try {
+        console.log('🗑️ === INICIANDO ELIMINACIÓN DE POST ===');
+        
+        const postId = req.params.id;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
+        }
+
+        console.log('📝 Datos de eliminación:', {
+            postId,
+            userId,
+            authMethod: req.authMethod
+        });
+
+        // Buscar el post
+        const post = await Post.findById(postId);
+        if (!post) {
+            console.log('❌ Post no encontrado:', postId);
+            return res.status(404).json({ 
+                success: false,
+                error: 'Post not found' 
+            });
+        }
+
+        // Verificar que el usuario es el autor
+        if (post.author.toString() !== userId.toString()) {
+            console.log('❌ Usuario no autorizado para eliminar este post');
+            console.log('   - Autor del post:', post.author.toString());
+            console.log('   - Usuario actual:', userId.toString());
+            return res.status(403).json({ 
+                success: false,
+                error: 'Not authorized to delete this post' 
+            });
+        }
+
+        console.log('✅ Usuario autorizado, eliminando post...');
+
+        // Eliminar el post de la base de datos
+        await Post.findByIdAndDelete(postId);
+        console.log('✅ Post eliminado de la base de datos');
+
+        // También eliminar comentarios asociados (opcional pero recomendado)
+        await Post.updateMany(
+            { 'comments.postId': postId },
+            { $pull: { comments: { postId: postId } } }
+        );
+        console.log('✅ Comentarios asociados eliminados');
+
+        res.json({ 
+            success: true, 
+            message: 'Post deleted successfully' 
+        });
+
+    } catch (error) {
+        console.error('❌ ERROR AL ELIMINAR POST:', error);
+        
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                success: false,
+                error: 'ID de post inválido' 
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            error: 'Error interno del servidor al eliminar el post',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+/******************************************************
  *              INICIO DEL SERVIDOR
  ******************************************************/
 app.listen(3000, () => {
@@ -1234,6 +1315,7 @@ app.listen(3000, () => {
     console.log('   GET  /api/posts/:id/comments');
     console.log('   PUT  /api/comments/:id');
     console.log('   DELETE /api/comments/:id');
+     console.log('   DELETE /api/posts/:id');
 });
 
 module.exports = app;

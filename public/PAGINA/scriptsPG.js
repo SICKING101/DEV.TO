@@ -25,11 +25,9 @@ const leftbar = document.getElementById('leftbar');
 const minibar = document.getElementById('minibar');
 
 // =====================================================================
-// SECCIÓN 2: FUNCIONALIDAD DE LA MINIBAR (BARRA LATERAL)
+// SECCIÓN 2: SISTEMA DE AUTENTICACIÓN - AUTH MANAGER
 // =====================================================================
-// public/PAGINA/scriptsPG.js
 
-// 🔥 AGREGAR AL INICIO DEL ARCHIVO
 class AuthManager {
     constructor() {
         this.token = localStorage.getItem('jwtToken');
@@ -73,115 +71,330 @@ class AuthManager {
         localStorage.removeItem('jwtToken');
     }
 
-async logout() {
-    try {
-        console.log('Ejecutando logout completo...');
-        
-        // 1. Limpiar TODO el estado local primero
-        this.clearToken();
-        this.clearAllUserData();
-        
-        // 2. Intentar logout en el servidor (pero no es crítico)
-        if (this.token) {
-            try {
-                const response = await fetch('/api/auth/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                console.log('Respuesta del servidor:', response.status);
-            } catch (error) {
-                console.log('Logout del servidor falló, pero continuando...');
+    async logout() {
+        try {
+            console.log('Ejecutando logout completo...');
+            
+            // 1. Limpiar TODO el estado local primero
+            this.clearToken();
+            this.clearAllUserData();
+            
+            // 2. Intentar logout en el servidor (pero no es crítico)
+            if (this.token) {
+                try {
+                    const response = await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log('Respuesta del servidor:', response.status);
+                } catch (error) {
+                    console.log('Logout del servidor falló, pero continuando...');
+                }
             }
+
+            // 3. 🔥 LIMPIAR CACHE Y REDIRIGIR INMEDIATAMENTE
+            this.clearAllCache();
+            window.location.href = '/login.html';
+            
+        } catch (error) {
+            console.error('Error en logout:', error);
+            // Forzar limpieza completa y redirección
+            this.clearAllUserData();
+            window.location.href = '/login.html';
         }
+    }
 
-        // 3. 🔥 LIMPIAR CACHE Y REDIRIGIR INMEDIATAMENTE
-        this.clearAllCache();
-        window.location.href = '/login.html';
+    /**
+     * Limpia TODOS los datos del usuario
+     */
+    clearAllUserData() {
+        console.log('Limpiando todos los datos del usuario...');
         
-    } catch (error) {
-        console.error('Error en logout:', error);
-        // Forzar limpieza completa y redirección
-        this.clearAllUserData();
-        window.location.href = '/login.html';
+        // Limpiar token
+        localStorage.removeItem('jwtToken');
+        
+        // Limpiar cualquier otro dato de usuario que puedas tener
+        localStorage.removeItem('userData');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userProfile');
+        
+        // Limpiar sessionStorage por si acaso
+        sessionStorage.clear();
+        
+        // Limpiar cookies relacionadas con autenticación
+        this.clearAuthCookies();
+        
+        this.token = null;
+        this.isAuthenticated = false;
+        
+        console.log('Todos los datos de usuario eliminados');
+    }
+
+    /**
+     * Limpia cookies de autenticación
+     */
+    clearAuthCookies() {
+        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    /**
+     * Limpia toda la cache de la aplicación
+     */
+    clearAllCache() {
+        // Limpiar cache de comentarios
+        if (window.devCommunity && window.devCommunity.commentSystem) {
+            window.devCommunity.commentSystem.commentsCache.clear();
+        }
+        
+        // Limpiar cualquier variable global
+        window.currentUser = null;
+        window.userData = null;
+        
+        console.log('Cache de la aplicación limpiada');
     }
 }
 
-/**
- * Limpia TODOS los datos del usuario
- */
-clearAllUserData() {
-    console.log('Limpiando todos los datos del usuario...');
-    
-    // Limpiar token
-    localStorage.removeItem('jwtToken');
-    
-    // Limpiar cualquier otro dato de usuario que puedas tener
-    localStorage.removeItem('userData');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('userProfile');
-    
-    // Limpiar sessionStorage por si acaso
-    sessionStorage.clear();
-    
-    // Limpiar cookies relacionadas con autenticación
-    this.clearAuthCookies();
-    
-    this.token = null;
-    this.isAuthenticated = false;
-    
-    console.log('Todos los datos de usuario eliminados');
-}
+// Instancia global del AuthManager
+const authManager = new AuthManager();
 
-/**
- * Limpia cookies de autenticación
- */
-clearAuthCookies() {
-    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-}
+// =====================================================================
+// SECCIÓN 3: MANEJO DE NAVEGACIÓN RESPONSIVE
+// =====================================================================
 
-/**
- * Limpia toda la cache de la aplicación
- */
-clearAllCache() {
-    // Limpiar cache de comentarios
-    if (window.devCommunity && window.devCommunity.commentSystem) {
-        window.devCommunity.commentSystem.commentsCache.clear();
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menuToggle');
+    const leftbar = document.getElementById('leftbar');
+    const body = document.body;
+    const minibar = document.getElementById('minibar');
+    
+    // Crear overlay dinámicamente si no existe
+    let mobileOverlay = document.getElementById('mobileOverlay');
+    if (!mobileOverlay) {
+        mobileOverlay = document.createElement('div');
+        mobileOverlay.id = 'mobileOverlay';
+        mobileOverlay.className = 'mobile-overlay';
+        document.body.appendChild(mobileOverlay);
     }
-    
-    // Limpiar cualquier variable global
-    window.currentUser = null;
-    window.userData = null;
-    
-    console.log('Cache de la aplicación limpiada');
-}
 
-}
+    // Estado del menú
+    let isMenuOpen = false;
+
+    // Función para abrir el menú
+    function openMobileMenu() {
+        leftbar.classList.add('open');
+        mobileOverlay.classList.add('active');
+        body.classList.add('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        menuToggle.innerHTML = '✕';
+        isMenuOpen = true;
+    }
+
+    // Función para cerrar el menú
+    function closeMobileMenu() {
+        leftbar.classList.remove('open');
+        mobileOverlay.classList.remove('active');
+        body.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.innerHTML = '☰';
+        isMenuOpen = false;
+    }
+
+    // Toggle del menú hamburguesa
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (isMenuOpen) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        });
+    }
+
+    // Cerrar menú al hacer clic en el overlay
+    mobileOverlay.addEventListener('click', closeMobileMenu);
+
+    // Cerrar menú con tecla Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isMenuOpen) {
+            closeMobileMenu();
+        }
+    });
+
+    // Cerrar menú al hacer clic en enlaces del menú
+    const mobileLinks = leftbar.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Solo cerrar si es un enlace interno (no externo ni con target blank)
+            if (this.getAttribute('href') && 
+                !this.getAttribute('href').startsWith('http') &&
+                !this.getAttribute('target') &&
+                window.innerWidth <= 768) {
+                closeMobileMenu();
+            }
+        });
+    });
+
+    // Cerrar menú al redimensionar a desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && isMenuOpen) {
+            closeMobileMenu();
+        }
+        
+        // Actualizar visibilidad del hamburger
+        updateHamburgerVisibility();
+    });
+
+    // Prevenir que los clics dentro del menú lo cierren
+    leftbar.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    // Cerrar menú al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (isMenuOpen && 
+            !leftbar.contains(e.target) && 
+            e.target !== menuToggle &&
+            !mobileOverlay.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+
+    // =====================================================================
+    // SECCIÓN 3.1: MANEJO DE ESTADO DE USUARIO
+    // =====================================================================
+
+    function updateUserState() {
+        // Simular estado de usuario (en una app real esto vendría del backend)
+        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        
+        if (isLoggedIn) {
+            body.classList.add('user-logged-in');
+            body.classList.remove('user-logged-out');
+            
+            // Mostrar user-nav y ocultar actions
+            const userNav = document.getElementById('userNav');
+            const authActions = document.getElementById('authActions');
+            
+            if (userNav) userNav.style.display = 'flex';
+            if (authActions) authActions.style.display = 'none';
+        } else {
+            body.classList.add('user-logged-out');
+            body.classList.remove('user-logged-in');
+            
+            // Mostrar actions y ocultar user-nav
+            const userNav = document.getElementById('userNav');
+            const authActions = document.getElementById('authActions');
+            
+            if (userNav) userNav.style.display = 'none';
+            if (authActions) authActions.style.display = 'flex';
+        }
+    }
+
+    // =====================================================================
+    // SECCIÓN 3.2: ACTUALIZAR VISIBILIDAD DEL HAMBURGUESA
+    // =====================================================================
+
+    function updateHamburgerVisibility() {
+        if (window.innerWidth <= 768) {
+            menuToggle.style.display = 'flex';
+        } else {
+            menuToggle.style.display = 'none';
+            closeMobileMenu();
+        }
+    }
+
+    // =====================================================================
+    // SECCIÓN 3.3: INICIALIZACIÓN
+    // =====================================================================
+
+    function initialize() {
+        updateUserState();
+        updateHamburgerVisibility();
+    }
+
+    // Ejecutar inicialización
+    initialize();
+
+    // Re-inicializar en resize - SOLO ACTUALIZAR HAMBURGUESA
+    window.addEventListener('resize', function() {
+        updateHamburgerVisibility();
+    });
+});
 
 // =====================================================================
-// SECCIÓN 2.1: FUNCIÓN GLOBAL DE LOGOUT
+// SECCIÓN 4: MANEJO DE CIERRE DE SESIÓN CON MODAL
 // =====================================================================
-
-/**
- * Función global para cerrar sesión - llamada desde el HTML
- */
 
 window.handleLogout = function(event) {
     if (event) event.preventDefault();
     
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        // Limpiar token inmediatamente
-        localStorage.removeItem('jwtToken');
-        // Redirigir inmediatamente
-        window.location.href = '/login.html';
-    }
+    const logoutModal = document.getElementById('logoutModal');
+    
+    // Mostrar el modal
+    logoutModal.style.display = 'flex';
+    
+    // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
 };
 
-const authManager = new AuthManager();
+// Inicializar eventos del modal
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutModal = document.getElementById('logoutModal');
+    const logoutConfirm = document.getElementById('logoutConfirm');
+    const logoutCancel = document.getElementById('logoutCancel');
+    const modalOverlay = logoutModal.querySelector('.modal__overlay');
+    
+    // Confirmar cierre de sesión
+    if (logoutConfirm) {
+        logoutConfirm.addEventListener('click', function() {
+            // Limpiar datos de sesión
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('userData');
+            
+            // Cerrar modal
+            logoutModal.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Redirigir a login
+            window.location.href = '/Login.html';
+        });
+    }
+    
+    // Cancelar cierre de sesión
+    if (logoutCancel) {
+        logoutCancel.addEventListener('click', function() {
+            logoutModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
+    // Cerrar modal al hacer clic en el overlay
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function() {
+            logoutModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && logoutModal.style.display === 'flex') {
+            logoutModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+// =====================================================================
+// SECCIÓN 5: FUNCIONALIDAD DE AUTENTICACIÓN
+// =====================================================================
 
 // 🔥 FUNCIÓN HELPER PARA REQUEST AUTENTICADOS
 async function makeAuthenticatedRequest(url, options = {}) {
@@ -237,58 +450,8 @@ async function refreshToken() {
     return false;
 }
 
-// 🔥 MODIFICAR LA FUNCIÓN DE REACCIONES (línea 1571 aproximadamente)
-async function addReaction(postId, reactionType) {
-    try {
-        const response = await makeAuthenticatedRequest(`/api/posts/${postId}/reactions`, {
-            method: 'POST',
-            body: JSON.stringify({ reactionType })
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al agregar reacción');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
-    }
-}
-
-// 🔥 MODIFICAR OTRAS FUNCIONES QUE USEN FETCH PARA USAR makeAuthenticatedRequest
-// Buscar todas las funciones que hagan POST, PUT, DELETE y cambiar fetch por makeAuthenticatedRequest
-
-/**
- * Inicializa la funcionalidad de la minibar (barra lateral con íconos)
- * Maneja los previews que aparecen al hacer hover sobre los íconos
- */
-function initMinibar() {
-    const minibarItems = document.querySelectorAll('.minibar__item');
-    
-    minibarItems.forEach(item => {
-        const link = item.querySelector('.minibar__link');
-        const preview = item.querySelector('.minibar__preview');
-        
-        // Mostrar preview al hacer hover
-        link.addEventListener('mouseenter', () => {
-            minibarItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('minibar__item--preview');
-                }
-            });
-            item.classList.add('minibar__item--preview');
-        });
-        
-        // Ocultar preview al quitar el mouse
-        item.addEventListener('mouseleave', () => {
-            item.classList.remove('minibar__item--preview');
-        });
-    });
-}
-
 // =====================================================================
-// SECCIÓN 3: MANEJO DE IMÁGENES Y AVATARS
+// SECCIÓN 6: MANEJO DE IMÁGENES Y AVATARS
 // =====================================================================
 
 /**
@@ -314,13 +477,9 @@ function setupImageErrorHandlers() {
 }
 
 // =====================================================================
-// SECCIÓN 4: SISTEMA DE AUTENTICACIÓN
+// SECCIÓN 7: SISTEMA DE AUTENTICACIÓN DE USUARIO
 // =====================================================================
 
-/**
- * Verifica el estado de autenticación del usuario
- * @returns {Object|null} Datos del usuario o null si no está autenticado
- */
 /**
  * Verifica el estado de autenticación del usuario
  * @returns {Object|null} Datos del usuario o null si no está autenticado
@@ -334,7 +493,7 @@ async function checkAuth() {
         
         if (!token) {
             console.log('❌ No hay token encontrado');
-            this.showUnauthenticatedState();
+            showUnauthenticatedState();
             return null;
         }
 
@@ -351,8 +510,8 @@ async function checkAuth() {
         if (!response.ok) {
             console.log('❌ Token inválido o expirado');
             // Token inválido, limpiar todo
-            this.clearAllUserData();
-            this.showUnauthenticatedState();
+            clearAllUserData();
+            showUnauthenticatedState();
             return null;
         }
         
@@ -361,18 +520,18 @@ async function checkAuth() {
         
         if (data.user && data.user.id) {
             console.log('✅ Usuario autenticado correctamente');
-            this.showAuthenticatedState(data.user);
+            showAuthenticatedState(data.user);
             return data.user;
         } else {
             console.log('❌ No hay datos de usuario en la respuesta');
-            this.clearAllUserData();
-            this.showUnauthenticatedState();
+            clearAllUserData();
+            showUnauthenticatedState();
             return null;
         }
     } catch (error) {
         console.error('❌ Error checking auth:', error);
-        this.clearAllUserData();
-        this.showUnauthenticatedState();
+        clearAllUserData();
+        showUnauthenticatedState();
         return null;
     }
 }
@@ -459,8 +618,20 @@ function resetUserInfo() {
     }
 }
 
+/**
+ * Limpia todos los datos del usuario
+ */
+function clearAllUserData() {
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userProfile');
+    sessionStorage.clear();
+}
+
 // =====================================================================
-// SECCIÓN 5: DROPDOWN DEL USUARIO
+// SECCIÓN 8: DROPDOWN DEL USUARIO
 // =====================================================================
 
 /**
@@ -531,7 +702,7 @@ function initUserDropdown() {
 }
 
 // =====================================================================
-// SECCIÓN 6: SISTEMA DE TAGS
+// SECCIÓN 9: SISTEMA DE TAGS
 // =====================================================================
 
 /**
@@ -566,7 +737,39 @@ function renderTags() {
 }
 
 // =====================================================================
-// SECCIÓN 7: SISTEMA DE COMENTARIOS - CLASE PRINCIPAL
+// SECCIÓN 10: FUNCIONALIDAD DE LA MINIBAR
+// =====================================================================
+
+/**
+ * Inicializa la funcionalidad de la minibar (barra lateral con íconos)
+ * Maneja los previews que aparecen al hacer hover sobre los íconos
+ */
+function initMinibar() {
+    const minibarItems = document.querySelectorAll('.minibar__item');
+    
+    minibarItems.forEach(item => {
+        const link = item.querySelector('.minibar__link');
+        const preview = item.querySelector('.minibar__preview');
+        
+        // Mostrar preview al hacer hover
+        link.addEventListener('mouseenter', () => {
+            minibarItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('minibar__item--preview');
+                }
+            });
+            item.classList.add('minibar__item--preview');
+        });
+        
+        // Ocultar preview al quitar el mouse
+        item.addEventListener('mouseleave', () => {
+            item.classList.remove('minibar__item--preview');
+        });
+    });
+}
+
+// =====================================================================
+// SECCIÓN 11: SISTEMA DE COMENTARIOS - CLASE PRINCIPAL
 // =====================================================================
 
 /**
@@ -1407,24 +1610,10 @@ class CommentSystem {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-
-    /**
-     * Log de detalles de respuesta para debugging
-     */
-    logResponseDetails(response, data) {
-        console.group('Comment API Response Details');
-        console.log('HTTP Status:', response.status);
-        console.log('Response OK:', response.ok);
-        console.log('Response Data:', data);
-        console.log('Has success property:', 'success' in data);
-        console.log('Has comment property:', 'comment' in data);
-        console.log('Comment structure:', data.comment);
-        console.groupEnd();
-    }
 }
 
 // =====================================================================
-// SECCIÓN 8: CLASE PRINCIPAL DEVCOMMUNITY - SISTEMA DE POSTS
+// SECCIÓN 12: CLASE PRINCIPAL DEVCOMMUNITY - SISTEMA DE POSTS CON FILTROS
 // =====================================================================
 
 /**
@@ -1439,6 +1628,7 @@ class DevCommunity {
         this.isLoading = false;
         this.hasMorePosts = true;
         this.commentSystem = new CommentSystem(this);
+        this.postDeletionSystem = new PostDeletionSystem(this); // ← AGREGAR ESTA LÍNEA
         this.init();
     }
 
@@ -1603,7 +1793,7 @@ class DevCommunity {
     }
 
     /**
-     * Carga los posts desde la API
+     * Carga los posts desde la API con los filtros correctos
      */
     async loadPosts() {
         if (this.isLoading || !this.hasMorePosts) return;
@@ -1615,51 +1805,200 @@ class DevCommunity {
             const view = document.querySelector('.tab--active')?.dataset.view || 'latest';
             const sort = document.getElementById('sortSelect')?.value || 'new';
             
-            const response = await fetch(`/api/posts?page=${this.currentPage}&view=${view}&sort=${sort}`);
+            // Construir URL con parámetros de filtro
+            let url = `/api/posts?page=${this.currentPage}&sort=${sort}`;
+            
+            // Aplicar filtros según la vista seleccionada
+            if (view === 'top') {
+                // Posts con más reacciones totales
+                url += '&sortBy=reactions&order=desc';
+            } else if (view === 'trending') {
+                // Posts con más corazones (likes específicos)
+                url += '&sortBy=hearts&order=desc';
+            } else {
+                // Latest - posts más recientes
+                url += '&sortBy=date&order=desc';
+            }
+            
+            console.log(`Loading posts with URL: ${url}`);
+            
+            const response = await fetch(url);
             
             if (!response.ok) {
-                // Si no hay endpoint de posts, mostrar estado vacío
+                // Si no hay endpoint de posts, usar datos de ejemplo
                 if (response.status === 404) {
-                    this.posts = [];
-                    this.renderPosts();
+                    console.log('API endpoint not found, using mock data');
+                    this.handleMockPosts(view);
                     return;
                 }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-
-            if (data.posts && data.posts.length > 0) {
-                if (this.currentPage === 1) {
-                    this.posts = data.posts;
-                } else {
-                    this.posts = [...this.posts, ...data.posts];
-                }
-                
-                this.renderPosts();
-                this.currentPage++;
-                
-                // Verificar si hay más páginas
-                if (this.currentPage > (data.totalPages || 1)) {
-                    this.hasMorePosts = false;
-                }
-            } else {
-                // No hay posts
-                this.posts = [];
-                this.renderPosts();
-                this.hasMorePosts = false;
-            }
+            this.handlePostsResponse(data, view);
 
         } catch (error) {
             console.error('Error loading posts:', error);
             this.showError('Error loading posts. Please try again.');
-            // En caso de error, mostrar estado vacío
-            this.posts = [];
-            this.renderPosts();
+            // En caso de error, usar datos de ejemplo
+            const view = document.querySelector('.tab--active')?.dataset.view || 'latest';
+            this.handleMockPosts(view);
         } finally {
             this.isLoading = false;
             this.showLoading(false);
         }
+    }
+
+    /**
+     * Maneja la respuesta de la API de posts
+     */
+    handlePostsResponse(data, view) {
+        let posts = [];
+        
+        if (data.posts && data.posts.length > 0) {
+            posts = data.posts;
+        } else if (Array.isArray(data)) {
+            posts = data;
+        }
+        
+        // Aplicar filtros locales si es necesario
+        if (posts.length > 0) {
+            posts = this.applyLocalFilters(posts, view);
+        }
+        
+        if (posts.length > 0) {
+            if (this.currentPage === 1) {
+                this.posts = posts;
+            } else {
+                this.posts = [...this.posts, ...posts];
+            }
+            
+            this.renderPosts();
+            this.currentPage++;
+            
+            // Verificar si hay más páginas
+            if (this.currentPage > (data.totalPages || 1)) {
+                this.hasMorePosts = false;
+            }
+        } else {
+            // No hay posts
+            this.posts = [];
+            this.renderPosts();
+            this.hasMorePosts = false;
+        }
+    }
+
+    /**
+     * Aplica filtros locales a los posts (fallback si el backend no lo hace)
+     */
+    applyLocalFilters(posts, view) {
+        console.log(`Applying local filter: ${view} to ${posts.length} posts`);
+        
+        switch (view) {
+            case 'top':
+                // Ordenar por total de reacciones (suma de todas las reacciones)
+                return posts.sort((a, b) => {
+                    const aReactions = this.calculateTotalReactions(a);
+                    const bReactions = this.calculateTotalReactions(b);
+                    return bReactions - aReactions;
+                });
+                
+            case 'trending':
+                // Ordenar por cantidad de corazones (reacción específica)
+                return posts.sort((a, b) => {
+                    const aHearts = a.reactionCounts?.heart || 0;
+                    const bHearts = b.reactionCounts?.heart || 0;
+                    return bHearts - aHearts;
+                });
+                
+            case 'latest':
+            default:
+                // Ordenar por fecha (más recientes primero)
+                return posts.sort((a, b) => {
+                    const aDate = new Date(a.createdAt || a.date || 0);
+                    const bDate = new Date(b.createdAt || b.date || 0);
+                    return bDate - aDate;
+                });
+        }
+    }
+
+    /**
+     * Calcula el total de reacciones de un post
+     */
+    calculateTotalReactions(post) {
+        if (!post.reactionCounts) return 0;
+        
+        return Object.values(post.reactionCounts).reduce((total, count) => {
+            return total + (parseInt(count) || 0);
+        }, 0);
+    }
+
+    /**
+     * Maneja datos de ejemplo cuando la API no está disponible
+     */
+    handleMockPosts(view) {
+        // Generar posts de ejemplo con diferentes cantidades de reacciones
+        const mockPosts = this.generateMockPosts();
+        
+        // Aplicar filtros a los posts de ejemplo
+        const filteredPosts = this.applyLocalFilters(mockPosts, view);
+        
+        if (this.currentPage === 1) {
+            this.posts = filteredPosts;
+        } else {
+            // Para scroll infinito, agregar más posts
+            const morePosts = this.generateMockPosts(10, this.posts.length);
+            this.posts = [...this.posts, ...this.applyLocalFilters(morePosts, view)];
+        }
+        
+        this.renderPosts();
+        this.currentPage++;
+        
+        // Limitar a 3 páginas para datos de ejemplo
+        if (this.currentPage > 3) {
+            this.hasMorePosts = false;
+        }
+    }
+
+    /**
+     * Genera posts de ejemplo con diferentes cantidades de reacciones
+     */
+    generateMockPosts(count = 10, offset = 0) {
+        const mockPosts = [];
+        const reactionTypes = ['like', 'unicorn', 'exploding_head', 'fire', 'heart', 'rocket'];
+        
+        for (let i = 0; i < count; i++) {
+            const postId = offset + i + 1;
+            
+            // Generar counts de reacciones aleatorias
+            const reactionCounts = {};
+            reactionTypes.forEach(type => {
+                // Los posts pares tienen más corazones para trending
+                // Los posts impares tienen más reacciones totales para top
+                if (type === 'heart') {
+                    reactionCounts[type] = postId % 2 === 0 ? Math.floor(Math.random() * 50) + 20 : Math.floor(Math.random() * 10);
+                } else {
+                    reactionCounts[type] = postId % 2 === 1 ? Math.floor(Math.random() * 30) + 10 : Math.floor(Math.random() * 15);
+                }
+            });
+            
+            mockPosts.push({
+                _id: `mock-post-${postId}`,
+                title: `Mock Post ${postId} - ${['JavaScript', 'React', 'Node.js', 'Python', 'Web Dev'][i % 5]}`,
+                content: `This is a mock post content for testing the ${view} filter. This post has various reaction counts for demonstration purposes.`,
+                author: {
+                    username: `user${postId}`,
+                    profilePicture: '/IMAGENES/default-avatar.png'
+                },
+                reactionCounts: reactionCounts,
+                commentsCount: Math.floor(Math.random() * 20),
+                readingTime: Math.floor(Math.random() * 10) + 1,
+                createdAt: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
+                tags: ['javascript', 'webdev', 'react', 'nodejs'].slice(0, Math.floor(Math.random() * 3) + 1)
+            });
+        }
+        
+        return mockPosts;
     }
 
     /**
@@ -1697,94 +2036,98 @@ class DevCommunity {
      * @param {Object} post - Datos del post
      * @returns {string} HTML del post
      */
-    createPostHTML(post) {
-        const readingTime = post.readingTime || Math.ceil((post.content?.length || 0) / 200) || 1;
-        const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        }) : 'Recently';
+createPostHTML(post) {
+    const readingTime = post.readingTime || Math.ceil((post.content?.length || 0) / 200) || 1;
+    const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    }) : 'Recently';
 
-        const author = post.author || {};
-        const profilePicture = author.profilePicture || '/IMAGENES/default-avatar.png';
-        const username = author.username || 'Unknown User';
+    const author = post.author || {};
+    const profilePicture = author.profilePicture || '/IMAGENES/default-avatar.png';
+    const username = author.username || 'Unknown User';
 
-        const postId = post._id || post.id;
+    const postId = post._id || post.id;
 
-        return `
-            <article class="article-card" data-post-id="${postId}" style="opacity: 1; background: white;">
-                <section class="article-card__inner">
-                    <header class="article-card__header">
-                        <img src="${profilePicture}" alt="${username}" class="article-card__avatar" onerror="this.src='/IMAGENES/default-avatar.png'">
-                        <section class="article-card__user-info">
-                            <span class="article-card__username">${username}</span>
-                            <time class="article-card__date">${date}</time>
-                        </section>
-                        ${this.currentUser ? `
-                            <button class="article-card__bookmark ${post.hasFavorited ? 'article-card__bookmark--active' : ''}" 
-                                    onclick="devCommunity.toggleFavorite('${postId}')">
-                                <i class="fas fa-bookmark"></i>
-                            </button>
-                        ` : ''}
-                    </header>
+    // Obtener HTML del botón de eliminar
+    const deleteButtonHTML = this.postDeletionSystem.createDeleteButtonHTML(post);
 
-                    <section class="article-card__content">
-                        <h2 class="article-card__title">
-                            <a href="#" onclick="devCommunity.viewPost('${postId}'); return false;">${post.title || 'Untitled Post'}</a>
-                        </h2>
-                        
-                        ${post.coverImage ? `
-                            <figure class="article-card__cover">
-                                <img src="${post.coverImage}" alt="Cover image for ${post.title}" onerror="this.style.display='none'">
-                            </figure>
-                        ` : ''}
-
-                        ${post.tags && post.tags.length > 0 ? `
-                            <nav class="article-card__tags">
-                                ${post.tags.map(tag => `
-                                    <span class="tag">#${tag}</span>
-                                `).join('')}
-                            </nav>
-                        ` : ''}
+    return `
+        <article class="article-card" data-post-id="${postId}" style="opacity: 1; background: white;">
+            <section class="article-card__inner">
+                <header class="article-card__header">
+                    <img src="${profilePicture}" alt="${username}" class="article-card__avatar" onerror="this.src='/IMAGENES/default-avatar.png'">
+                    <section class="article-card__user-info">
+                        <span class="article-card__username">${username}</span>
+                        <time class="article-card__date">${date}</time>
                     </section>
+                    ${deleteButtonHTML}
+                    ${this.currentUser && !deleteButtonHTML ? `
+                        <button class="article-card__bookmark ${post.hasFavorited ? 'article-card__bookmark--active' : ''}" 
+                                onclick="devCommunity.toggleFavorite('${postId}')">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    ` : ''}
+                </header>
 
-                    <footer class="article-card__footer">
-                        <nav class="article-card__reactions">
-                            ${this.createReactionsHTML(post)}
+                <section class="article-card__content">
+                    <h2 class="article-card__title">
+                        <a href="#" onclick="devCommunity.viewPost('${postId}'); return false;">${post.title || 'Untitled Post'}</a>
+                    </h2>
+                    
+                    ${post.coverImage ? `
+                        <figure class="article-card__cover">
+                            <img src="${post.coverImage}" alt="Cover image for ${post.title}" onerror="this.style.display='none'">
+                        </figure>
+                    ` : ''}
+
+                    ${post.tags && post.tags.length > 0 ? `
+                        <nav class="article-card__tags">
+                            ${post.tags.map(tag => `
+                                <span class="tag">#${tag}</span>
+                            `).join('')}
                         </nav>
-                        
-                        <section class="article-card__meta">
-                            <span class="article-card__reading-time">${readingTime} min read</span>
-                            <button class="article-card__comments-btn" onclick="devCommunity.commentSystem.toggleComments('${postId}')">
-                                <i class="fas fa-comment"></i>
-                                <span>${post.commentsCount || 0}</span>
+                    ` : ''}
+                </section>
+
+                <footer class="article-card__footer">
+                    <nav class="article-card__reactions">
+                        ${this.createReactionsHTML(post)}
+                    </nav>
+                    
+                    <section class="article-card__meta">
+                        <span class="article-card__reading-time">${readingTime} min read</span>
+                        <button class="article-card__comments-btn" onclick="devCommunity.commentSystem.toggleComments('${postId}')">
+                            <i class="fas fa-comment"></i>
+                            <span>${post.commentsCount || 0}</span>
+                        </button>
+                    </section>
+                </footer>
+
+                <!-- SECCIÓN DE COMENTARIOS -->
+                <section class="article-card__comments" id="comments-${postId}" style="display: none;">
+                    <section class="comments-container" id="comments-container-${postId}">
+                        <!-- Los comentarios se cargarán aquí -->
+                    </section>
+                    ${this.currentUser ? `
+                        <section class="comment-form">
+                            <textarea class="comment-input" id="comment-input-${postId}" 
+                                      placeholder="Add to the discussion... (Ctrl+Enter to submit)"></textarea>
+                            <button class="btn btn--primary btn--small" onclick="devCommunity.commentSystem.addComment('${postId}')">
+                                Submit Comment
                             </button>
                         </section>
-                    </footer>
-
-                    <!-- SECCIÓN DE COMENTARIOS -->
-                    <section class="article-card__comments" id="comments-${postId}" style="display: none;">
-                        <section class="comments-container" id="comments-container-${postId}">
-                            <!-- Los comentarios se cargarán aquí -->
+                    ` : `
+                        <section class="login-prompt">
+                            <a href="/Login.html">Log in</a> to leave a comment
                         </section>
-                        ${this.currentUser ? `
-                            <section class="comment-form">
-                                <textarea class="comment-input" id="comment-input-${postId}" 
-                                          placeholder="Add to the discussion... (Ctrl+Enter to submit)"></textarea>
-                                <button class="btn btn--primary btn--small" onclick="devCommunity.commentSystem.addComment('${postId}')">
-                                    Submit Comment
-                                </button>
-                            </section>
-                        ` : `
-                            <section class="login-prompt">
-                                <a href="/Login.html">Log in</a> to leave a comment
-                            </section>
-                        `}
-                    </section>
+                    `}
                 </section>
-            </article>
-        `;
-    }
+            </section>
+        </article>
+    `;
+}
 
     /**
      * Crea el HTML para las reacciones de un post
@@ -1801,19 +2144,28 @@ class DevCommunity {
             { type: 'rocket', icon: '🚀', label: 'Rocket' }
         ];
 
-        return reactions.map(reaction => {
-            const count = post.reactionCounts?.[reaction.type] || 0;
-            const isActive = post.hasReacted && post.userReaction === reaction.type;
-            
-            return `
-                <button class="reaction-btn ${isActive ? 'reaction-btn--active' : ''}" 
-                        onclick="devCommunity.addReaction('${post._id || post.id}', '${reaction.type}')"
-                        title="${reaction.label}">
-                    <span class="reaction-emoji">${reaction.icon}</span>
-                    <span class="reaction-count">${count}</span>
-                </button>
-            `;
-        }).join('');
+        // Calcular total de reacciones para este post
+        const totalReactions = this.calculateTotalReactions(post);
+        
+        return `
+            <section class="reactions-section">
+                <nav class="article-card__reactions">
+                    ${reactions.map(reaction => {
+                        const count = post.reactionCounts?.[reaction.type] || 0;
+                        const isActive = post.hasReacted && post.userReaction === reaction.type;
+                        
+                        return `
+                            <button class="reaction-btn ${isActive ? 'reaction-btn--active' : ''}" 
+                                    onclick="devCommunity.addReaction('${post._id || post.id}', '${reaction.type}')"
+                                    title="${reaction.label}: ${count}">
+                                <span class="reaction-emoji">${reaction.icon}</span>
+                                <span class="reaction-count">${count}</span>
+                            </button>
+                        `;
+                    }).join('')}
+                </nav>
+            </section>
+        `;
     }
 
     /**
@@ -1930,6 +2282,8 @@ class DevCommunity {
      * @param {string} view - Tipo de vista
      */
     switchFeedView(view) {
+        console.log(`Switching to view: ${view}`);
+        
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(tab => {
             tab.classList.toggle('tab--active', tab.dataset.view === view);
@@ -1939,7 +2293,27 @@ class DevCommunity {
         this.currentPage = 1;
         this.hasMorePosts = true;
         this.posts = [];
+        
+        // Mostrar indicador de filtro activo
+        this.showActiveFilter(view);
+        
         this.loadPosts();
+    }
+
+    /**
+     * Muestra el filtro activo en la interfaz
+     */
+    showActiveFilter(view) {
+        // Remover indicadores anteriores
+        const existingIndicators = document.querySelectorAll('.active-filter-indicator');
+        existingIndicators.forEach(indicator => indicator.remove());
+        
+        const feedControls = document.querySelector('.feed-controls');
+        if (feedControls) {
+            const indicator = document.createElement('div');
+            indicator.className = 'active-filter-indicator';
+            feedControls.appendChild(indicator);
+        }
     }
 
     /**
@@ -2054,7 +2428,7 @@ class DevCommunity {
 }
 
 // =====================================================================
-// SECCIÓN 9: INYECCIÓN DE ESTILOS CSS
+// SECCIÓN 13: INYECCIÓN DE ESTILOS CSS
 // =====================================================================
 
 /**
@@ -2345,6 +2719,52 @@ function injectCommentCSS() {
     }
 }
 
+/* Estilos para los filtros de posts */
+.active-filter-indicator {
+    margin-left: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.reactions-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.total-reactions {
+    font-size: 11px;
+    color: #666;
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+/* Mejorar la visibilidad de los tabs activos */
+.tab--active {
+    background: #3b49df !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.tab--active:hover {
+    background: #2f3ab2 !important;
+}
+
+/* Estilos para los posts ordenados */
+.article-card[data-sort="top"] {
+    border-left: 3px solid #ff6b35;
+}
+
+.article-card[data-sort="trending"] {
+    border-left: 3px solid #e63946;
+}
+
+.article-card[data-sort="latest"] {
+    border-left: 3px solid #3b49df;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .comment__header {
@@ -2371,6 +2791,17 @@ function injectCommentCSS() {
         left: 10px !important;
         min-width: unset !important;
     }
+    
+    .reactions-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .active-filter-indicator {
+        margin-left: 0;
+        margin-top: 8px;
+    }
 }
 `;
         document.head.appendChild(style);
@@ -2378,7 +2809,7 @@ function injectCommentCSS() {
 }
 
 // =====================================================================
-// SECCIÓN 10: FUNCIONALIDAD DE LA MINIBAR (MEJORADA)
+// SECCIÓN 14: FUNCIONALIDAD DE LA MINIBAR (MEJORADA)
 // =====================================================================
 
 /**
@@ -2508,7 +2939,445 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =====================================================================
-// SECCIÓN 11: FUNCIONES GLOBALES Y EVENT HANDLERS
+// SECCIÓN 18: SISTEMA DE ELIMINACIÓN DE POSTS CON BACKEND
+// =====================================================================
+
+/**
+ * Clase que maneja la eliminación de posts
+ */
+class PostDeletionSystem {
+    constructor(devCommunity) {
+        this.devCommunity = devCommunity;
+        this.debug = true;
+    }
+
+    /**
+     * Logging para debugging del sistema de eliminación
+     */
+    log(message, data = null) {
+        if (this.debug) {
+            if (data) {
+                console.log(`[PostDeletionSystem] ${message}`, data);
+            } else {
+                console.log(`[PostDeletionSystem] ${message}`);
+            }
+        }
+    }
+
+    /**
+     * Verifica si el usuario actual es el autor del post
+     * @param {Object} post - Datos del post
+     * @returns {boolean} True si el usuario es el autor
+     */
+    isUserPostAuthor(post) {
+        if (!this.devCommunity.currentUser || !post.author) {
+            return false;
+        }
+
+        const currentUserId = this.devCommunity.currentUser.id || this.devCommunity.currentUser._id;
+        const authorId = post.author._id || post.author.id;
+        
+        return currentUserId === authorId;
+    }
+
+    /**
+     * Agrega el botón de eliminar al HTML del post si el usuario es el autor
+     * @param {Object} post - Datos del post
+     * @returns {string} HTML del botón de eliminar
+     */
+    createDeleteButtonHTML(post) {
+        if (!this.isUserPostAuthor(post)) {
+            return '';
+        }
+
+        const postId = post._id || post.id;
+        return `
+            <button class="article-card__delete-btn" onclick="devCommunity.postDeletionSystem.showDeleteConfirmation('${postId}')" title="Delete Post">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+    }
+
+    /**
+     * Muestra el modal de confirmación para eliminar un post
+     * @param {string} postId - ID del post a eliminar
+     */
+    showDeleteConfirmation(postId) {
+        this.log(`Showing delete confirmation for post: ${postId}`);
+        
+        // Crear modal de confirmación
+        const modalHTML = `
+            <div id="deletePostModal" class="modal" style="display: flex;">
+                <div class="modal__overlay"></div>
+                <div class="modal__content">
+                    <div class="modal__center">
+                        <div class="modal__icon" style="font-size: 48px; color: #dc3545; margin-bottom: 16px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p class="modal__text" style="text-align: center; margin-bottom: 24px;">
+                            Are you sure you want to delete this post?<br>
+                            <small style="color: #666;">This action cannot be undone.</small>
+                        </p>
+                        <div class="modal__actions">
+                            <button type="button" class="btn btn--outline" id="deletePostCancel">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn--danger" id="deletePostConfirm">
+                                Yes, Delete Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remover modal anterior si existe
+        const existingModal = document.getElementById('deletePostModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Configurar event listeners
+        this.setupDeleteModalEvents(postId);
+        
+        // Prevenir scroll del body
+        document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Configura los eventos del modal de eliminación
+     * @param {string} postId - ID del post a eliminar
+     */
+    setupDeleteModalEvents(postId) {
+        const modal = document.getElementById('deletePostModal');
+        const confirmBtn = document.getElementById('deletePostConfirm');
+        const cancelBtn = document.getElementById('deletePostCancel');
+        const overlay = modal.querySelector('.modal__overlay');
+
+        // Confirmar eliminación
+        confirmBtn.addEventListener('click', () => {
+            this.deletePost(postId);
+            this.closeDeleteModal();
+        });
+
+        // Cancelar eliminación
+        cancelBtn.addEventListener('click', () => {
+            this.closeDeleteModal();
+        });
+
+        // Cerrar modal al hacer clic en el overlay
+        overlay.addEventListener('click', () => {
+            this.closeDeleteModal();
+        });
+
+        // Cerrar modal con tecla Escape
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.closeDeleteModal();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+    }
+
+    /**
+     * Cierra el modal de eliminación
+     */
+    closeDeleteModal() {
+        const modal = document.getElementById('deletePostModal');
+        if (modal) {
+            modal.remove();
+        }
+        document.body.style.overflow = '';
+    }
+
+    /**
+     * Elimina un post del servidor
+     * @param {string} postId - ID del post a eliminar
+     */
+    async deletePost(postId) {
+        this.log(`Deleting post: ${postId}`);
+        
+        try {
+            // Mostrar indicador de carga
+            this.showDeletionLoading(postId, true);
+
+            // 🔥 USAR makeAuthenticatedRequest EN LUGAR DE fetch DIRECTAMENTE
+            const response = await makeAuthenticatedRequest(`/api/posts/${postId}`, {
+                method: 'DELETE'
+            });
+
+            this.log(`Delete response status: ${response.status}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                this.log('Delete response data:', data);
+                
+                if (data.success) {
+                    await this.handlePostDeletionSuccess(postId);
+                } else {
+                    throw new Error(data.message || 'Failed to delete post');
+                }
+            } else if (response.status === 401) {
+                throw new Error('Authentication required. Please log in again.');
+            } else if (response.status === 403) {
+                throw new Error('You are not authorized to delete this post.');
+            } else if (response.status === 404) {
+                throw new Error('Post not found. It may have been already deleted.');
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Server error: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            this.handlePostDeletionError(postId, error);
+        } finally {
+            this.showDeletionLoading(postId, false);
+        }
+    }
+
+    /**
+     * Maneja el éxito en la eliminación de un post
+     * @param {string} postId - ID del post eliminado
+     */
+    async handlePostDeletionSuccess(postId) {
+        this.log(`Post deletion successful: ${postId}`);
+        
+        // Encontrar y remover el post del array local
+        const postIndex = this.devCommunity.posts.findIndex(post => {
+            const id = post._id || post.id;
+            return id === postId;
+        });
+
+        if (postIndex !== -1) {
+            this.devCommunity.posts.splice(postIndex, 1);
+            this.devCommunity.renderPosts();
+        }
+
+        this.showMessage('Post deleted successfully!', 'success');
+        
+        // Recargar los posts desde el servidor para asegurar consistencia
+        await this.refreshPostsFromServer();
+    }
+
+    /**
+     * Recarga los posts desde el servidor para mantener consistencia
+     */
+    async refreshPostsFromServer() {
+        try {
+            this.log('Refreshing posts from server...');
+            
+            // Resetear estado de paginación
+            this.devCommunity.currentPage = 1;
+            this.devCommunity.hasMorePosts = true;
+            this.devCommunity.posts = [];
+            
+            // Recargar posts
+            await this.devCommunity.loadPosts();
+            
+            this.log('Posts refreshed successfully');
+        } catch (error) {
+            console.error('Error refreshing posts:', error);
+            // No mostrar error al usuario, ya que la eliminación fue exitosa
+        }
+    }
+
+    /**
+     * Maneja errores en la eliminación de posts
+     * @param {string} postId - ID del post
+     * @param {Error} error - Error ocurrido
+     */
+    handlePostDeletionError(postId, error) {
+        this.log(`Post deletion error: ${postId}`, error);
+        
+        let errorMessage = 'Error deleting post. Please try again.';
+        
+        if (error.message.includes('Authentication required')) {
+            errorMessage = 'You need to be logged in to delete posts.';
+            // Redirigir al login
+            setTimeout(() => {
+                window.location.href = '/Login.html';
+            }, 2000);
+        } else if (error.message.includes('not authorized')) {
+            errorMessage = 'You can only delete your own posts.';
+        } else if (error.message.includes('not found')) {
+            errorMessage = 'Post not found. It may have been already deleted.';
+            // Forzar recarga de posts
+            this.refreshPostsFromServer();
+        } else {
+            errorMessage = error.message || 'Error deleting post. Please try again.';
+        }
+
+        this.showMessage(errorMessage, 'error');
+    }
+
+    /**
+     * Muestra/oculta el indicador de carga durante la eliminación
+     * @param {string} postId - ID del post
+     * @param {boolean} show - Mostrar u ocultar
+     */
+    showDeletionLoading(postId, show) {
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        if (!postElement) return;
+
+        const deleteBtn = postElement.querySelector('.article-card__delete-btn');
+        if (deleteBtn) {
+            if (show) {
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                deleteBtn.disabled = true;
+                deleteBtn.style.opacity = '0.6';
+            } else {
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.disabled = false;
+                deleteBtn.style.opacity = '1';
+            }
+        }
+    }
+
+    /**
+     * Muestra un mensaje toast al usuario
+     * @param {string} message - Mensaje a mostrar
+     * @param {string} type - Tipo de mensaje (success, error, warning)
+     */
+    showMessage(message, type = 'success') {
+        // Remover toasts anteriores
+        const existingToasts = document.querySelectorAll('.post-deletion-toast');
+        existingToasts.forEach(toast => toast.remove());
+
+        const toast = document.createElement('div');
+        toast.className = 'post-deletion-toast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: ${this.getToastColor(type)};
+            color: white;
+            border-radius: 4px;
+            z-index: 10000;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Animación de entrada
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            toast.style.transition = 'transform 0.3s ease';
+            toast.style.transform = 'translateX(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+
+    /**
+     * Obtiene el color del toast según el tipo
+     * @param {string} type - Tipo de mensaje
+     * @returns {string} Color en hexadecimal
+     */
+    getToastColor(type) {
+        const colors = {
+            success: '#28a745',
+            error: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8'
+        };
+        return colors[type] || colors.info;
+    }
+
+    /**
+     * Inyecta los estilos CSS para la funcionalidad de eliminación
+     */
+    injectDeletionCSS() {
+        if (!document.querySelector('#post-deletion-css')) {
+            const style = document.createElement('style');
+            style.id = 'post-deletion-css';
+            style.textContent = `
+/* Post Deletion System Styles */
+.article-card__delete-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.article-card__delete-btn:hover {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+.article-card__delete-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.article-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.article-card__user-info {
+    flex: 1;
+}
+
+.btn--danger {
+    background: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.btn--danger:hover {
+    background: #c82333;
+    border-color: #bd2130;
+}
+
+.modal__icon {
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .article-card__delete-btn {
+        padding: 6px;
+        font-size: 12px;
+    }
+    
+    .post-deletion-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+`;
+            document.head.appendChild(style);
+        }
+    }
+}
+
+// =====================================================================
+// SECCIÓN 15: FUNCIONES GLOBALES Y EVENT HANDLERS
 // =====================================================================
 
 // Funciones globales para los event handlers del HTML
@@ -2517,9 +3386,10 @@ window.addReaction = (postId, reactionType) => window.devCommunity?.addReaction(
 window.toggleFavorite = (postId) => window.devCommunity?.toggleFavorite(postId);
 window.addComment = (postId) => window.devCommunity?.commentSystem.addComment(postId);
 window.viewPost = (postId) => window.devCommunity?.viewPost(postId);
+window.deletePost = (postId) => window.devCommunity?.postDeletionSystem?.showDeleteConfirmation(postId);
 
 // =====================================================================
-// SECCIÓN 12: INICIALIZACIÓN DE LA APLICACIÓN
+// SECCIÓN 16: INICIALIZACIÓN DE LA APLICACIÓN
 // =====================================================================
 
 /**
@@ -2532,8 +3402,9 @@ function init() {
     renderTags();
     initMinibar();
     injectCommentCSS(); // Inyectar CSS de comentarios
+    window.devCommunity?.postDeletionSystem?.injectDeletionCSS();
     
-    // Inicializar la aplicación principal
+    // Inicializa la aplicación principal
     window.devCommunity = new DevCommunity();
     
     console.log('DEV Community with Comment System initialized successfully');
@@ -2544,8 +3415,24 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(init, 100);
 });
 
-// Inicialización adicional para el dropdown del usuariou
+// Inicialización adicional para el dropdown del usuario
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM cargado. Inicializando dropdown...");
   initUserDropdown();
 });
+
+// =====================================================================
+// SECCIÓN 17: DETECCIÓN DE DISPOSITIVO
+// =====================================================================
+
+function isMobileDevice() {
+    return window.innerWidth <= 768;
+}
+
+function isTabletDevice() {
+    return window.innerWidth > 768 && window.innerWidth <= 1024;
+}
+
+function isDesktopDevice() {
+    return window.innerWidth > 1024;
+}

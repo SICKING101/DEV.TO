@@ -1,9 +1,9 @@
-// public/user.js
+// Dependencias
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../config/jwtConfig');
 // Prueba temporal
-const testToken = generateToken({ id: 1, username: 'Jared' });
+const testToken = generateToken({ id: 1, username: 'Jared Admin' });
 console.log('🔑 Token generado:', testToken);
 
 const userSchema = new mongoose.Schema({
@@ -118,7 +118,7 @@ userSchema.methods.generateAuthToken = async function(device = 'web') {
     });
     
     // Limitar a 5 tokens activos por usuario
-    if (user.tokens.length > 5) {
+    if (user.tokens.length > 50) {
         user.tokens = user.tokens.slice(-5);
     }
     
