@@ -49,11 +49,11 @@ SECCION 3: HEADER STYLES
     background: #ffffff;
     border-bottom: 1px solid var(--border);
     z-index: 1;
-    height: 56px;
+    height: 56px; /* altura real */
     width: 100%;
-    margin-left: 60px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+
 
 .topbar__inner {
     width: var(--maxw);
@@ -1863,6 +1863,11 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
     
     body {
         overflow-x: hidden;
+        padding-top: 60px; /* Igual o mayor a la altura de la topbar */
+    }
+
+    main {
+        padding-top: 60px;
     }
     
     body.menu-open {
@@ -1874,11 +1879,11 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
     }
     
     /* =====================================================================
-    SECCION 17.2: HEADER MOBILE - ESTILO DEV.TO
+    SECCION 17.2: HEADER MOBILE - ESTILO DEV.TO CORREGIDO
     ===================================================================== */
     
     .topbar {
-        height: 50px;
+        height: 56px;
         margin-left: 0;
         padding: 0;
         border-bottom: 1px solid #e0e0e0;
@@ -1897,53 +1902,12 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         justify-content: space-between;
         height: 100%;
         align-items: center;
+        display: flex;
     }
     
-    /* Logo centrado */
-    .brand {
-        order: 2;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0;
-    }
+    /* ORDEN CORRECTO DE ELEMENTOS EN MÓVIL: Hamburguesa, Logo, Notificaciones, Perfil */
     
-    .brand img {
-        width: 40px;
-        height: 30px;
-        margin-right: 300px;
-    }
-    
-    /* Búsqueda oculta en móvil por defecto */
-    .search {
-        display: none;
-    }
-    
-    /* Botones de auth - estilo DEV.TO */
-    .actions {
-        gap: 8px;
-        margin-left: 0;
-        order: 3;
-    }
-    
-    .btn {
-        padding: 8px 16px;
-        font-size: 14px;
-        height: 36px;
-        border-radius: 4px;
-        font-weight: 500;
-    }
-    
-    .btn--outline {
-        display: none; /* Ocultar Login en móvil como DEV.TO */
-    }
-    
-    .btn--primary {
-        background: #3b49df;
-        font-weight: 600;
-    }
-    
-    /* Hamburguesa estilo DEV.TO */
+    /* Hamburguesa - PRIMERO */
     .hambtn {
         display: flex;
         align-items: center;
@@ -1957,20 +1921,36 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         cursor: pointer;
         border-radius: 4px;
         transition: background-color 0.2s;
-        order: 1;
+        order: 1; /* PRIMERA POSICIÓN */
     }
     
     .hambtn:hover {
         background: #f5f5f5;
     }
     
-    /* User nav para móvil cuando está logueado */
+    /* Logo - SEGUNDO (Centrado) */
+    .brand {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        order: 2; /* SEGUNDA POSICIÓN */
+        flex: 1;
+        margin: 0 auto;
+    }
+
+    .brand img {
+        width: 40px;
+        height: 30px;
+    }
+    
+    /* User nav para móvil cuando está logueado - TERCERO */
     .user-nav {
         display: flex;
         align-items: center;
         gap: 8px;
         margin-left: 0;
-        order: 3;
+        order: 3; /* TERCERA POSICIÓN */
     }
     
     /* Ocultar texto en botones de user-nav en móvil */
@@ -1986,6 +1966,9 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         display: flex;
         align-items: center;
         justify-content: center;
+        background: #3b49df;
+        color: white;
+        border: none;
     }
     
     .user-nav .icon-btn {
@@ -1995,11 +1978,60 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         display: flex;
         align-items: center;
         justify-content: center;
+        background: none;
+        border: none;
+        color: #333;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .user-nav .icon-btn:hover {
+        background: #f5f5f5;
     }
     
     .user-avatar {
         width: 32px;
         height: 32px;
+        border-radius: 50%;
+        border: 2px solid #e0e0e0;
+        cursor: pointer;
+    }
+    
+    /* Botones de auth - estilo DEV.TO (para usuarios no logueados) */
+    .actions {
+        gap: 8px;
+        margin-left: 0;
+        order: 3; /* TERCERA POSICIÓN (reemplaza user-nav cuando no está logueado) */
+        display: flex;
+        align-items: center;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+        height: 36px;
+        border-radius: 4px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn--outline {
+        display: none;
+    }
+    
+    .btn--primary {
+        background: #3b49df;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .btn--primary:hover {
+        background: #2f3ab2;
     }
     
     /* =====================================================================
@@ -2013,6 +2045,8 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         z-index: 1001;
         top: 50px;
         height: calc(100vh - 50px);
+        background: #fff;
+        border-right: 1px solid #e0e0e0;
     }
     
     .minibar--open {
@@ -2029,7 +2063,7 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         gap: 16px;
         margin-left: 0;
         max-width: 100%;
-        padding-top: 16px;
+        padding-top: 120px; /* Ajuste para header fijo + barra de búsqueda móvil */
     }
     
     /* =====================================================================
@@ -2124,6 +2158,7 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
         align-items: center;
         justify-content: center;
         text-decoration: none;
+        color: #333;
     }
     
     .social-icon:hover {
@@ -2165,10 +2200,18 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
     .section__title {
         font-size: 12px;
         margin-bottom: 12px;
+        color: #666;
+        font-weight: 700;
     }
     
     .taglist__link, .topiclist__link, .resourceList__link {
         font-size: 14px;
+        color: #333;
+        text-decoration: none;
+    }
+    
+    .taglist__link:hover, .topiclist__link:hover, .resourceList__link:hover {
+        color: #3b49df;
     }
     
     /* =====================================================================
@@ -2183,7 +2226,6 @@ SECCION 17: RESPONSIVE STYLES - MOBILE FIRST
     /* Hero section móvil - CORREGIDO */
     .hero {
         padding: 24px 20px;
-        margin-bottom: 20px;
         border-radius: 8px;
         background: #fff;
         color: #242424;
@@ -2435,6 +2477,24 @@ SECCION 18: SMALL MOBILE (480px y menores) - CORREGIDO
         height: 26px;
     }
     
+    /* Botones más pequeños */
+    .hambtn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    
+    .user-nav .btn--create-post,
+    .user-nav .icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+    
     /* Botón Create Account más pequeño */
     .btn--primary {
         padding: 6px 12px;
@@ -2457,11 +2517,11 @@ SECCION 18: SMALL MOBILE (480px y menores) - CORREGIDO
     .layout {
         padding: 12px;
         gap: 12px;
+        padding-top: 116px; /* Ajuste para header + barra búsqueda en móvil pequeño */
     }
     
     .hero {
         padding: 20px 16px;
-        margin-bottom: 16px;
     }
     
     .hero__title {
@@ -2496,17 +2556,6 @@ SECCION 18: SMALL MOBILE (480px y menores) - CORREGIDO
     .user-nav {
         gap: 4px;
     }
-    
-    .user-nav .btn--create-post,
-    .user-nav .icon-btn {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .user-avatar {
-        width: 30px;
-        height: 30px;
-    }
 }
 
 /* =====================================================================
@@ -2515,11 +2564,17 @@ SECCION 19: TABLET (769px - 1024px)
 
 @media (min-width: 769px) and (max-width: 1024px) {
     
+    /* Mostrar barra de búsqueda normal en tablet */
+    .topbar .search {
+        display: flex !important;
+    }
+    
     .layout {
         grid-template-columns: 200px 1fr;
         padding: 20px;
         gap: 20px;
-        padding-left: 76px; /* Ajuste para minibar */
+        padding-left: 76px;
+        padding-top: 76px;
     }
     
     .rightbar {
@@ -2530,17 +2585,18 @@ SECCION 19: TABLET (769px - 1024px)
         width: 100%;
         max-width: none;
         padding: 0 20px;
-        margin-left: 60px; /* Compensar minibar */
+        margin-left: 60px;
     }
     
-    /* Search bar más pequeña en tablet */
+    /* Search bar tablet */
     .search {
         max-width: 300px;
+        margin: 0 auto;
     }
     
     /* Ajustes de contenido para tablet */
     .content {
-        min-width: 0; /* Permite que se reduzca */
+        min-width: 0;
     }
     
     .hero__title {
@@ -2550,13 +2606,22 @@ SECCION 19: TABLET (769px - 1024px)
     /* Ajustar leftbar para tablet */
     .leftbar {
         position: sticky;
-        top: 76px; /* header + margen */
+        top: 76px;
         height: fit-content;
+        transform: none;
+        width: auto;
+        box-shadow: none;
+        border-right: none;
+        background: transparent;
     }
     
-    /* Mostrar hamburger en tablet si es necesario */
+    /* Ocultar hamburger en tablet */
     .hambtn {
-        display: none; /* Ocultar en tablet */
+        display: none;
+    }
+    
+    .mobile-overlay {
+        display: none !important;
     }
 }
 
@@ -2590,6 +2655,10 @@ SECCION 20: UTILIDADES RESPONSIVE
     
     .minibar {
         height: calc(100vh - 40px);
+    }
+    
+    .layout {
+        padding-top: 100px;
     }
 }
 
@@ -2630,8 +2699,10 @@ body:not(.user-logged-in) .actions {
     }
     
     .search {
-        display: block;
+        display: flex !important;
         order: 2;
+        max-width: 400px;
+        margin: 0 auto;
     }
     
     .actions {
@@ -2694,12 +2765,11 @@ USER MENU - RESPONSIVE MOBILE (768px y menores) - CORREGIDO
     }
     
     /* DROPDOWN CENTRADO - CORREGIDO */
-.user-dropdown {
+    .user-dropdown {
         position: fixed !important;
         top: 60px !important;
-        left: 50% !important; /* Centrado horizontal */
-        right: auto !important;
-        transform: translateX(-100%) !important; /* Compensación para centrado perfecto */
+        left: 50% !important;
+        transform: translateX(-90%) !important;
         width: 280px !important;
         max-width: calc(100vw - 32px);
         margin-top: 0;
@@ -2765,7 +2835,7 @@ USER MENU - RESPONSIVE MOBILE (768px y menores) - CORREGIDO
     
     .dropdown-item:hover {
         background: #f8f9fa;
-        color: var(--accent);
+        color: #3b49df;
     }
     
     .dropdown-item--logout {
@@ -2805,7 +2875,7 @@ USER MENU - RESPONSIVE MOBILE (768px y menores) - CORREGIDO
         -webkit-overflow-scrolling: touch;
     }
     
-    /* Dividers mejorados para móvil */
+    /* Dividers para móvil */
     .dropdown-divider {
         background-color: #e9ecef;
         margin: 8px 0;
@@ -2821,13 +2891,11 @@ USER MENU - SMALL MOBILE (480px y menores) - CORREGIDO
 
 @media (max-width: 480px) {
     
-        /* DROPDOWN CENTRADO - CORREGIDO */
-.user-dropdown {
+    .user-dropdown {
         position: fixed !important;
         top: 60px !important;
-        left: 50% !important; /* Centrado horizontal */
-        right: auto !important;
-        transform: translateX(-100%) !important; /* Compensación para centrado perfecto */
+        left: 50% !important;
+        transform: translateX(-90%) !important;
         width: 280px !important;
         max-width: calc(100vw - 32px);
         margin-top: 0;
@@ -2881,7 +2949,7 @@ USER MENU - SMALL MOBILE (480px y menores) - CORREGIDO
     
     .modal__center {
         padding: 24px;
-        gap: 16px; /* Reducir el gap para móvil */
+        gap: 16px;
     }
     
     .modal__actions {
@@ -2892,14 +2960,583 @@ USER MENU - SMALL MOBILE (480px y menores) - CORREGIDO
     .modal__actions .btn {
         min-width: auto;
         width: 100%;
-        margin: 0; /* Asegurar que no tenga márgenes */
+        margin: 0;
     }
     
-    /* Asegurar que ambos botones sean visibles */
     .modal__actions .btn--outline,
     .modal__actions .btn--primary {
         display: block;
         opacity: 1;
         visibility: visible;
     }
+}
+
+/* ===== ESTILOS MEJORADOS PARA EDICIÓN DE POSTS ===== */
+
+/* ===== ESTILOS MEJORADOS PARA EDICIÓN DE POSTS ===== */
+
+/* Botón de editar en la tarjeta del post */
+.article-card__edit-btn {
+    background: none;
+    border: none;
+    color: #3b49df;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+    border: 1px solid #3b49df;
+}
+
+.article-card__edit-btn:hover {
+    background: #3b49df;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 73, 223, 0.3);
+}
+
+.article-card__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Modal mejorado */
+#editPostModal {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#editPostModal .modal__content--large {
+    max-width: 800px;
+    max-height: 95vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e1e5e9;
+}
+
+#editPostModal .modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+#editPostModal .modal__title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+#editPostModal .modal__close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#editPostModal .modal__close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+#editPostModal .modal__body {
+    padding: 32px;
+    background: #fafafa;
+}
+
+#editPostModal .modal__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-top: 1px solid #f0f0f0;
+    background: white;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Formulario mejorado */
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input, .form-textarea {
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #3b49df;
+    box-shadow: 0 0 0 3px rgba(59, 73, 223, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-input:hover, .form-textarea:hover {
+    border-color: #cbd5e0;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 200px;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.form-help {
+    color: #718096;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Tags input mejorado */
+#editPostTags {
+    background: white;
+    border: 2px dashed #e2e8f0;
+}
+
+#editPostTags:focus {
+    border-style: solid;
+    border-color: #3b49df;
+}
+
+/* Sección de imagen de portada */
+.current-cover-image {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+}
+
+.current-cover-image img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cover-image-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cover-image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.cover-image-upload:hover {
+    border-color: #3b49df;
+    background: #f7faff;
+}
+
+.cover-image-upload .file-input {
+    padding: 12px;
+    border: 2px dashed #cbd5e0;
+    border-radius: 6px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cover-image-upload .file-input:hover {
+    border-color: #3b49df;
+    background: #eef2ff;
+}
+
+/* Radio buttons mejorados */
+.radio-group {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 12px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: white;
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.radio-label:hover {
+    border-color: #3b49df;
+    background: #f7faff;
+    transform: translateY(-1px);
+}
+
+.radio-label input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e0;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+    border-color: #3b49df;
+    background: #3b49df;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.radio-label input[type="radio"]:checked ~ span {
+    color: #3b49df;
+    font-weight: 600;
+}
+
+/* Información del post */
+.post-info {
+    padding: 20px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 8px;
+    font-size: 14px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-info p {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-info p:before {
+    content: '📅';
+    font-size: 16px;
+}
+
+.post-info p:nth-child(2):before {
+    content: '✏️';
+}
+
+.post-info p:nth-child(3):before {
+    content: '🚀';
+}
+
+/* Contador de caracteres */
+.char-counter {
+    text-align: right;
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.char-counter.warning {
+    color: #ed8936;
+}
+
+.char-counter.error {
+    color: #f56565;
+    font-weight: 600;
+}
+
+/* Botones mejorados */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn--outline {
+    background: transparent;
+    color: #4a5568;
+    border: 2px solid #cbd5e0;
+}
+
+.btn--outline:hover:not(:disabled) {
+    background: #4a5568;
+    color: white;
+    border-color: #4a5568;
+    transform: translateY(-1px);
+}
+
+.btn--secondary {
+    background: #718096;
+    color: white;
+    border: 2px solid #718096;
+}
+
+.btn--secondary:hover:not(:disabled) {
+    background: #4a5568;
+    border-color: #4a5568;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
+}
+
+.btn--primary {
+    background: linear-gradient(135deg, #3b49df 0%, #2f3ab2 100%);
+    color: white;
+    border: 2px solid #3b49df;
+}
+
+.btn--primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2f3ab2 0%, #1e2a78 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 73, 223, 0.4);
+}
+
+.btn--small {
+    padding: 8px 16px;
+    font-size: 12px;
+}
+
+.btn--danger {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+    border: 2px solid #f56565;
+}
+
+.btn--danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+/* Toast notifications mejoradas */
+.post-edit-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    z-index: 10000;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease;
+}
+
+.post-edit-toast::before {
+    font-size: 18px;
+}
+
+.post-edit-toast.success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.post-edit-toast.success::before {
+    content: '✅';
+}
+
+.post-edit-toast.error {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+}
+
+.post-edit-toast.error::before {
+    content: '❌';
+}
+
+.post-edit-toast.info {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+}
+
+.post-edit-toast.info::before {
+    content: 'ℹ️';
+}
+
+.post-edit-toast.warning {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    color: white;
+}
+
+.post-edit-toast.warning::before {
+    content: '⚠️';
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #editPostModal .modal__content--large {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+        border-radius: 8px;
+    }
+    
+    #editPostModal .modal__header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    #editPostModal .modal__body {
+        padding: 20px;
+    }
+    
+    #editPostModal .modal__footer {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .radio-label {
+        min-width: auto;
+        justify-content: flex-start;
+    }
+    
+    .cover-image-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .post-edit-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Efectos de carga */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mejoras visuales adicionales */
+.form-group:focus-within .form-label {
+    color: #3b49df;
+}
+
+/* Transiciones suaves */
+.modal__content--large {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Efecto de profundidad */
+.modal__overlay {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
 }

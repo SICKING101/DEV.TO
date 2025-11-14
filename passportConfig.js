@@ -76,7 +76,7 @@ async (req, accessToken, refreshToken, profile, done) => {
 
 
 /******************************************************
- *             ESTRATEGIA DE GOOGLE (MEJORADA)
+ *             ESTRATEGIA DE GOOGLE 
  ******************************************************/
 passport.use(new GoogleStrategy({
     clientID: '326743051749-rkvj819e71mhkc2iifqt6dnjcnu2ssrg.apps.googleusercontent.com',
@@ -132,7 +132,7 @@ async (req, accessToken, refreshToken, profile, done) => {
 
 
 /******************************************************
- *             ESTRATEGIA DE GITHUB (MEJORADA)
+ *             ESTRATEGIA DE GITHUB 
  ******************************************************/
 passport.use(new GitHubStrategy({
     clientID: 'Ov23lieYzKQaz5axfnd1',

@@ -34,6 +34,33 @@ class AuthManager {
         this.isAuthenticated = !!this.token;
     }
 
+    syncAuthState() {
+        console.log('🔄 Sincronizando estado de autenticación...');
+        
+        // Verificar token en localStorage
+        const storedToken = localStorage.getItem('jwtToken');
+        if (storedToken && !this.token) {
+            console.log('🔄 Token encontrado en localStorage, actualizando authManager');
+            this.token = storedToken;
+            this.isAuthenticated = true;
+        }
+        
+        // Verificar si hay usuario en devCommunity
+        if (window.devCommunity && window.devCommunity.currentUser && !this.isAuthenticated) {
+            console.log('🔄 Usuario encontrado en devCommunity, marcando como autenticado');
+            this.isAuthenticated = true;
+        }
+        
+        console.log('✅ Estado final de autenticación:', {
+            isAuthenticated: this.isAuthenticated,
+            token: this.token ? 'PRESENTE' : 'AUSENTE',
+            devCommunityUser: window.devCommunity?.currentUser ? 'PRESENTE' : 'AUSENTE'
+        });
+        
+        return this.isAuthenticated;
+    }
+
+
     getAuthHeaders() {
         if (this.token) {
             return {
@@ -95,7 +122,7 @@ class AuthManager {
                 }
             }
 
-            // 3. 🔥 LIMPIAR CACHE Y REDIRIGIR INMEDIATAMENTE
+            // 3. LIMPIAR CACHE Y REDIRIGIR INMEDIATAMENTE
             this.clearAllCache();
             window.location.href = '/login.html';
             
@@ -396,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // SECCIÓN 5: FUNCIONALIDAD DE AUTENTICACIÓN
 // =====================================================================
 
-// 🔥 FUNCIÓN HELPER PARA REQUEST AUTENTICADOS
+// FUNCIÓN HELPER PARA REQUEST AUTENTICADOS
 async function makeAuthenticatedRequest(url, options = {}) {
     const authHeaders = authManager.getAuthHeaders();
     
@@ -1629,7 +1656,28 @@ class DevCommunity {
         this.hasMorePosts = true;
         this.commentSystem = new CommentSystem(this);
         this.postDeletionSystem = new PostDeletionSystem(this); // ← AGREGAR ESTA LÍNEA
+        this.postEditSystem = new PostEditSystem(this); // ← NUEVA LÍNEA
         this.init();
+    }
+
+    /**
+     * Verifica y sincroniza el estado de autenticación
+     */
+    checkAndSyncAuth() {
+        console.log('🔐 Verificando y sincronizando autenticación...');
+        
+        // Sincronizar authManager
+        if (authManager) {
+            authManager.syncAuthState();
+        }
+        
+        // Si hay usuario actual pero authManager no está autenticado, actualizar
+        if (this.currentUser && !authManager.isAuthenticated) {
+            console.log('🔄 Actualizando authManager con usuario de devCommunity');
+            authManager.isAuthenticated = true;
+        }
+        
+        return this.currentUser || authManager.isAuthenticated;
     }
 
     /**
@@ -2031,45 +2079,47 @@ class DevCommunity {
         });
     }
 
-    /**
+/**
      * Crea el HTML para un post individual
-     * @param {Object} post - Datos del post
-     * @returns {string} HTML del post
      */
-createPostHTML(post) {
-    const readingTime = post.readingTime || Math.ceil((post.content?.length || 0) / 200) || 1;
-    const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    }) : 'Recently';
+    createPostHTML(post) {
+        const readingTime = post.readingTime || Math.ceil((post.content?.length || 0) / 200) || 1;
+        const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        }) : 'Recently';
 
-    const author = post.author || {};
-    const profilePicture = author.profilePicture || '/IMAGENES/default-avatar.png';
-    const username = author.username || 'Unknown User';
+        const author = post.author || {};
+        const profilePicture = author.profilePicture || '/IMAGENES/default-avatar.png';
+        const username = author.username || 'Unknown User';
 
-    const postId = post._id || post.id;
+        const postId = post._id || post.id;
 
-    // Obtener HTML del botón de eliminar
-    const deleteButtonHTML = this.postDeletionSystem.createDeleteButtonHTML(post);
+        // Obtener HTML de los botones de acción
+        const deleteButtonHTML = this.postDeletionSystem.createDeleteButtonHTML(post);
+        const editButtonHTML = this.postEditSystem.createEditButtonHTML(post);
 
-    return `
-        <article class="article-card" data-post-id="${postId}" style="opacity: 1; background: white;">
-            <section class="article-card__inner">
-                <header class="article-card__header">
-                    <img src="${profilePicture}" alt="${username}" class="article-card__avatar" onerror="this.src='/IMAGENES/default-avatar.png'">
-                    <section class="article-card__user-info">
-                        <span class="article-card__username">${username}</span>
-                        <time class="article-card__date">${date}</time>
-                    </section>
-                    ${deleteButtonHTML}
-                    ${this.currentUser && !deleteButtonHTML ? `
-                        <button class="article-card__bookmark ${post.hasFavorited ? 'article-card__bookmark--active' : ''}" 
-                                onclick="devCommunity.toggleFavorite('${postId}')">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-                    ` : ''}
-                </header>
+        return `
+            <article class="article-card" data-post-id="${postId}" style="opacity: 1; background: white;">
+                <section class="article-card__inner">
+                    <header class="article-card__header">
+                        <img src="${profilePicture}" alt="${username}" class="article-card__avatar" onerror="this.src='/IMAGENES/default-avatar.png'">
+                        <section class="article-card__user-info">
+                            <span class="article-card__username">${username}</span>
+                            <time class="article-card__date">${date}</time>
+                        </section>
+                        <section class="article-card__actions">
+                            ${editButtonHTML}
+                            ${deleteButtonHTML}
+                            ${this.currentUser && !deleteButtonHTML ? `
+                                <button class="article-card__bookmark ${post.hasFavorited ? 'article-card__bookmark--active' : ''}" 
+                                        onclick="devCommunity.toggleFavorite('${postId}')">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                            ` : ''}
+                        </section>
+                    </header>
 
                 <section class="article-card__content">
                     <h2 class="article-card__title">
@@ -2432,7 +2482,7 @@ createPostHTML(post) {
 // =====================================================================
 
 /**
- * Inyecta los estilos CSS necesarios para el sistema de comentarios
+ * Inyecta los estilos CSS necesarios para el sistema de comentarios, no es lo mas recomendable pero X
  */
 function injectCommentCSS() {
     if (!document.querySelector('#comment-system-css')) {
@@ -2809,11 +2859,11 @@ function injectCommentCSS() {
 }
 
 // =====================================================================
-// SECCIÓN 14: FUNCIONALIDAD DE LA MINIBAR (MEJORADA)
+// SECCIÓN 14: FUNCIONALIDAD DE LA MINIBAR 
 // =====================================================================
 
 /**
- * Funcionalidad mejorada de la minibar con previews interactivos
+ * Funcionalidad de la minibar con previews interactivos
  * Maneja los previews que aparecen al pasar el mouse sobre los íconos
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -2939,7 +2989,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =====================================================================
-// SECCIÓN 18: SISTEMA DE ELIMINACIÓN DE POSTS CON BACKEND
+// SECCIÓN 15: SISTEMA DE ELIMINACIÓN DE POSTS CON BACKEND
 // =====================================================================
 
 /**
@@ -3007,28 +3057,28 @@ class PostDeletionSystem {
         
         // Crear modal de confirmación
         const modalHTML = `
-            <div id="deletePostModal" class="modal" style="display: flex;">
-                <div class="modal__overlay"></div>
-                <div class="modal__content">
-                    <div class="modal__center">
-                        <div class="modal__icon" style="font-size: 48px; color: #dc3545; margin-bottom: 16px;">
+            <section id="deletePostModal" class="modal" style="display: flex;">
+                <section class="modal__overlay"></section>
+                <section class="modal__content">
+                    <section class="modal__center">
+                        <section class="modal__icon" style="font-size: 48px; color: #dc3545; margin-bottom: 16px;">
                             <i class="fas fa-exclamation-triangle"></i>
-                        </div>
+                        </section>
                         <p class="modal__text" style="text-align: center; margin-bottom: 24px;">
                             Are you sure you want to delete this post?<br>
                             <small style="color: #666;">This action cannot be undone.</small>
                         </p>
-                        <div class="modal__actions">
+                        <section class="modal__actions">
                             <button type="button" class="btn btn--outline" id="deletePostCancel">
                                 Cancel
                             </button>
                             <button type="button" class="btn btn--danger" id="deletePostConfirm">
                                 Yes, Delete Post
                             </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
         `;
 
         // Remover modal anterior si existe
@@ -3166,6 +3216,13 @@ class PostDeletionSystem {
     /**
      * Recarga los posts desde el servidor para mantener consistencia
      */
+    async refreshPosts() {
+        this.currentPage = 1;
+        this.hasMorePosts = true;
+        this.posts = [];
+        await this.loadPosts();
+    }
+
     async refreshPostsFromServer() {
         try {
             this.log('Refreshing posts from server...');
@@ -3377,7 +3434,1399 @@ class PostDeletionSystem {
 }
 
 // =====================================================================
-// SECCIÓN 15: FUNCIONES GLOBALES Y EVENT HANDLERS
+// SECCIÓN 15.1: SISTEMA DE EDICIÓN DE POSTS CON DEBUGGING
+// =====================================================================
+
+/**
+ * Clase que maneja la edición de posts
+ */
+class PostEditSystem {
+    constructor(devCommunity) {
+        this.devCommunity = devCommunity;
+        this.debug = true;
+        this.currentEditingPost = null;
+    }
+
+    /**
+     * Logging para debugging del sistema de edición
+     */
+    log(message, data = null) {
+        if (this.debug) {
+            if (data) {
+                console.log(`[PostEditSystem] ${message}`, data);
+            } else {
+                console.log(`[PostEditSystem] ${message}`);
+            }
+        }
+    }
+
+    /**
+     * Verifica si el usuario actual es el autor del post
+     * @param {Object} post - Datos del post
+     * @returns {boolean} True si el usuario es el autor
+     */
+    isUserPostAuthor(post) {
+        if (!this.devCommunity.currentUser || !post.author) {
+            return false;
+        }
+
+        const currentUserId = this.devCommunity.currentUser.id || this.devCommunity.currentUser._id;
+        const authorId = post.author._id || post.author.id;
+        
+        return currentUserId === authorId;
+    }
+
+/**
+ * Agrega el botón de editar al HTML del post si el usuario es el autor
+ * @param {Object} post - Datos del post
+ * @returns {string} HTML del botón de editar
+ */
+createEditButtonHTML(post) {
+    if (!this.isUserPostAuthor(post)) {
+        return '';
+    }
+
+    // Forzar sincronización de autenticación antes de mostrar el botón
+    if (authManager) {
+        authManager.syncAuthState();
+    }
+
+    const postId = post._id || post.id;
+    return `
+        <button class="article-card__edit-btn" onclick="devCommunity.postEditSystem.showEditForm('${postId}')" title="Edit Post">
+            <i class="fas fa-edit"></i>
+        </button>
+    `;
+}
+
+    /**
+ * Muestra el formulario de edición para un post - CORREGIDO
+ * @param {string} postId - ID del post a editar
+ */
+async showEditForm(postId) {
+    try {
+        this.log(`🔄 Iniciando showEditForm para post: ${postId}`);
+        
+        // VERIFICACIÓN MEJORADA DE AUTENTICACIÓN
+        console.log('🔐 Estado completo de autenticación:', {
+            authManager: {
+                isAuthenticated: authManager.isAuthenticated,
+                token: authManager.token ? 'PRESENTE' : 'AUSENTE',
+                tokenLength: authManager.token ? authManager.token.length : 0
+            },
+            devCommunity: {
+                currentUser: this.devCommunity.currentUser ? 'PRESENTE' : 'AUSENTE',
+                currentUserData: this.devCommunity.currentUser
+            },
+            localStorage: {
+                jwtToken: localStorage.getItem('jwtToken') ? 'PRESENTE' : 'AUSENTE'
+            }
+        });
+
+        // Verificar autenticación de múltiples maneras
+        const isAuthenticated = authManager.isAuthenticated || 
+                              this.devCommunity.currentUser || 
+                              localStorage.getItem('jwtToken');
+
+        if (!isAuthenticated) {
+            console.error('❌ Usuario no autenticado en todos los métodos');
+            this.showMessage('Please log in to edit posts', 'error');
+            return;
+        }
+
+        // Si authManager no tiene token pero hay uno en localStorage, actualizarlo
+        if (!authManager.token && localStorage.getItem('jwtToken')) {
+            console.log('🔄 Actualizando token en authManager desde localStorage');
+            authManager.token = localStorage.getItem('jwtToken');
+            authManager.isAuthenticated = true;
+        }
+
+        // Mostrar indicador de carga
+        this.showEditLoading(true);
+
+        const url = `/api/posts/${postId}/edit`;
+        console.log('🌐 Realizando request a:', url);
+
+        // Preparar headers de autenticación
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // Agregar token JWT si está disponible
+        if (authManager.token) {
+            headers['Authorization'] = `Bearer ${authManager.token}`;
+            console.log('🔑 Token JWT agregado a headers');
+        }
+
+        console.log('📋 Headers de la solicitud:', headers);
+
+        // Cargar datos del post con debugging extendido
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers,
+            credentials: 'include' // Importante para cookies de sesión
+        });
+
+        console.log('📡 Response recibida:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+            url: response.url
+        });
+
+        if (!response.ok) {
+            let errorMessage = `Error ${response.status}: ${response.statusText}`;
+            
+            // Intentar obtener más detalles del error
+            try {
+                const errorData = await response.json();
+                console.log('📡 Error data:', errorData);
+                errorMessage = errorData.error || errorMessage;
+            } catch (parseError) {
+                console.log('📡 No se pudo parsear respuesta de error:', parseError);
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        console.log('📡 Response data completa:', data);
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Error al cargar el post');
+        }
+
+        console.log('✅ Datos del post cargados exitosamente:', {
+            id: data.post._id,
+            title: data.post.title,
+            author: data.post.author.username
+        });
+
+        this.currentEditingPost = data.post;
+        this.renderEditForm(data.post);
+
+    } catch (error) {
+        console.error('❌ Error al cargar post para edición:', error);
+        
+        let userMessage = error.message;
+        
+        // Mensajes más amigables para el usuario
+        if (error.message.includes('401')) {
+            userMessage = 'Please log in to edit posts';
+            // Forzar recarga para renovar autenticación
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else if (error.message.includes('403')) {
+            userMessage = 'You are not authorized to edit this post';
+        } else if (error.message.includes('404')) {
+            userMessage = 'Post not found';
+        } else if (error.message.includes('500')) {
+            userMessage = 'Server error. Please try again later.';
+        }
+        
+        this.showMessage(userMessage, 'error');
+        
+    } finally {
+        this.showEditLoading(false);
+    }
+}
+
+/**
+ * Renderiza el formulario de edición mejorado
+ * @param {Object} post - Datos del post
+ */
+renderEditForm(post) {
+    this.log('🎨 Renderizando formulario de edición mejorado para post:', post);
+
+    // Crear modal de edición mejorado
+    const modalHTML = `
+        <section id="editPostModal" class="modal" style="display: flex;">
+            <section class="modal__overlay"></section>
+            <section class="modal__content modal__content--large">
+                <header class="modal__header">
+                    <h2 class="modal__title">
+                        <i class="fas fa-edit" style="margin-right: 12px;"></i>
+                        Edit Your Post
+                    </h2>
+                    <button class="modal__close" onclick="devCommunity.postEditSystem.closeEditForm()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </header>
+                
+                <section class="modal__body">
+                    <form id="editPostForm" class="post-form">
+                        <!-- Título -->
+                        <section class="form-group">
+                            <label for="editPostTitle" class="form-label">
+                                <i class="fas fa-heading" style="margin-right: 8px;"></i>
+                                Post Title
+                            </label>
+                            <input type="text" id="editPostTitle" class="form-input" 
+                                   value="${this.escapeHtml(post.title)}" 
+                                   placeholder="Craft an amazing title that captures attention..." 
+                                   maxlength="200" required>
+                            <small class="form-help">A great title can make all the difference. Be specific and compelling!</small>
+                            <div class="char-counter">${post.title.length}/200 characters</div>
+                        </section>
+
+                        <!-- Contenido -->
+                        <section class="form-group">
+                            <label for="editPostContent" class="form-label">
+                                <i class="fas fa-file-alt" style="margin-right: 8px;"></i>
+                                Post Content
+                            </label>
+                            <textarea id="editPostContent" class="form-textarea" 
+                                      rows="15" 
+                                      placeholder="Share your knowledge, story, or ideas... (Markdown supported)"
+                                      required>${this.escapeHtml(post.content)}</textarea>
+                            <small class="form-help">You can use Markdown for formatting. Write from the heart!</small>
+                        </section>
+
+                        <!-- Tags -->
+                        <section class="form-group">
+                            <label for="editPostTags" class="form-label">
+                                <i class="fas fa-tags" style="margin-right: 8px;"></i>
+                                Tags
+                            </label>
+                            <input type="text" id="editPostTags" class="form-input" 
+                                   value="${post.tags ? post.tags.join(', ') : ''}" 
+                                   placeholder="javascript, webdev, react, programming">
+                            <small class="form-help">Add up to 4 tags separated by commas. Help others discover your post!</small>
+                        </section>
+
+                        <!-- Imagen de Portada -->
+                        <section class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-image" style="margin-right: 8px;"></i>
+                                Cover Image
+                            </label>
+                            
+                            ${post.coverImage ? `
+                                <section class="current-cover-image">
+                                    <img src="${post.coverImage}" alt="Current cover image" 
+                                         onerror="this.style.display='none'">
+                                    <section class="cover-image-actions">
+                                        <button type="button" class="btn btn--outline btn--small" 
+                                                onclick="devCommunity.postEditSystem.changeCoverImage()">
+                                            <i class="fas fa-sync-alt"></i>
+                                            Change Image
+                                        </button>
+                                        <button type="button" class="btn btn--danger btn--small" 
+                                                onclick="devCommunity.postEditSystem.removeCoverImage()">
+                                            <i class="fas fa-trash"></i>
+                                            Remove Image
+                                        </button>
+                                    </section>
+                                    <input type="hidden" id="editRemoveCoverImage" value="false">
+                                </section>
+                            ` : `
+                                <section class="cover-image-upload">
+                                    <input type="file" id="editPostCoverImage" 
+                                           accept="image/*" class="file-input">
+                                    <small class="form-help">
+                                        <i class="fas fa-upload"></i> 
+                                        Click to upload a cover image (Optional, max 5MB)
+                                    </small>
+                                </section>
+                            `}
+                        </section>
+
+                        <!-- Estado de Publicación -->
+                        <section class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-globe" style="margin-right: 8px;"></i>
+                                Publication Status
+                            </label>
+                            <section class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="editPostPublished" value="true" 
+                                           ${post.published ? 'checked' : ''}>
+                                    <span class="radio-custom"></span>
+                                    <span>
+                                        <i class="fas fa-rocket"></i>
+                                        Published
+                                    </span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="editPostPublished" value="false" 
+                                           ${!post.published ? 'checked' : ''}>
+                                    <span class="radio-custom"></span>
+                                    <span>
+                                        <i class="fas fa-edit"></i>
+                                        Draft
+                                    </span>
+                                </label>
+                            </section>
+                        </section>
+
+                        <!-- Información del Post -->
+                        <section class="post-info">
+                            <p><strong>Created:</strong> ${new Date(post.createdAt).toLocaleString()}</p>
+                            ${post.updatedAt ? `<p><strong>Last Updated:</strong> ${new Date(post.updatedAt).toLocaleString()}</p>` : ''}
+                            ${post.publishedAt ? `<p><strong>Published:</strong> ${new Date(post.publishedAt).toLocaleString()}</p>` : ''}
+                        </section>
+                    </form>
+                </section>
+
+                <footer class="modal__footer">
+                    <button type="button" class="btn btn--outline" 
+                            onclick="devCommunity.postEditSystem.closeEditForm()">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                    <section style="display: flex; gap: 12px;">
+                        <button type="button" class="btn btn--secondary" 
+                                onclick="devCommunity.postEditSystem.saveAsDraft()">
+                            <i class="fas fa-save"></i>
+                            Save Draft
+                        </button>
+                        <button type="button" class="btn btn--primary" 
+                                onclick="devCommunity.postEditSystem.updatePost()">
+                            <i class="fas fa-paper-plane"></i>
+                            Update Post
+                        </button>
+                    </section>
+                </footer>
+            </section>
+        </section>
+    `;
+
+    // Remover modal anterior si existe
+    const existingModal = document.getElementById('editPostModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Agregar modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Configurar event listeners mejorados
+    this.setupEditFormEvents();
+
+    // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
+
+    console.log('✅ Formulario de edición mejorado renderizado exitosamente');
+}
+
+/**
+ * Configura los eventos del formulario de edición mejorado
+ */
+setupEditFormEvents() {
+    const modal = document.getElementById('editPostModal');
+    const overlay = modal.querySelector('.modal__overlay');
+    const closeBtn = modal.querySelector('.modal__close');
+
+    // Cerrar modal al hacer clic en el overlay
+    overlay.addEventListener('click', () => {
+        this.closeEditForm();
+    });
+
+    // Cerrar modal con el botón de cerrar
+    closeBtn.addEventListener('click', () => {
+        this.closeEditForm();
+    });
+
+    // Cerrar modal con tecla Escape
+    const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+            this.closeEditForm();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
+
+    // Auto-resize del textarea
+    const textarea = document.getElementById('editPostContent');
+    if (textarea) {
+        textarea.addEventListener('input', this.autoResizeTextarea);
+        this.autoResizeTextarea({ target: textarea });
+    }
+
+    // Contador de caracteres para el título
+    const titleInput = document.getElementById('editPostTitle');
+    if (titleInput) {
+        titleInput.addEventListener('input', this.updateTitleCounter);
+        this.updateTitleCounter({ target: titleInput });
+        
+        // Efecto de foco mejorado
+        titleInput.addEventListener('focus', () => {
+            titleInput.parentNode.classList.add('focused');
+        });
+        titleInput.addEventListener('blur', () => {
+            titleInput.parentNode.classList.remove('focused');
+        });
+    }
+
+    // Efectos hover para los radio buttons
+    const radioLabels = modal.querySelectorAll('.radio-label');
+    radioLabels.forEach(label => {
+        label.addEventListener('mouseenter', () => {
+            label.style.transform = 'translateY(-2px)';
+        });
+        label.addEventListener('mouseleave', () => {
+            if (!label.querySelector('input').checked) {
+                label.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    console.log('✅ Eventos del formulario mejorado configurados');
+}
+
+/**
+ * Actualiza el contador de caracteres del título con estilos mejorados
+ */
+updateTitleCounter(e) {
+    const input = e.target;
+    const maxLength = 200;
+    const currentLength = input.value.length;
+    const percentage = (currentLength / maxLength) * 100;
+    
+    let counter = input.parentNode.querySelector('.char-counter');
+    if (!counter) {
+        counter = document.createElement('div');
+        counter.className = 'char-counter';
+        input.parentNode.appendChild(counter);
+    }
+    
+    counter.textContent = `${currentLength}/${maxLength} characters`;
+    
+    // Cambiar colores según el porcentaje usado
+    if (percentage >= 90) {
+        counter.classList.add('error');
+        counter.classList.remove('warning');
+    } else if (percentage >= 75) {
+        counter.classList.add('warning');
+        counter.classList.remove('error');
+    } else {
+        counter.classList.remove('warning', 'error');
+    }
+}
+
+    /**
+     * Ajusta automáticamente la altura del textarea
+     */
+    autoResizeTextarea(e) {
+        const textarea = e.target;
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 400) + 'px';
+    }
+
+    /**
+     * Maneja el cambio de imagen de portada
+     */
+    changeCoverImage() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.handleCoverImageChange(e.target.files[0]);
+            }
+        });
+        
+        document.body.appendChild(fileInput);
+        fileInput.click();
+        document.body.removeChild(fileInput);
+    }
+
+    /**
+     * Maneja la selección de nueva imagen de portada
+     */
+    handleCoverImageChange(file) {
+        if (!file) return;
+
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+            this.showMessage('Please select a valid image file', 'error');
+            return;
+        }
+
+        // Validar tamaño (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            this.showMessage('Image must be less than 5MB', 'error');
+            return;
+        }
+
+        // Mostrar preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const currentCoverSection = document.querySelector('.current-cover-image');
+            if (currentCoverSection) {
+                const img = currentCoverSection.querySelector('img');
+                const coverImageActions = currentCoverSection.querySelector('.cover-image-actions');
+                
+                img.src = e.target.result;
+                img.style.display = 'block';
+                
+                // Reemplazar input hidden
+                const removeCoverInput = document.getElementById('editRemoveCoverImage');
+                if (removeCoverInput) {
+                    removeCoverInput.value = 'false';
+                }
+                
+                // Agregar input file para el nuevo archivo
+                let fileInput = document.getElementById('editPostCoverImage');
+                if (!fileInput) {
+                    fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.id = 'editPostCoverImage';
+                    fileInput.name = 'coverImage';
+                    fileInput.style.display = 'none';
+                    currentCoverSection.appendChild(fileInput);
+                }
+                
+                // Crear un FileList simulado (esto es un workaround)
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    /**
+     * Remueve la imagen de portada
+     */
+    removeCoverImage() {
+        const currentCoverSection = document.querySelector('.current-cover-image');
+        if (currentCoverSection) {
+            const img = currentCoverSection.querySelector('img');
+            img.style.display = 'none';
+            
+            const removeCoverInput = document.getElementById('editRemoveCoverImage');
+            if (removeCoverInput) {
+                removeCoverInput.value = 'true';
+            }
+            
+            // Remover input file si existe
+            const fileInput = document.getElementById('editPostCoverImage');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            
+            this.showMessage('Cover image will be removed', 'info');
+        }
+    }
+
+    /**
+     * Actualiza el post - CON DEBUGGING MEJORADO
+     */
+    async updatePost() {
+        try {
+            this.log('🔄 Iniciando actualización de post...');
+            
+            if (!this.currentEditingPost) {
+                throw new Error('No hay post seleccionado para editar');
+            }
+
+            const formData = new FormData();
+            const postId = this.currentEditingPost._id;
+
+            // Obtener valores del formulario
+            const title = document.getElementById('editPostTitle').value.trim();
+            const content = document.getElementById('editPostContent').value.trim();
+            const tags = document.getElementById('editPostTags').value.trim();
+            const published = document.querySelector('input[name="editPostPublished"]:checked').value;
+            const removeCoverImage = document.getElementById('editRemoveCoverImage')?.value || 'false';
+
+            console.log('📝 Datos del formulario:', {
+                title,
+                contentLength: content.length,
+                tags,
+                published,
+                removeCoverImage
+            });
+
+            // Validaciones
+            if (!title) {
+                this.showMessage('Title is required', 'error');
+                return;
+            }
+
+            if (!content) {
+                this.showMessage('Content is required', 'error');
+                return;
+            }
+
+            if (title.length > 200) {
+                this.showMessage('Title must be less than 200 characters', 'error');
+                return;
+            }
+
+            // Preparar datos
+            formData.append('title', title);
+            formData.append('content', content);
+            formData.append('tags', tags);
+            formData.append('published', published);
+            formData.append('removeCoverImage', removeCoverImage);
+
+            // Agregar archivo de imagen si existe
+            const coverImageInput = document.getElementById('editPostCoverImage');
+            if (coverImageInput && coverImageInput.files[0]) {
+                formData.append('coverImage', coverImageInput.files[0]);
+                console.log('🖼️ Archivo de imagen agregado:', coverImageInput.files[0].name);
+            }
+
+            // Mostrar indicador de carga
+            this.showEditLoading(true);
+
+            const url = `/api/posts/${postId}`;
+            console.log('🌐 Enviando solicitud PUT a:', url);
+
+            // Enviar solicitud
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authManager.token}`
+                },
+                body: formData
+            });
+
+            console.log('📡 Response de actualización:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok
+            });
+
+            const data = await response.json();
+            console.log('📡 Data de respuesta:', data);
+
+            if (!response.ok) {
+                throw new Error(data.error || `Error ${response.status}`);
+            }
+
+            if (!data.success) {
+                throw new Error(data.error || 'Error updating post');
+            }
+
+            this.showMessage(data.message, 'success');
+            
+            // Cerrar modal y recargar posts
+            this.closeEditForm();
+
+            console.log('✅ Post actualizado exitosamente');
+
+        } catch (error) {
+            console.error('❌ Error updating post:', error);
+            this.showMessage(`Error: ${error.message}`, 'error');
+        } finally {
+            this.showEditLoading(false);
+        }
+    }
+
+    /**
+     * Guarda el post como borrador
+     */
+    saveAsDraft() {
+        const publishedRadio = document.querySelector('input[name="editPostPublished"][value="false"]');
+        if (publishedRadio) {
+            publishedRadio.checked = true;
+        }
+        this.updatePost();
+    }
+
+    /**
+     * Cierra el formulario de edición
+     */
+    closeEditForm() {
+        const modal = document.getElementById('editPostModal');
+        if (modal) {
+            modal.remove();
+        }
+        document.body.style.overflow = '';
+        this.currentEditingPost = null;
+        console.log('✅ Formulario de edición cerrado');
+    }
+
+/**
+ * Muestra/oculta el indicador de carga mejorado
+ */
+showEditLoading(show) {
+    const updateBtn = document.querySelector('#editPostModal .btn--primary');
+    const draftBtn = document.querySelector('#editPostModal .btn--secondary');
+    const cancelBtn = document.querySelector('#editPostModal .btn--outline');
+    
+    if (updateBtn) {
+        if (show) {
+            updateBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Updating Post...';
+            updateBtn.disabled = true;
+            if (draftBtn) draftBtn.disabled = true;
+            if (cancelBtn) cancelBtn.disabled = true;
+            
+            // Agregar efecto de desvanecimiento
+            updateBtn.style.opacity = '0.8';
+        } else {
+            updateBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Update Post';
+            updateBtn.disabled = false;
+            if (draftBtn) draftBtn.disabled = false;
+            if (cancelBtn) cancelBtn.disabled = false;
+            updateBtn.style.opacity = '1';
+        }
+    }
+}
+
+    /**
+     * Muestra un mensaje toast
+     */
+    showMessage(message, type = 'success') {
+        // Remover toasts anteriores
+        const existingToasts = document.querySelectorAll('.post-edit-toast');
+        existingToasts.forEach(toast => toast.remove());
+
+        const toast = document.createElement('div');
+        toast.className = 'post-edit-toast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: ${this.getToastColor(type)};
+            color: white;
+            border-radius: 4px;
+            z-index: 10000;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Animación de entrada
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            toast.style.transition = 'transform 0.3s ease';
+            toast.style.transform = 'translateX(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+
+    /**
+     * Obtiene el color del toast según el tipo
+     */
+    getToastColor(type) {
+        const colors = {
+            success: '#28a745',
+            error: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8'
+        };
+        return colors[type] || colors.info;
+    }
+
+    /**
+     * Escapa caracteres HTML para prevenir XSS
+     */
+    escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+/**
+ * Inyecta los estilos CSS mejorados para la funcionalidad de edición
+ */
+injectEditCSS() {
+    if (!document.querySelector('#post-edit-css')) {
+        const style = document.createElement('style');
+        style.id = 'post-edit-css';
+        style.textContent = `
+/* ===== ESTILOS MEJORADOS PARA EDICIÓN DE POSTS ===== */
+
+/* Botón de editar en la tarjeta del post */
+.article-card__edit-btn {
+    background: none;
+    border: none;
+    color: #3b49df;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+    border: 1px solid #3b49df;
+}
+
+.article-card__edit-btn:hover {
+    background: #3b49df;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 73, 223, 0.3);
+}
+
+.article-card__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Modal mejorado */
+#editPostModal {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#editPostModal .modal__content--large {
+    max-width: 800px;
+    max-height: 95vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e1e5e9;
+}
+
+#editPostModal .modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+#editPostModal .modal__title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+#editPostModal .modal__close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#editPostModal .modal__close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+#editPostModal .modal__body {
+    padding: 32px;
+    background: #fafafa;
+}
+
+#editPostModal .modal__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-top: 1px solid #f0f0f0;
+    background: white;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Formulario mejorado */
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input, .form-textarea {
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #3b49df;
+    box-shadow: 0 0 0 3px rgba(59, 73, 223, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-input:hover, .form-textarea:hover {
+    border-color: #cbd5e0;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 200px;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.form-help {
+    color: #718096;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Tags input mejorado */
+#editPostTags {
+    background: white;
+    border: 2px dashed #e2e8f0;
+}
+
+#editPostTags:focus {
+    border-style: solid;
+    border-color: #3b49df;
+}
+
+/* Sección de imagen de portada */
+.current-cover-image {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+}
+
+.current-cover-image img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cover-image-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cover-image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.cover-image-upload:hover {
+    border-color: #3b49df;
+    background: #f7faff;
+}
+
+.cover-image-upload .file-input {
+    padding: 12px;
+    border: 2px dashed #cbd5e0;
+    border-radius: 6px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cover-image-upload .file-input:hover {
+    border-color: #3b49df;
+    background: #eef2ff;
+}
+
+/* Radio buttons mejorados */
+.radio-group {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 12px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: white;
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.radio-label:hover {
+    border-color: #3b49df;
+    background: #f7faff;
+    transform: translateY(-1px);
+}
+
+.radio-label input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e0;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+    border-color: #3b49df;
+    background: #3b49df;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.radio-label input[type="radio"]:checked ~ span {
+    color: #3b49df;
+    font-weight: 600;
+}
+
+/* Información del post */
+.post-info {
+    padding: 20px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 8px;
+    font-size: 14px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-info p {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-info p:before {
+    content: '📅';
+    font-size: 16px;
+}
+
+.post-info p:nth-child(2):before {
+    content: '✏️';
+}
+
+.post-info p:nth-child(3):before {
+    content: '🚀';
+}
+
+/* Contador de caracteres */
+.char-counter {
+    text-align: right;
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.char-counter.warning {
+    color: #ed8936;
+}
+
+.char-counter.error {
+    color: #f56565;
+    font-weight: 600;
+}
+
+/* Botones mejorados */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn--outline {
+    background: transparent;
+    color: #4a5568;
+    border: 2px solid #cbd5e0;
+}
+
+.btn--outline:hover:not(:disabled) {
+    background: #4a5568;
+    color: white;
+    border-color: #4a5568;
+    transform: translateY(-1px);
+}
+
+.btn--secondary {
+    background: #718096;
+    color: white;
+    border: 2px solid #718096;
+}
+
+.btn--secondary:hover:not(:disabled) {
+    background: #4a5568;
+    border-color: #4a5568;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
+}
+
+.btn--primary {
+    background: linear-gradient(135deg, #3b49df 0%, #2f3ab2 100%);
+    color: white;
+    border: 2px solid #3b49df;
+}
+
+.btn--primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2f3ab2 0%, #1e2a78 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 73, 223, 0.4);
+}
+
+.btn--small {
+    padding: 8px 16px;
+    font-size: 12px;
+}
+
+.btn--danger {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+    border: 2px solid #f56565;
+}
+
+.btn--danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+/* Toast notifications mejoradas */
+.post-edit-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    z-index: 10000;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease;
+}
+
+.post-edit-toast::before {
+    font-size: 18px;
+}
+
+.post-edit-toast.success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.post-edit-toast.success::before {
+    content: '✅';
+}
+
+.post-edit-toast.error {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+}
+
+.post-edit-toast.error::before {
+    content: '❌';
+}
+
+.post-edit-toast.info {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+}
+
+.post-edit-toast.info::before {
+    content: 'ℹ️';
+}
+
+.post-edit-toast.warning {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    color: white;
+}
+
+.post-edit-toast.warning::before {
+    content: '⚠️';
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #editPostModal .modal__content--large {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+        border-radius: 8px;
+    }
+    
+    #editPostModal .modal__header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    #editPostModal .modal__body {
+        padding: 20px;
+    }
+    
+    #editPostModal .modal__footer {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .radio-label {
+        min-width: auto;
+        justify-content: flex-start;
+    }
+    
+    .cover-image-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .post-edit-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Efectos de carga */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mejoras visuales adicionales */
+.form-group:focus-within .form-label {
+    color: #3b49df;
+}
+
+/* Transiciones suaves */
+.modal__content--large {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Efecto de profundidad */
+.modal__overlay {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+`;
+        document.head.appendChild(style);
+        console.log('✅ CSS mejorado de edición de posts inyectado');
+    }
+}
+}
+
+// =====================================================================
+// SECCIÓN 16: FUNCIONES GLOBALES Y EVENT HANDLERS
 // =====================================================================
 
 // Funciones globales para los event handlers del HTML
@@ -3387,9 +4836,11 @@ window.toggleFavorite = (postId) => window.devCommunity?.toggleFavorite(postId);
 window.addComment = (postId) => window.devCommunity?.commentSystem.addComment(postId);
 window.viewPost = (postId) => window.devCommunity?.viewPost(postId);
 window.deletePost = (postId) => window.devCommunity?.postDeletionSystem?.showDeleteConfirmation(postId);
+// Función global para editar posts
+window.editPost = (postId) => window.devCommunity?.postEditSystem?.showEditForm(postId);
 
 // =====================================================================
-// SECCIÓN 16: INICIALIZACIÓN DE LA APLICACIÓN
+// SECCIÓN 17: INICIALIZACIÓN DE LA APLICACIÓN
 // =====================================================================
 
 /**
@@ -3397,18 +4848,73 @@ window.deletePost = (postId) => window.devCommunity?.postDeletionSystem?.showDel
  */
 function init() {
     console.log('Initializing DEV Community with Comment System...');
+    
+    // Sincronizar autenticación inmediatamente
+    if (authManager) {
+        authManager.syncAuthState();
+    }
+    
     setupImageErrorHandlers();
     initUserDropdown();
     renderTags();
     initMinibar();
-    injectCommentCSS(); // Inyectar CSS de comentarios
+    injectCommentCSS();
     window.devCommunity?.postDeletionSystem?.injectDeletionCSS();
+    window.devCommunity?.postEditSystem?.injectEditCSS();
     
     // Inicializa la aplicación principal
     window.devCommunity = new DevCommunity();
     
+    // Verificar autenticación después de inicializar
+    setTimeout(() => {
+        if (window.devCommunity) {
+            window.devCommunity.checkAndSyncAuth();
+        }
+    }, 500);
+    
     console.log('DEV Community with Comment System initialized successfully');
 }
+
+// Función global para debugging de autenticación
+window.debugAuth = function() {
+    console.log('🔐 DEBUG DE AUTENTICACIÓN COMPLETO:');
+    console.log('====================================');
+    console.log('1. AuthManager:');
+    console.log('   - isAuthenticated:', authManager.isAuthenticated);
+    console.log('   - token:', authManager.token ? `PRESENTE (${authManager.token.length} chars)` : 'AUSENTE');
+    
+    console.log('2. DevCommunity:');
+    console.log('   - currentUser:', window.devCommunity?.currentUser ? 'PRESENTE' : 'AUSENTE');
+    console.log('   - currentUser data:', window.devCommunity?.currentUser);
+    
+    console.log('3. localStorage:');
+    console.log('   - jwtToken:', localStorage.getItem('jwtToken') ? 'PRESENTE' : 'AUSENTE');
+    console.log('   - userLoggedIn:', localStorage.getItem('userLoggedIn'));
+    
+    console.log('4. Session:');
+    console.log('   - sessionStorage user:', sessionStorage.getItem('user'));
+    
+    console.log('5. Verificando endpoint /api/user...');
+    
+    // Probar el endpoint de usuario
+    fetch('/api/user', {
+        headers: {
+            'Authorization': `Bearer ${authManager.token}`
+        }
+    })
+    .then(response => {
+        console.log('   - /api/user status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('   - /api/user response:', data);
+    })
+    .catch(error => {
+        console.log('   - /api/user error:', error);
+    });
+};
+
+// También puedes llamar a debugAuth() desde la consola del navegador
 
 // Inicializar cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
@@ -3422,7 +4928,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =====================================================================
-// SECCIÓN 17: DETECCIÓN DE DISPOSITIVO
+// SECCIÓN 18: DETECCIÓN DE DISPOSITIVO
 // =====================================================================
 
 function isMobileDevice() {
@@ -3436,3 +4942,54 @@ function isTabletDevice() {
 function isDesktopDevice() {
     return window.innerWidth > 1024;
 }
+
+
+
+// Mobile Search Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchToggle = document.getElementById('searchToggle');
+    const mobileSearch = document.getElementById('mobileSearch');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    const searchClose = document.getElementById('searchClose');
+    const body = document.body;
+
+    if (searchToggle && mobileSearch) {
+        // Abrir search
+        searchToggle.addEventListener('click', function() {
+            mobileSearch.classList.add('active');
+            body.classList.add('search-open');
+            setTimeout(() => {
+                mobileSearchInput.focus();
+            }, 100);
+        });
+
+        // Cerrar search
+        function closeSearch() {
+            mobileSearch.classList.remove('active');
+            body.classList.remove('search-open');
+            mobileSearchInput.blur();
+        }
+
+        searchClose.addEventListener('click', closeSearch);
+
+        // Cerrar con Escape key
+        mobileSearchInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSearch();
+                searchToggle.focus();
+            }
+        });
+
+        // Cerrar al hacer clic fuera (en el overlay)
+        document.addEventListener('click', function(event) {
+            if (mobileSearch.classList.contains('active') && 
+                !mobileSearch.contains(event.target) && 
+                !searchToggle.contains(event.target)) {
+                closeSearch();
+            }
+        });
+    }
+});
+
+
+

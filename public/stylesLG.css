@@ -627,7 +627,7 @@ fieldset {
     min-height: calc(100vh - 56px);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 580px) {
     .login-card {
         padding: 20px;
     }
@@ -638,7 +638,9 @@ fieldset {
     }
     
     .minibar {
-        display: none;
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
     }
     
     /* Reset adicional para móviles */

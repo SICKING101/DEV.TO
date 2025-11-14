@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Posición inicial: alineado verticalmente con el ítem de la minibar
         let topPosition = linkRect.top;
-        // Altura fija estimada del preview (podría mejorarse calculándola dinámicamente)
+        // Altura fija estimada del preview 
         const previewHeight = 320;
         
         // AJUSTE 1: Si el preview se sale por la parte INFERIOR de la pantalla
@@ -189,7 +189,7 @@ if (colorInput && colorPreview) {
 }
 
         // =====================================================================
-        // SECCION 4: LOGIN FUNCTIONALITY - Funcionalidad de Login Mejorada CON JWT
+        // SECCION 4: LOGIN FUNCTIONALITY - Funcionalidad de Login CON JWT
         // =====================================================================
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
@@ -370,7 +370,7 @@ if (colorInput && colorPreview) {
         });
 
         // =====================================================================
-        // SECCION 5: REGISTER FUNCTIONALITY - Funcionalidad de Registro Mejorada
+        // SECCION 5: REGISTER FUNCTIONALITY - Funcionalidad de Registro 
         // =====================================================================
         document.addEventListener('DOMContentLoaded', function() {
             const registerForm = document.getElementById('registerForm');

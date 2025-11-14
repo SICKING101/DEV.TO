@@ -110,7 +110,7 @@ const requireAuthHybrid = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
-        const { verifyToken } = require('/config/jwtConfig');
+        const { verifyToken } = require('./config/jwtConfig');
         
         try {
             const decoded = verifyToken(token);
@@ -1095,6 +1095,368 @@ app.post('/api/posts/:id/favorite', requireAuthHybrid, async (req, res) => {
 });
 
 /******************************************************
+ *              RUTAS DE EDICIÓN DE POSTS CON DEBUGGING
+ ******************************************************/
+
+// Obtener post para edición - CON DEBUGGING EXTENDIDO
+app.get('/api/posts/:id/edit', requireAuthHybrid, async (req, res) => {
+  try {
+    console.log('📝 === SOLICITANDO POST PARA EDICIÓN ===');
+    
+    const postId = req.params.id;
+    
+    // Obtener user ID del método de autenticación usado
+    let userId;
+    if (req.authMethod === 'jwt') {
+      userId = req.user.id;
+    } else {
+      userId = req.session.user ? req.session.user.id : req.user._id;
+    }
+
+    console.log('📋 Datos de solicitud:', {
+      postId,
+      userId,
+      authMethod: req.authMethod,
+      headers: req.headers
+    });
+
+    console.log('🔍 Buscando post en la base de datos...');
+    const post = await Post.findById(postId)
+      .populate('author', 'username profilePicture');
+
+    if (!post) {
+      console.log('❌ Post no encontrado:', postId);
+      return res.status(404).json({ 
+        success: false,
+        error: 'Post no encontrado' 
+      });
+    }
+
+    console.log('✅ Post encontrado:', {
+      id: post._id,
+      title: post.title,
+      authorId: post.author._id.toString(),
+      authorUsername: post.author.username,
+      currentUserId: userId
+    });
+
+    // Verificar que el usuario es el autor
+    if (post.author._id.toString() !== userId.toString()) {
+      console.log('❌ Usuario no autorizado para editar este post');
+      console.log('   - Autor del post:', post.author._id.toString());
+      console.log('   - Usuario actual:', userId.toString());
+      console.log('   - ¿Son iguales?', post.author._id.toString() === userId.toString());
+      return res.status(403).json({ 
+        success: false,
+        error: 'No tienes permiso para editar este post' 
+      });
+    }
+
+    console.log('✅ Usuario autorizado para editar');
+
+    const postData = {
+      _id: post._id,
+      title: post.title,
+      content: post.content,
+      tags: post.tags,
+      coverImage: post.coverImage,
+      published: post.published,
+      publishedAt: post.publishedAt,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      author: {
+        _id: post.author._id,
+        username: post.author.username,
+        profilePicture: post.author.profilePicture || '/IMAGENES/default-avatar.png'
+      }
+    };
+
+    console.log('📤 Enviando datos del post al cliente');
+    console.log('📊 Datos del post:', {
+      title: postData.title,
+      contentLength: postData.content.length,
+      tags: postData.tags,
+      published: postData.published
+    });
+
+    res.json({
+      success: true,
+      post: postData
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR AL OBTENER POST PARA EDICIÓN:', error);
+    console.error('❌ Stack trace completo:', error.stack);
+    
+    if (error.name === 'CastError') {
+      console.error('❌ Error de casteo - ID inválido:', postId);
+      return res.status(400).json({ 
+        success: false,
+        error: 'ID de post inválido' 
+      });
+    }
+
+    res.status(500).json({ 
+      success: false,
+      error: 'Error interno del servidor al obtener el post',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Actualizar post - CON DEBUGGING EXTENDIDO
+app.put('/api/posts/:id', requireAuthHybrid, upload.single('coverImage'), async (req, res) => {
+  try {
+    console.log('✏️ === INICIANDO ACTUALIZACIÓN DE POST ===');
+    
+    const postId = req.params.id;
+    const { title, content, tags, published, removeCoverImage } = req.body;
+    
+    // Obtener user ID del método de autenticación usado
+    let userId;
+    if (req.authMethod === 'jwt') {
+      userId = req.user.id;
+    } else {
+      userId = req.session.user ? req.session.user.id : req.user._id;
+    }
+
+    console.log('📝 Datos recibidos:', {
+      postId,
+      userId,
+      title: title ? `${title.substring(0, 50)}...` : 'Vacío',
+      contentLength: content ? content.length : 0,
+      tags: tags || 'No tags',
+      published: published || 'false',
+      removeCoverImage: removeCoverImage || 'false',
+      hasNewCoverImage: !!req.file,
+      authMethod: req.authMethod
+    });
+
+    // Buscar el post
+    console.log('🔍 Buscando post para actualizar...');
+    const post = await Post.findById(postId);
+    if (!post) {
+      console.log('❌ Post no encontrado:', postId);
+      return res.status(404).json({ 
+        success: false,
+        error: 'Post no encontrado' 
+      });
+    }
+
+    console.log('✅ Post encontrado:', {
+      id: post._id,
+      title: post.title,
+      author: post.author.toString()
+    });
+
+    // Verificar que el usuario es el autor
+    if (post.author.toString() !== userId.toString()) {
+      console.log('❌ Usuario no autorizado para editar este post');
+      console.log('   - Autor del post:', post.author.toString());
+      console.log('   - Usuario actual:', userId.toString());
+      console.log('   - ¿Son iguales?', post.author.toString() === userId.toString());
+      return res.status(403).json({ 
+        success: false,
+        error: 'No tienes permiso para editar este post' 
+      });
+    }
+
+    console.log('✅ Usuario autorizado, validando datos...');
+
+    // Validaciones
+    if (!title || !title.trim()) {
+      console.log('❌ Validación fallida: título vacío');
+      return res.status(400).json({
+        success: false,
+        error: 'El título del post es requerido'
+      });
+    }
+
+    if (!content || !content.trim()) {
+      console.log('❌ Validación fallida: contenido vacío');
+      return res.status(400).json({
+        success: false,
+        error: 'El contenido del post es requerido'
+      });
+    }
+
+    if (title.length > 200) {
+      console.log('❌ Validación fallida: título muy largo');
+      return res.status(400).json({
+        success: false,
+        error: 'El título no puede tener más de 200 caracteres'
+      });
+    }
+
+    // Procesar tags
+    let tagsArray = [];
+    if (tags && tags.trim()) {
+      tagsArray = tags.split(',')
+        .map(tag => tag.trim().toLowerCase())
+        .filter(tag => tag.length > 0)
+        .slice(0, 4);
+    }
+
+    console.log('🏷️ Tags procesados:', tagsArray);
+
+    // Preparar datos de actualización
+    const updateData = {
+      title: title.trim(),
+      content: content.trim(),
+      tags: tagsArray,
+      published: published === 'true'
+    };
+
+    // Manejar imagen de portada
+    if (removeCoverImage === 'true') {
+      updateData.coverImage = null;
+      console.log('🗑️ Imagen de portada removida');
+    } else if (req.file) {
+      updateData.coverImage = `/uploads/${req.file.filename}`;
+      console.log('🖼️ Nueva imagen de portada:', updateData.coverImage);
+    }
+
+    console.log('📦 Datos de actualización:', updateData);
+
+    // Actualizar el post usando el método del modelo
+    post.updatePost(updateData);
+    await post.save();
+    await post.populate('author', 'username profilePicture');
+
+    console.log('✅ Post actualizado exitosamente - ID:', post._id);
+    console.log('📊 Post actualizado:', {
+      title: post.title,
+      published: post.published,
+      tags: post.tags,
+      coverImage: post.coverImage
+    });
+
+    res.json({
+      success: true,
+      message: published === 'true' ? '🎉 Post actualizado y publicado exitosamente' : '💾 Post actualizado como borrador',
+      post: {
+        id: post._id,
+        title: post.title,
+        content: post.content,
+        tags: post.tags,
+        coverImage: post.coverImage,
+        published: post.published,
+        publishedAt: post.publishedAt,
+        updatedAt: post.updatedAt,
+        author: post.author
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR AL ACTUALIZAR POST:', error);
+    console.error('❌ Stack trace completo:', error.stack);
+    
+    if (error.name === 'ValidationError') {
+      console.error('❌ Error de validación:', error.message);
+      return res.status(400).json({
+        success: false,
+        error: 'Datos del post inválidos',
+        details: Object.values(error.errors).map(e => e.message)
+      });
+    }
+
+    if (error.name === 'CastError') {
+      console.error('❌ Error de casteo - ID inválido:', postId);
+      return res.status(400).json({ 
+        success: false,
+        error: 'ID de post inválido' 
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al actualizar el post',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/******************************************************
+ *              ELIMINAR POST
+ ******************************************************/
+app.delete('/api/posts/:id', requireAuthHybrid, async (req, res) => {
+    try {
+        console.log('🗑️ === INICIANDO ELIMINACIÓN DE POST ===');
+        
+        const postId = req.params.id;
+        
+        // Obtener user ID del método de autenticación usado
+        let userId;
+        if (req.authMethod === 'jwt') {
+            userId = req.user.id;
+        } else {
+            userId = req.session.user ? req.session.user.id : req.user._id;
+        }
+
+        console.log('📝 Datos de eliminación:', {
+            postId,
+            userId,
+            authMethod: req.authMethod
+        });
+
+        // Buscar el post
+        const post = await Post.findById(postId);
+        if (!post) {
+            console.log('❌ Post no encontrado:', postId);
+            return res.status(404).json({ 
+                success: false,
+                error: 'Post not found' 
+            });
+        }
+
+        // Verificar que el usuario es el autor
+        if (post.author.toString() !== userId.toString()) {
+            console.log('❌ Usuario no autorizado para eliminar este post');
+            console.log('   - Autor del post:', post.author.toString());
+            console.log('   - Usuario actual:', userId.toString());
+            return res.status(403).json({ 
+                success: false,
+                error: 'Not authorized to delete this post' 
+            });
+        }
+
+        console.log('✅ Usuario autorizado, eliminando post...');
+
+        // Eliminar el post de la base de datos
+        await Post.findByIdAndDelete(postId);
+        console.log('✅ Post eliminado de la base de datos');
+
+        // También eliminar comentarios asociados (opcional pero recomendado)
+        await Post.updateMany(
+            { 'comments.postId': postId },
+            { $pull: { comments: { postId: postId } } }
+        );
+        console.log('✅ Comentarios asociados eliminados');
+
+        res.json({ 
+            success: true, 
+            message: 'Post deleted successfully' 
+        });
+
+    } catch (error) {
+        console.error('❌ ERROR AL ELIMINAR POST:', error);
+        
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                success: false,
+                error: 'ID de post inválido' 
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            error: 'Error interno del servidor al eliminar el post',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+/******************************************************
  *              CIERRE DE SESIÓN
  ******************************************************/
 app.get('/logout', (req, res) => {
@@ -1219,86 +1581,6 @@ app.get('/auth/github/callback',
 );
 
 /******************************************************
- *              ELIMINAR POST
- ******************************************************/
-app.delete('/api/posts/:id', requireAuthHybrid, async (req, res) => {
-    try {
-        console.log('🗑️ === INICIANDO ELIMINACIÓN DE POST ===');
-        
-        const postId = req.params.id;
-        
-        // Obtener user ID del método de autenticación usado
-        let userId;
-        if (req.authMethod === 'jwt') {
-            userId = req.user.id;
-        } else {
-            userId = req.session.user ? req.session.user.id : req.user._id;
-        }
-
-        console.log('📝 Datos de eliminación:', {
-            postId,
-            userId,
-            authMethod: req.authMethod
-        });
-
-        // Buscar el post
-        const post = await Post.findById(postId);
-        if (!post) {
-            console.log('❌ Post no encontrado:', postId);
-            return res.status(404).json({ 
-                success: false,
-                error: 'Post not found' 
-            });
-        }
-
-        // Verificar que el usuario es el autor
-        if (post.author.toString() !== userId.toString()) {
-            console.log('❌ Usuario no autorizado para eliminar este post');
-            console.log('   - Autor del post:', post.author.toString());
-            console.log('   - Usuario actual:', userId.toString());
-            return res.status(403).json({ 
-                success: false,
-                error: 'Not authorized to delete this post' 
-            });
-        }
-
-        console.log('✅ Usuario autorizado, eliminando post...');
-
-        // Eliminar el post de la base de datos
-        await Post.findByIdAndDelete(postId);
-        console.log('✅ Post eliminado de la base de datos');
-
-        // También eliminar comentarios asociados (opcional pero recomendado)
-        await Post.updateMany(
-            { 'comments.postId': postId },
-            { $pull: { comments: { postId: postId } } }
-        );
-        console.log('✅ Comentarios asociados eliminados');
-
-        res.json({ 
-            success: true, 
-            message: 'Post deleted successfully' 
-        });
-
-    } catch (error) {
-        console.error('❌ ERROR AL ELIMINAR POST:', error);
-        
-        if (error.name === 'CastError') {
-            return res.status(400).json({ 
-                success: false,
-                error: 'ID de post inválido' 
-            });
-        }
-
-        res.status(500).json({ 
-            success: false,
-            error: 'Error interno del servidor al eliminar el post',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-});
-
-/******************************************************
  *              INICIO DEL SERVIDOR
  ******************************************************/
 app.listen(3000, () => {
@@ -1315,7 +1597,10 @@ app.listen(3000, () => {
     console.log('   GET  /api/posts/:id/comments');
     console.log('   PUT  /api/comments/:id');
     console.log('   DELETE /api/comments/:id');
-     console.log('   DELETE /api/posts/:id');
+    console.log('📝 Endpoints de posts disponibles:');
+    console.log('   GET  /api/posts/:id/edit');
+    console.log('   PUT  /api/posts/:id');
+    console.log('   DELETE /api/posts/:id');
 });
 
 module.exports = app;
