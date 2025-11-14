@@ -25,7 +25,7 @@ const leftbar = document.getElementById('leftbar');
 const minibar = document.getElementById('minibar');
 
 // =====================================================================
-// SECCIÓN 2: SISTEMA DE AUTENTICACIÓN - AUTH MANAGER
+// SECCION 2: SISTEMA DE AUTENTICACION - AUTH MANAGER
 // =====================================================================
 
 class AuthManager {
@@ -35,31 +35,28 @@ class AuthManager {
     }
 
     syncAuthState() {
-        console.log('🔄 Sincronizando estado de autenticación...');
-        
-        // Verificar token en localStorage
+        console.log('🔄 Sincronizando estado de autenticacion...');
+
         const storedToken = localStorage.getItem('jwtToken');
         if (storedToken && !this.token) {
             console.log('🔄 Token encontrado en localStorage, actualizando authManager');
             this.token = storedToken;
             this.isAuthenticated = true;
         }
-        
-        // Verificar si hay usuario en devCommunity
+
         if (window.devCommunity && window.devCommunity.currentUser && !this.isAuthenticated) {
             console.log('🔄 Usuario encontrado en devCommunity, marcando como autenticado');
             this.isAuthenticated = true;
         }
-        
-        console.log('✅ Estado final de autenticación:', {
+
+        console.log('✅ Estado final de autenticacion:', {
             isAuthenticated: this.isAuthenticated,
             token: this.token ? 'PRESENTE' : 'AUSENTE',
             devCommunityUser: window.devCommunity?.currentUser ? 'PRESENTE' : 'AUSENTE'
         });
-        
+
         return this.isAuthenticated;
     }
-
 
     getAuthHeaders() {
         if (this.token) {
@@ -93,113 +90,103 @@ class AuthManager {
     }
 
     clearToken() {
+        console.log("🗑 Eliminando token JWT...");
         this.token = null;
         this.isAuthenticated = false;
         localStorage.removeItem('jwtToken');
     }
 
-    async logout() {
-        try {
-            console.log('Ejecutando logout completo...');
-            
-            // 1. Limpiar TODO el estado local primero
-            this.clearToken();
-            this.clearAllUserData();
-            
-            // 2. Intentar logout en el servidor (pero no es crítico)
-            if (this.token) {
-                try {
-                    const response = await fetch('/api/auth/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${this.token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    console.log('Respuesta del servidor:', response.status);
-                } catch (error) {
-                    console.log('Logout del servidor falló, pero continuando...');
-                }
-            }
-
-            // 3. LIMPIAR CACHE Y REDIRIGIR INMEDIATAMENTE
-            this.clearAllCache();
-            window.location.href = '/login.html';
-            
-        } catch (error) {
-            console.error('Error en logout:', error);
-            // Forzar limpieza completa y redirección
-            this.clearAllUserData();
-            window.location.href = '/login.html';
-        }
-    }
-
-    /**
-     * Limpia TODOS los datos del usuario
-     */
-    clearAllUserData() {
-        console.log('Limpiando todos los datos del usuario...');
-        
-        // Limpiar token
-        localStorage.removeItem('jwtToken');
-        
-        // Limpiar cualquier otro dato de usuario que puedas tener
-        localStorage.removeItem('userData');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('userProfile');
-        
-        // Limpiar sessionStorage por si acaso
-        sessionStorage.clear();
-        
-        // Limpiar cookies relacionadas con autenticación
-        this.clearAuthCookies();
-        
-        this.token = null;
-        this.isAuthenticated = false;
-        
-        console.log('Todos los datos de usuario eliminados');
-    }
-
-    /**
-     * Limpia cookies de autenticación
-     */
     clearAuthCookies() {
         document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 
-    /**
-     * Limpia toda la cache de la aplicación
-     */
+    clearAllUserData() {
+        console.log("🧹 Limpiando todos los datos del usuario...");
+
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userProfile');
+        localStorage.removeItem('userLoggedIn');
+
+        sessionStorage.clear();
+        this.clearAuthCookies();
+
+        this.token = null;
+        this.isAuthenticated = false;
+
+        console.log("✔ Datos de usuario completamente eliminados");
+    }
+
     clearAllCache() {
-        // Limpiar cache de comentarios
         if (window.devCommunity && window.devCommunity.commentSystem) {
             window.devCommunity.commentSystem.commentsCache.clear();
         }
-        
-        // Limpiar cualquier variable global
+
         window.currentUser = null;
         window.userData = null;
-        
-        console.log('Cache de la aplicación limpiada');
+
+        console.log("🧹 Cache limpiada");
+    }
+
+    // ============================================================
+    // LOGOUT REAL Y FUNCIONAL — YA NO USA TOKEN BORRADO
+    // ============================================================
+    async logout() {
+        try {
+            console.log("🚪 Iniciando logout...");
+
+            // Guardamos el token temporalmente ANTES de borrarlo
+            const tokenToInvalidate = this.token;
+
+            // 1. Limpiar localmente ANTES DE TODO
+            this.clearAllUserData();
+
+            // 2. Intentar logout en backend SI existía token
+            if (tokenToInvalidate) {
+            try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${tokenToInvalidate}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log("✔ Logout en servidor completado");
+                } catch (error) {
+                    console.log("❌ Error en logout del servidor, pero continuando...");
+                }
+            }
+
+            // 3. Limpiar cache
+            this.clearAllCache();
+
+            // 4. Redirigir
+            window.location.href = '/login.html';
+
+        } catch (error) {
+            console.error("❌ Error en logout:", error);
+            this.clearAllUserData();
+            window.location.href = '/login.html';
+        }
     }
 }
 
 // Instancia global del AuthManager
 const authManager = new AuthManager();
 
+
 // =====================================================================
-// SECCIÓN 3: MANEJO DE NAVEGACIÓN RESPONSIVE
+// SECCION 3: RESPONSIVE NAV (COMPLETO TAL CUAL)
 // =====================================================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menuToggle');
     const leftbar = document.getElementById('leftbar');
     const body = document.body;
-    const minibar = document.getElementById('minibar');
-    
-    // Crear overlay dinámicamente si no existe
+
     let mobileOverlay = document.getElementById('mobileOverlay');
     if (!mobileOverlay) {
         mobileOverlay = document.createElement('div');
@@ -208,10 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(mobileOverlay);
     }
 
-    // Estado del menú
     let isMenuOpen = false;
 
-    // Función para abrir el menú
     function openMobileMenu() {
         leftbar.classList.add('open');
         mobileOverlay.classList.add('active');
@@ -221,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
         isMenuOpen = true;
     }
 
-    // Función para cerrar el menú
     function closeMobileMenu() {
         leftbar.classList.remove('open');
         mobileOverlay.classList.remove('active');
@@ -231,187 +215,114 @@ document.addEventListener('DOMContentLoaded', function() {
         isMenuOpen = false;
     }
 
-    // Toggle del menú hamburguesa
     if (menuToggle) {
-        menuToggle.addEventListener('click', function(e) {
+        menuToggle.addEventListener('click', function (e) {
             e.stopPropagation();
-            if (isMenuOpen) {
-                closeMobileMenu();
-            } else {
-                openMobileMenu();
-            }
+            isMenuOpen ? closeMobileMenu() : openMobileMenu();
         });
     }
 
-    // Cerrar menú al hacer clic en el overlay
     mobileOverlay.addEventListener('click', closeMobileMenu);
 
-    // Cerrar menú con tecla Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && isMenuOpen) {
-            closeMobileMenu();
-        }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && isMenuOpen) closeMobileMenu();
     });
 
-    // Cerrar menú al hacer clic en enlaces del menú
     const mobileLinks = leftbar.querySelectorAll('a');
     mobileLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Solo cerrar si es un enlace interno (no externo ni con target blank)
-            if (this.getAttribute('href') && 
-                !this.getAttribute('href').startsWith('http') &&
-                !this.getAttribute('target') &&
-                window.innerWidth <= 768) {
+        link.addEventListener('click', function () {
+            if (!this.href.startsWith('http') && window.innerWidth <= 768) {
                 closeMobileMenu();
             }
         });
     });
 
-    // Cerrar menú al redimensionar a desktop
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768 && isMenuOpen) {
-            closeMobileMenu();
-        }
-        
-        // Actualizar visibilidad del hamburger
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 768 && isMenuOpen) closeMobileMenu();
         updateHamburgerVisibility();
     });
 
-    // Prevenir que los clics dentro del menú lo cierren
-    leftbar.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
+    leftbar.addEventListener('click', e => e.stopPropagation());
 
-    // Cerrar menú al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (isMenuOpen && 
-            !leftbar.contains(e.target) && 
-            e.target !== menuToggle &&
-            !mobileOverlay.contains(e.target)) {
+    document.addEventListener('click', function (e) {
+        if (isMenuOpen && !leftbar.contains(e.target) && e.target !== menuToggle) {
             closeMobileMenu();
         }
     });
 
-    // =====================================================================
-    // SECCIÓN 3.1: MANEJO DE ESTADO DE USUARIO
-    // =====================================================================
-
     function updateUserState() {
-        // Simular estado de usuario (en una app real esto vendría del backend)
         const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-        
+        const userNav = document.getElementById('userNav');
+        const authActions = document.getElementById('authActions');
+
         if (isLoggedIn) {
             body.classList.add('user-logged-in');
             body.classList.remove('user-logged-out');
-            
-            // Mostrar user-nav y ocultar actions
-            const userNav = document.getElementById('userNav');
-            const authActions = document.getElementById('authActions');
-            
             if (userNav) userNav.style.display = 'flex';
             if (authActions) authActions.style.display = 'none';
         } else {
             body.classList.add('user-logged-out');
             body.classList.remove('user-logged-in');
-            
-            // Mostrar actions y ocultar user-nav
-            const userNav = document.getElementById('userNav');
-            const authActions = document.getElementById('authActions');
-            
             if (userNav) userNav.style.display = 'none';
             if (authActions) authActions.style.display = 'flex';
         }
     }
 
-    // =====================================================================
-    // SECCIÓN 3.2: ACTUALIZAR VISIBILIDAD DEL HAMBURGUESA
-    // =====================================================================
-
     function updateHamburgerVisibility() {
-        if (window.innerWidth <= 768) {
-            menuToggle.style.display = 'flex';
-        } else {
-            menuToggle.style.display = 'none';
-            closeMobileMenu();
-        }
+        menuToggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+        if (window.innerWidth > 768) closeMobileMenu();
     }
-
-    // =====================================================================
-    // SECCIÓN 3.3: INICIALIZACIÓN
-    // =====================================================================
 
     function initialize() {
         updateUserState();
         updateHamburgerVisibility();
     }
 
-    // Ejecutar inicialización
     initialize();
-
-    // Re-inicializar en resize - SOLO ACTUALIZAR HAMBURGUESA
-    window.addEventListener('resize', function() {
-        updateHamburgerVisibility();
-    });
+    window.addEventListener('resize', updateHamburgerVisibility);
 });
 
+
 // =====================================================================
-// SECCIÓN 4: MANEJO DE CIERRE DE SESIÓN CON MODAL
+// SECCION 4: MODAL DE LOGOUT (COMPLETO)
 // =====================================================================
 
-window.handleLogout = function(event) {
+window.handleLogout = function (event) {
     if (event) event.preventDefault();
-    
     const logoutModal = document.getElementById('logoutModal');
-    
-    // Mostrar el modal
     logoutModal.style.display = 'flex';
-    
-    // Prevenir scroll del body
     document.body.style.overflow = 'hidden';
 };
 
-// Inicializar eventos del modal
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const logoutModal = document.getElementById('logoutModal');
     const logoutConfirm = document.getElementById('logoutConfirm');
     const logoutCancel = document.getElementById('logoutCancel');
     const modalOverlay = logoutModal.querySelector('.modal__overlay');
-    
-    // Confirmar cierre de sesión
+
     if (logoutConfirm) {
-        logoutConfirm.addEventListener('click', function() {
-            // Limpiar datos de sesión
-            localStorage.removeItem('userLoggedIn');
-            localStorage.removeItem('jwtToken');
-            localStorage.removeItem('userData');
-            
-            // Cerrar modal
+        logoutConfirm.addEventListener('click', async function () {
             logoutModal.style.display = 'none';
             document.body.style.overflow = '';
-            
-            // Redirigir a login
-            window.location.href = '/Login.html';
+            await authManager.logout();
         });
     }
-    
-    // Cancelar cierre de sesión
+
     if (logoutCancel) {
-        logoutCancel.addEventListener('click', function() {
+        logoutCancel.addEventListener('click', function () {
             logoutModal.style.display = 'none';
             document.body.style.overflow = '';
         });
     }
-    
-    // Cerrar modal al hacer clic en el overlay
+
     if (modalOverlay) {
-        modalOverlay.addEventListener('click', function() {
+        modalOverlay.addEventListener('click', function () {
             logoutModal.style.display = 'none';
             document.body.style.overflow = '';
         });
     }
-    
-    // Cerrar modal con tecla Escape
-    document.addEventListener('keydown', function(e) {
+
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && logoutModal.style.display === 'flex') {
             logoutModal.style.display = 'none';
             document.body.style.overflow = '';
@@ -419,14 +330,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
 // =====================================================================
-// SECCIÓN 5: FUNCIONALIDAD DE AUTENTICACIÓN
+// SECCION 5: REQUESTS AUTENTICADOS (COMPLETOS)
 // =====================================================================
 
-// FUNCIÓN HELPER PARA REQUEST AUTENTICADOS
 async function makeAuthenticatedRequest(url, options = {}) {
     const authHeaders = authManager.getAuthHeaders();
-    
+
     const config = {
         ...options,
         headers: {
@@ -437,7 +348,7 @@ async function makeAuthenticatedRequest(url, options = {}) {
 
     try {
         const response = await fetch(url, config);
-        
+
         if (response.status === 401 && authManager.token) {
             console.log('Token expirado, intentando refresh...');
             const refreshed = await refreshToken();
@@ -446,7 +357,7 @@ async function makeAuthenticatedRequest(url, options = {}) {
                 return await fetch(url, config);
             }
         }
-        
+
         return response;
     } catch (error) {
         console.error('Error en request autenticado:', error);
@@ -462,7 +373,7 @@ async function refreshToken() {
                 'Authorization': `Bearer ${authManager.token}`
             }
         });
-        
+
         if (response.ok) {
             const data = await response.json();
             authManager.setToken(data.token);
@@ -471,183 +382,107 @@ async function refreshToken() {
     } catch (error) {
         console.error('Error refrescando token:', error);
     }
-    
+
     authManager.clearToken();
     window.location.href = '/';
     return false;
 }
 
+
 // =====================================================================
-// SECCIÓN 6: MANEJO DE IMÁGENES Y AVATARS
+// SECCION 6 y 7: AVATARS Y AUTH UI (COMPLETO)
 // =====================================================================
 
-/**
- * Maneja errores de carga de imágenes mostrando un avatar por defecto
- * @param {HTMLImageElement} img - Elemento de imagen que falló al cargar
- */
 function handleImageError(img) {
-    console.warn('Failed to load profile image, using default');
     img.src = '/IMAGENES/default-avatar.png';
     img.alt = 'Default Avatar';
 }
 
-/**
- * Configura los manejadores de error para todas las imágenes de perfil
- */
 function setupImageErrorHandlers() {
-    if (userAvatar) {
-        userAvatar.addEventListener('error', () => handleImageError(userAvatar));
-    }
-    if (dropdownAvatar) {
-        dropdownAvatar.addEventListener('error', () => handleImageError(dropdownAvatar));
-    }
+    if (userAvatar) userAvatar.addEventListener('error', () => handleImageError(userAvatar));
+    if (dropdownAvatar) dropdownAvatar.addEventListener('error', () => handleImageError(dropdownAvatar));
 }
 
-// =====================================================================
-// SECCIÓN 7: SISTEMA DE AUTENTICACIÓN DE USUARIO
-// =====================================================================
-
-/**
- * Verifica el estado de autenticación del usuario
- * @returns {Object|null} Datos del usuario o null si no está autenticado
- */
 async function checkAuth() {
     try {
-        console.log('🔐 Verificando estado de autenticación...');
-        
-        // Verificar si hay token en localStorage
+        console.log('🔐 Verificando estado de autenticacion...');
+
         const token = localStorage.getItem('jwtToken');
-        
+
         if (!token) {
-            console.log('❌ No hay token encontrado');
+            console.log('❌ No hay token');
             showUnauthenticatedState();
             return null;
         }
 
-        console.log('✅ Token encontrado, verificando con servidor...');
         const response = await fetch('/api/user', {
             method: 'GET',
             credentials: 'include',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
-        
+
         if (!response.ok) {
-            console.log('❌ Token inválido o expirado');
-            // Token inválido, limpiar todo
+            console.log('❌ Token invalido');
             clearAllUserData();
             showUnauthenticatedState();
             return null;
         }
-        
+
         const data = await response.json();
-        console.log('Auth response:', data);
-        
+
         if (data.user && data.user.id) {
-            console.log('✅ Usuario autenticado correctamente');
             showAuthenticatedState(data.user);
             return data.user;
-        } else {
-            console.log('❌ No hay datos de usuario en la respuesta');
-            clearAllUserData();
-            showUnauthenticatedState();
-            return null;
         }
+
+        showUnauthenticatedState();
+        return null;
+
     } catch (error) {
-        console.error('❌ Error checking auth:', error);
+        console.error('❌ Error en checkAuth:', error);
         clearAllUserData();
         showUnauthenticatedState();
         return null;
     }
 }
 
-/**
- * Muestra la interfaz para usuarios autenticados
- * @param {Object} user - Datos del usuario
- */
 function showAuthenticatedState(user) {
-    console.log('Showing authenticated state for user:', user);
-    
-    // Mostrar/ocultar elementos de navegación
     if (authActions) authActions.style.display = 'none';
     if (userNav) userNav.style.display = 'flex';
 
-    // Obtener datos del usuario
     const profilePic = user.profilePicture || user.avatar || '/IMAGENES/default-avatar.png';
-    const username = user.username || user.name || 'User';
-    const email = user.email || 'user@example.com';
-    const displayName = user.displayName || username;
 
-    console.log('User data to display:', { profilePic, username, email, displayName });
-
-    // Actualizar avatar principal
     if (userAvatar) {
         userAvatar.src = profilePic;
-        userAvatar.alt = username;
-        userAvatar.onerror = () => handleImageError(userAvatar);
+        userAvatar.alt = user.username;
     }
 
-    // Actualizar dropdown del usuario
     if (dropdownAvatar) {
         dropdownAvatar.src = profilePic;
-        dropdownAvatar.alt = username;
-        dropdownAvatar.onerror = () => handleImageError(dropdownAvatar);
-    }
-    
-    if (dropdownUsername) {
-        dropdownUsername.textContent = displayName;
-    }
-    
-    if (dropdownEmail) {
-        dropdownEmail.textContent = email;
+        dropdownAvatar.alt = user.username;
     }
 
-    console.log('Dropdown updated with user info');
+    if (dropdownUsername) dropdownUsername.textContent = user.username;
+    if (dropdownEmail) dropdownEmail.textContent = user.email;
 }
 
-/**
- * Muestra la interfaz para usuarios no autenticados
- */
 function showUnauthenticatedState() {
-    console.log('Showing unauthenticated state');
     if (authActions) authActions.style.display = 'flex';
     if (userNav) userNav.style.display = 'none';
     resetUserInfo();
 }
 
-/**
- * Restablece la información del usuario a valores por defecto
- */
 function resetUserInfo() {
     const defaultAvatar = '/IMAGENES/default-avatar.png';
-    const defaultUsername = 'Username';
-    const defaultEmail = 'user@example.com';
-
-    if (userAvatar) {
-        userAvatar.src = defaultAvatar;
-        userAvatar.alt = 'Default Avatar';
-    }
-    
-    // Resetear dropdown también
-    if (dropdownAvatar) {
-        dropdownAvatar.src = defaultAvatar;
-        dropdownAvatar.alt = 'Default Avatar';
-    }
-    
-    if (dropdownUsername) {
-        dropdownUsername.textContent = defaultUsername;
-    }
-    
-    if (dropdownEmail) {
-        dropdownEmail.textContent = defaultEmail;
-    }
+    if (userAvatar) userAvatar.src = defaultAvatar;
+    if (dropdownAvatar) dropdownAvatar.src = defaultAvatar;
+    if (dropdownUsername) dropdownUsername.textContent = 'Username';
+    if (dropdownEmail) dropdownEmail.textContent = 'user@example.com';
 }
 
-/**
- * Limpia todos los datos del usuario
- */
 function clearAllUserData() {
     localStorage.removeItem('userLoggedIn');
     localStorage.removeItem('jwtToken');
@@ -656,6 +491,7 @@ function clearAllUserData() {
     localStorage.removeItem('userProfile');
     sessionStorage.clear();
 }
+
 
 // =====================================================================
 // SECCIÓN 8: DROPDOWN DEL USUARIO
@@ -692,26 +528,26 @@ function initUserDropdown() {
     userAvatar.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const isVisible = userDropdown.style.display === 'block';
         userDropdown.style.display = isVisible ? 'none' : 'block';
-        
+
         console.log('User dropdown toggled:', !isVisible ? 'visible' : 'hidden');
     });
-    
+
     // Cerrar dropdown al hacer clic fuera
     document.addEventListener('click', (e) => {
         if (userDropdown.style.display === 'block') {
             const isClickInsideDropdown = userDropdown.contains(e.target);
             const isClickOnAvatar = userAvatar.contains(e.target);
-            
+
             if (!isClickInsideDropdown && !isClickOnAvatar) {
                 userDropdown.style.display = 'none';
                 console.log('User dropdown closed (click outside)');
             }
         }
     });
-    
+
     // Prevenir que se cierre al hacer clic dentro del dropdown
     userDropdown.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -737,9 +573,9 @@ function initUserDropdown() {
  */
 function renderTags() {
     if (!popularTagsEl) return;
-    
+
     const popularTags = ['javascript', 'webdev', 'python', 'devops', 'react', 'nodejs', 'ai', 'machinelearning'];
-    
+
     popularTagsEl.innerHTML = '';
     popularTags.forEach(tag => {
         const li = document.createElement('li');
@@ -747,7 +583,7 @@ function renderTags() {
         li.innerHTML = `<a href="#" class="taglist__link" data-tag="${tag}">#${tag}</a>`;
         popularTagsEl.appendChild(li);
     });
-    
+
     // Configurar búsqueda al hacer clic en un tag
     popularTagsEl.addEventListener('click', (e) => {
         const a = e.target.closest('a');
@@ -773,11 +609,11 @@ function renderTags() {
  */
 function initMinibar() {
     const minibarItems = document.querySelectorAll('.minibar__item');
-    
+
     minibarItems.forEach(item => {
         const link = item.querySelector('.minibar__link');
         const preview = item.querySelector('.minibar__preview');
-        
+
         // Mostrar preview al hacer hover
         link.addEventListener('mouseenter', () => {
             minibarItems.forEach(otherItem => {
@@ -787,7 +623,7 @@ function initMinibar() {
             });
             item.classList.add('minibar__item--preview');
         });
-        
+
         // Ocultar preview al quitar el mouse
         item.addEventListener('mouseleave', () => {
             item.classList.remove('minibar__item--preview');
@@ -829,7 +665,7 @@ class CommentSystem {
      */
     async toggleComments(postId) {
         this.log(`toggleComments called for post: ${postId}`);
-        
+
         const commentsSection = document.getElementById(`comments-${postId}`);
         if (!commentsSection) {
             console.error(`Comments section not found for post: ${postId}`);
@@ -838,27 +674,27 @@ class CommentSystem {
 
         const isVisible = commentsSection.style.display !== 'none';
         this.log(`Comments section visible: ${isVisible}`);
-        
+
         if (!isVisible) {
             await this.loadComments(postId);
             commentsSection.style.display = 'block';
-            
+
             // Agregar animación suave
             commentsSection.style.opacity = '0';
             commentsSection.style.transform = 'translateY(-10px)';
-            
+
             setTimeout(() => {
                 commentsSection.style.transition = 'all 0.3s ease';
                 commentsSection.style.opacity = '1';
                 commentsSection.style.transform = 'translateY(0)';
             }, 10);
-            
+
         } else {
             // Animación al cerrar
             commentsSection.style.transition = 'all 0.3s ease';
             commentsSection.style.opacity = '0';
             commentsSection.style.transform = 'translateY(-10px)';
-            
+
             setTimeout(() => {
                 commentsSection.style.display = 'none';
             }, 300);
@@ -872,7 +708,7 @@ class CommentSystem {
     async loadComments(postId) {
         try {
             this.log(`Loading comments for post: ${postId}`);
-            
+
             // Verificar si ya tenemos comentarios en cache
             if (this.commentsCache.has(postId)) {
                 const cachedComments = this.commentsCache.get(postId);
@@ -883,14 +719,14 @@ class CommentSystem {
 
             // Intentar cargar comentarios desde la API
             const response = await fetch(`/api/posts/${postId}/comments`);
-            
+
             if (response.status === 404) {
                 this.log('Comments endpoint not available (404), using empty comments');
                 this.commentsCache.set(postId, []);
                 this.renderComments(postId, []);
                 return;
             }
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -899,7 +735,7 @@ class CommentSystem {
             this.log('Comments API response received', data);
 
             let comments = [];
-            
+
             // Manejar diferentes formatos de respuesta
             if (data.success && data.comments) {
                 comments = data.comments;
@@ -910,7 +746,7 @@ class CommentSystem {
             }
 
             this.log(`Loaded ${comments.length} comments from API`);
-            
+
             // Cachear los comentarios
             this.commentsCache.set(postId, comments);
             this.renderComments(postId, comments);
@@ -948,7 +784,7 @@ class CommentSystem {
         }
 
         container.innerHTML = comments.map(comment => this.createCommentHTML(comment)).join('');
-        
+
         this.log(`Successfully rendered ${comments.length} comments`);
     }
 
@@ -967,7 +803,7 @@ class CommentSystem {
 
         // Manejar diferentes formatos de comentario
         const user = comment.userId || comment.user || comment.author || {};
-        const commentDate = comment.createdAt ? 
+        const commentDate = comment.createdAt ?
             new Date(comment.createdAt).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
@@ -975,10 +811,10 @@ class CommentSystem {
                 hour: '2-digit',
                 minute: '2-digit'
             }) : 'Recently';
-            
+
         const username = user.username || user.name || 'Anonymous User';
         const profilePicture = user.profilePicture || user.avatar || '/IMAGENES/default-avatar.png';
-        
+
         // Verificar si el comentario es del usuario actual
         let isCurrentUser = false;
         if (this.devCommunity.currentUser) {
@@ -1056,7 +892,7 @@ class CommentSystem {
 
         try {
             this.log(`Adding comment to post: ${postId}`, { content });
-            
+
             const response = await fetch(`/api/posts/${postId}/comments`, {
                 method: 'POST',
                 headers: {
@@ -1091,23 +927,23 @@ class CommentSystem {
     async verifyAndHandleCommentCreation(postId, content, commentInput) {
         try {
             this.log('Verifying if comment was created despite server error...');
-            
+
             // Esperar un momento para dar tiempo al servidor
             await new Promise(resolve => setTimeout(resolve, 1000));
-            
+
             // Recargar comentarios para verificar
             this.commentsCache.delete(postId);
             await this.loadComments(postId);
-            
+
             const currentComments = this.commentsCache.get(postId) || [];
             this.log(`Current comments after verification: ${currentComments.length}`);
-            
+
             // Buscar si nuestro comentario está en la lista
-            const newCommentExists = currentComments.some(comment => 
-                comment.content === content || 
+            const newCommentExists = currentComments.some(comment =>
+                comment.content === content ||
                 (comment.content && comment.content.includes(content.substring(0, 50)))
             );
-            
+
             if (newCommentExists) {
                 // El comentario se creó exitosamente a pesar del error del servidor
                 this.log('Comment was successfully created despite server error');
@@ -1127,17 +963,17 @@ class CommentSystem {
      */
     handleCommentSuccess(postId, commentData, commentInput) {
         this.log('Handling comment success', { postId, commentData });
-        
+
         // Limpiar el input
         if (commentInput) commentInput.value = '';
-        
+
         // Invalidar cache y recargar comentarios
         this.commentsCache.delete(postId);
         this.loadComments(postId);
-        
+
         // Actualizar contador de comentarios
         this.updateCommentCount(postId, 1);
-        
+
         this.showCommentSuccess(postId, 'Comment added successfully!');
     }
 
@@ -1208,7 +1044,7 @@ class CommentSystem {
 
             if (response.ok) {
                 const data = await response.json();
-                
+
                 if (data.success) {
                     // Recargar los comentarios del post desde la base de datos
                     const postId = this.getPostIdFromComment(commentId);
@@ -1236,7 +1072,7 @@ class CommentSystem {
      */
     handleLocalCommentEdit(commentId, newContent) {
         this.log(`Handling local comment edit: ${commentId}`);
-        
+
         const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
         if (!commentElement) return;
 
@@ -1245,7 +1081,7 @@ class CommentSystem {
 
         // Obtener comentarios actuales del cache
         const currentComments = this.commentsCache.get(postId) || [];
-        
+
         // Actualizar el comentario en el cache
         const updatedComments = currentComments.map(comment => {
             const id = comment._id || comment.id;
@@ -1258,13 +1094,13 @@ class CommentSystem {
             }
             return comment;
         });
-        
+
         // Actualizar cache
         this.commentsCache.set(postId, updatedComments);
-        
+
         // Re-renderizar comentarios
         this.renderComments(postId, updatedComments);
-        
+
         this.showMessage('Comment updated successfully! (local)', 'success');
     }
 
@@ -1290,7 +1126,7 @@ class CommentSystem {
      */
     async deleteComment(commentId) {
         this.log(`Delete comment: ${commentId}`);
-        
+
         if (!confirm('Are you sure you want to delete this comment?')) {
             return;
         }
@@ -1305,7 +1141,7 @@ class CommentSystem {
 
             if (response.ok) {
                 const data = await response.json();
-                
+
                 if (data.success) {
                     // Recargar los comentarios del post desde la base de datos
                     const postId = this.getPostIdFromComment(commentId);
@@ -1334,7 +1170,7 @@ class CommentSystem {
      */
     handleLocalCommentDelete(commentId) {
         this.log(`Handling local comment deletion: ${commentId}`);
-        
+
         const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
         if (!commentElement) {
             this.log('Comment element not found for deletion');
@@ -1350,24 +1186,24 @@ class CommentSystem {
         // Obtener comentarios actuales del cache
         const currentComments = this.commentsCache.get(postId) || [];
         this.log(`Current comments before deletion: ${currentComments.length}`);
-        
+
         // Filtrar el comentario a eliminar
         const updatedComments = currentComments.filter(comment => {
             const id = comment._id || comment.id;
             return id !== commentId;
         });
-        
+
         this.log(`Comments after deletion: ${updatedComments.length}`);
-        
+
         // Actualizar cache
         this.commentsCache.set(postId, updatedComments);
-        
+
         // Re-renderizar comentarios
         this.renderComments(postId, updatedComments);
-        
+
         // Actualizar contador de comentarios - RESTAR 1
         this.updateCommentCount(postId, -1);
-        
+
         this.showMessage('Comment deleted successfully! (local)', 'success');
     }
 
@@ -1392,7 +1228,7 @@ class CommentSystem {
 
             if (response.ok) {
                 const data = await response.json();
-                
+
                 if (data.success) {
                     // Recargar comentarios para mostrar el like actualizado
                     const postId = this.getPostIdFromComment(commentId);
@@ -1424,14 +1260,14 @@ class CommentSystem {
 
         const likeBtn = commentElement.querySelector('.comment__like-btn');
         const likeCount = commentElement.querySelector('.comment__like-count');
-        
+
         if (likeBtn && likeCount) {
             const isActive = likeBtn.classList.contains('comment__like-btn--active');
             const currentCount = parseInt(likeCount.textContent) || 0;
-            
+
             likeBtn.classList.toggle('comment__like-btn--active', !isActive);
             likeCount.textContent = isActive ? currentCount - 1 : currentCount + 1;
-            
+
             this.showMessage('Like updated! (local)', 'success');
         }
     }
@@ -1443,7 +1279,7 @@ class CommentSystem {
      */
     updateCommentCount(postId, change) {
         this.log(`Updating comment count for post ${postId}: change = ${change}`);
-        
+
         const commentsBtn = document.querySelector(`[data-post-id="${postId}"] .article-card__comments-btn span`);
         if (commentsBtn) {
             const currentCount = parseInt(commentsBtn.textContent) || 0;
@@ -1616,9 +1452,9 @@ class CommentSystem {
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         `;
         toast.textContent = message;
-        
+
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             if (document.body.contains(toast)) {
                 document.body.removeChild(toast);
@@ -1665,18 +1501,18 @@ class DevCommunity {
      */
     checkAndSyncAuth() {
         console.log('🔐 Verificando y sincronizando autenticación...');
-        
+
         // Sincronizar authManager
         if (authManager) {
             authManager.syncAuthState();
         }
-        
+
         // Si hay usuario actual pero authManager no está autenticado, actualizar
         if (this.currentUser && !authManager.isAuthenticated) {
             console.log('🔄 Actualizando authManager con usuario de devCommunity');
             authManager.isAuthenticated = true;
         }
-        
+
         return this.currentUser || authManager.isAuthenticated;
     }
 
@@ -1699,7 +1535,7 @@ class DevCommunity {
             const response = await fetch('/api/user');
             if (!response.ok) throw new Error('Auth failed');
             const data = await response.json();
-            
+
             if (data.user) {
                 this.currentUser = data.user;
                 this.showUserNavigation();
@@ -1720,7 +1556,7 @@ class DevCommunity {
         const userNav = document.getElementById('userNav');
         const userAvatar = document.getElementById('userAvatar');
         const dropdownUsername = document.getElementById('dropdownUsername');
-        
+
         if (authActions) authActions.style.display = 'none';
         if (userNav) userNav.style.display = 'flex';
         if (userAvatar && this.currentUser.profilePicture) {
@@ -1729,7 +1565,7 @@ class DevCommunity {
         if (dropdownUsername && this.currentUser.username) {
             dropdownUsername.textContent = this.currentUser.username;
         }
-        
+
         this.setupUserMenu();
     }
 
@@ -1739,7 +1575,7 @@ class DevCommunity {
     showAuthNavigation() {
         const authActions = document.getElementById('authActions');
         const userNav = document.getElementById('userNav');
-        
+
         if (authActions) authActions.style.display = 'flex';
         if (userNav) userNav.style.display = 'none';
     }
@@ -1759,11 +1595,11 @@ class DevCommunity {
                 }
             });
         }
-        
+
         document.addEventListener('click', () => {
             if (userDropdown) userDropdown.style.display = 'none';
         });
-        
+
         if (userDropdown) {
             userDropdown.addEventListener('click', (e) => e.stopPropagation());
         }
@@ -1829,7 +1665,7 @@ class DevCommunity {
                     this.doSearch(searchInput.value.trim());
                 }, 300);
             });
-            
+
             // También buscar al presionar Enter
             searchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -1845,17 +1681,17 @@ class DevCommunity {
      */
     async loadPosts() {
         if (this.isLoading || !this.hasMorePosts) return;
-        
+
         this.isLoading = true;
         this.showLoading(true);
 
         try {
             const view = document.querySelector('.tab--active')?.dataset.view || 'latest';
             const sort = document.getElementById('sortSelect')?.value || 'new';
-            
+
             // Construir URL con parámetros de filtro
             let url = `/api/posts?page=${this.currentPage}&sort=${sort}`;
-            
+
             // Aplicar filtros según la vista seleccionada
             if (view === 'top') {
                 // Posts con más reacciones totales
@@ -1867,11 +1703,11 @@ class DevCommunity {
                 // Latest - posts más recientes
                 url += '&sortBy=date&order=desc';
             }
-            
+
             console.log(`Loading posts with URL: ${url}`);
-            
+
             const response = await fetch(url);
-            
+
             if (!response.ok) {
                 // Si no hay endpoint de posts, usar datos de ejemplo
                 if (response.status === 404) {
@@ -1902,28 +1738,28 @@ class DevCommunity {
      */
     handlePostsResponse(data, view) {
         let posts = [];
-        
+
         if (data.posts && data.posts.length > 0) {
             posts = data.posts;
         } else if (Array.isArray(data)) {
             posts = data;
         }
-        
+
         // Aplicar filtros locales si es necesario
         if (posts.length > 0) {
             posts = this.applyLocalFilters(posts, view);
         }
-        
+
         if (posts.length > 0) {
             if (this.currentPage === 1) {
                 this.posts = posts;
             } else {
                 this.posts = [...this.posts, ...posts];
             }
-            
+
             this.renderPosts();
             this.currentPage++;
-            
+
             // Verificar si hay más páginas
             if (this.currentPage > (data.totalPages || 1)) {
                 this.hasMorePosts = false;
@@ -1941,7 +1777,7 @@ class DevCommunity {
      */
     applyLocalFilters(posts, view) {
         console.log(`Applying local filter: ${view} to ${posts.length} posts`);
-        
+
         switch (view) {
             case 'top':
                 // Ordenar por total de reacciones (suma de todas las reacciones)
@@ -1950,7 +1786,7 @@ class DevCommunity {
                     const bReactions = this.calculateTotalReactions(b);
                     return bReactions - aReactions;
                 });
-                
+
             case 'trending':
                 // Ordenar por cantidad de corazones (reacción específica)
                 return posts.sort((a, b) => {
@@ -1958,7 +1794,7 @@ class DevCommunity {
                     const bHearts = b.reactionCounts?.heart || 0;
                     return bHearts - aHearts;
                 });
-                
+
             case 'latest':
             default:
                 // Ordenar por fecha (más recientes primero)
@@ -1975,7 +1811,7 @@ class DevCommunity {
      */
     calculateTotalReactions(post) {
         if (!post.reactionCounts) return 0;
-        
+
         return Object.values(post.reactionCounts).reduce((total, count) => {
             return total + (parseInt(count) || 0);
         }, 0);
@@ -1987,10 +1823,10 @@ class DevCommunity {
     handleMockPosts(view) {
         // Generar posts de ejemplo con diferentes cantidades de reacciones
         const mockPosts = this.generateMockPosts();
-        
+
         // Aplicar filtros a los posts de ejemplo
         const filteredPosts = this.applyLocalFilters(mockPosts, view);
-        
+
         if (this.currentPage === 1) {
             this.posts = filteredPosts;
         } else {
@@ -1998,10 +1834,10 @@ class DevCommunity {
             const morePosts = this.generateMockPosts(10, this.posts.length);
             this.posts = [...this.posts, ...this.applyLocalFilters(morePosts, view)];
         }
-        
+
         this.renderPosts();
         this.currentPage++;
-        
+
         // Limitar a 3 páginas para datos de ejemplo
         if (this.currentPage > 3) {
             this.hasMorePosts = false;
@@ -2014,10 +1850,10 @@ class DevCommunity {
     generateMockPosts(count = 10, offset = 0) {
         const mockPosts = [];
         const reactionTypes = ['like', 'unicorn', 'exploding_head', 'fire', 'heart', 'rocket'];
-        
+
         for (let i = 0; i < count; i++) {
             const postId = offset + i + 1;
-            
+
             // Generar counts de reacciones aleatorias
             const reactionCounts = {};
             reactionTypes.forEach(type => {
@@ -2029,7 +1865,7 @@ class DevCommunity {
                     reactionCounts[type] = postId % 2 === 1 ? Math.floor(Math.random() * 30) + 10 : Math.floor(Math.random() * 15);
                 }
             });
-            
+
             mockPosts.push({
                 _id: `mock-post-${postId}`,
                 title: `Mock Post ${postId} - ${['JavaScript', 'React', 'Node.js', 'Python', 'Web Dev'][i % 5]}`,
@@ -2045,7 +1881,7 @@ class DevCommunity {
                 tags: ['javascript', 'webdev', 'react', 'nodejs'].slice(0, Math.floor(Math.random() * 3) + 1)
             });
         }
-        
+
         return mockPosts;
     }
 
@@ -2054,7 +1890,7 @@ class DevCommunity {
      */
     renderPosts() {
         const articlesContainer = document.getElementById('articles');
-        
+
         if (!articlesContainer) return;
 
         if (this.posts.length === 0) {
@@ -2070,7 +1906,7 @@ class DevCommunity {
         }
 
         articlesContainer.innerHTML = this.posts.map(post => this.createPostHTML(post)).join('');
-        
+
         // Asegurar que las tarjetas se vean bien
         const articleCards = articlesContainer.querySelectorAll('.article-card');
         articleCards.forEach(card => {
@@ -2079,9 +1915,9 @@ class DevCommunity {
         });
     }
 
-/**
-     * Crea el HTML para un post individual
-     */
+    /**
+         * Crea el HTML para un post individual
+         */
     createPostHTML(post) {
         const readingTime = post.readingTime || Math.ceil((post.content?.length || 0) / 200) || 1;
         const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', {
@@ -2177,7 +2013,7 @@ class DevCommunity {
             </section>
         </article>
     `;
-}
+    }
 
     /**
      * Crea el HTML para las reacciones de un post
@@ -2196,15 +2032,15 @@ class DevCommunity {
 
         // Calcular total de reacciones para este post
         const totalReactions = this.calculateTotalReactions(post);
-        
+
         return `
             <section class="reactions-section">
                 <nav class="article-card__reactions">
                     ${reactions.map(reaction => {
-                        const count = post.reactionCounts?.[reaction.type] || 0;
-                        const isActive = post.hasReacted && post.userReaction === reaction.type;
-                        
-                        return `
+            const count = post.reactionCounts?.[reaction.type] || 0;
+            const isActive = post.hasReacted && post.userReaction === reaction.type;
+
+            return `
                             <button class="reaction-btn ${isActive ? 'reaction-btn--active' : ''}" 
                                     onclick="devCommunity.addReaction('${post._id || post.id}', '${reaction.type}')"
                                     title="${reaction.label}: ${count}">
@@ -2212,7 +2048,7 @@ class DevCommunity {
                                 <span class="reaction-count">${count}</span>
                             </button>
                         `;
-                    }).join('')}
+        }).join('')}
                 </nav>
             </section>
         `;
@@ -2263,7 +2099,7 @@ class DevCommunity {
                 this.posts[postIndex].reactionCounts = reactionData.reactionCounts;
                 this.posts[postIndex].hasReacted = reactionData.hasReacted;
                 this.posts[postIndex].userReaction = reactionData.userReaction;
-                
+
                 reactionsContainer.innerHTML = this.createReactionsHTML(this.posts[postIndex]);
             }
         }
@@ -2309,7 +2145,7 @@ class DevCommunity {
             } else {
                 bookmarkBtn.classList.remove('article-card__bookmark--active');
             }
-            
+
             const postIndex = this.posts.findIndex(p => (p._id || p.id) === postId);
             if (postIndex !== -1) {
                 this.posts[postIndex].hasFavorited = favoriteData.addedToFavorites;
@@ -2333,7 +2169,7 @@ class DevCommunity {
      */
     switchFeedView(view) {
         console.log(`Switching to view: ${view}`);
-        
+
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(tab => {
             tab.classList.toggle('tab--active', tab.dataset.view === view);
@@ -2343,10 +2179,10 @@ class DevCommunity {
         this.currentPage = 1;
         this.hasMorePosts = true;
         this.posts = [];
-        
+
         // Mostrar indicador de filtro activo
         this.showActiveFilter(view);
-        
+
         this.loadPosts();
     }
 
@@ -2357,7 +2193,7 @@ class DevCommunity {
         // Remover indicadores anteriores
         const existingIndicators = document.querySelectorAll('.active-filter-indicator');
         existingIndicators.forEach(indicator => indicator.remove());
-        
+
         const feedControls = document.querySelector('.feed-controls');
         if (feedControls) {
             const indicator = document.createElement('div');
@@ -2416,7 +2252,7 @@ class DevCommunity {
      */
     handleScroll() {
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-        
+
         if (scrollTop + clientHeight >= scrollHeight - 500 && !this.isLoading && this.hasMorePosts) {
             this.loadPosts();
         }
@@ -2431,7 +2267,7 @@ class DevCommunity {
         if (loadingElement) {
             loadingElement.style.display = show ? 'block' : 'none';
         }
-        
+
         const articlesContainer = document.getElementById('articles');
         if (articlesContainer) {
             articlesContainer.style.opacity = show ? '0.5' : '1';
@@ -2451,7 +2287,7 @@ class DevCommunity {
      */
     setupMinibar() {
         const minibarItems = document.querySelectorAll('.minibar__item');
-        
+
         minibarItems.forEach(item => {
             item.addEventListener('mouseenter', () => {
                 const preview = item.querySelector('.minibar__preview');
@@ -2459,7 +2295,7 @@ class DevCommunity {
                     preview.style.display = 'block';
                 }
             });
-            
+
             item.addEventListener('mouseleave', () => {
                 const preview = item.querySelector('.minibar__preview');
                 if (preview) {
@@ -2478,387 +2314,6 @@ class DevCommunity {
 }
 
 // =====================================================================
-// SECCIÓN 13: INYECCIÓN DE ESTILOS CSS
-// =====================================================================
-
-/**
- * Inyecta los estilos CSS necesarios para el sistema de comentarios, no es lo mas recomendable pero X
- */
-function injectCommentCSS() {
-    if (!document.querySelector('#comment-system-css')) {
-        const style = document.createElement('style');
-        style.id = 'comment-system-css';
-        style.textContent = `
-/* Comment System Styles */
-.comment {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-left: 3px solid #3b49df;
-}
-
-.comment__avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    object-fit: cover;
-}
-
-.comment__content {
-    flex: 1;
-    min-width: 0;
-}
-
-.comment__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-    gap: 12px;
-}
-
-.comment__user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.comment__username {
-    font-weight: 600;
-    color: #242424;
-    font-size: 14px;
-}
-
-.comment__badge {
-    background: #3b49df;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 500;
-}
-
-.comment__actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.comment__action-btn {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    font-size: 12px;
-    transition: all 0.2s;
-}
-
-.comment__action-btn:hover {
-    background: #e9ecef;
-    color: #242424;
-}
-
-.comment__action-btn--danger:hover {
-    background: #dc3545;
-    color: white;
-}
-
-.comment__date {
-    font-size: 12px;
-    color: #666;
-    white-space: nowrap;
-}
-
-.comment__text {
-    color: #242424;
-    line-height: 1.5;
-    font-size: 14px;
-    margin-bottom: 8px;
-    word-wrap: break-word;
-}
-
-.comment__edited {
-    margin-top: 4px;
-}
-
-.comment__edited small {
-    color: #666;
-    font-size: 11px;
-    font-style: italic;
-}
-
-.comment__footer {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 8px;
-}
-
-.comment__like-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    transition: all 0.2s;
-}
-
-.comment__like-btn:hover {
-    background: #e9ecef;
-    color: #dc3545;
-}
-
-.comment__like-btn--active {
-    color: #dc3545;
-}
-
-.comment__like-count {
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.comment-edit-form {
-    margin-bottom: 8px;
-}
-
-.comment-edit-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    resize: vertical;
-    min-height: 80px;
-    font-family: inherit;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.comment-edit-input:focus {
-    outline: none;
-    border-color: #3b49df;
-}
-
-.comment-edit-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.no-comments {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
-}
-
-.no-comments i {
-    margin-bottom: 12px;
-}
-
-.comments-error {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-}
-
-.comment-form {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.comment-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    resize: vertical;
-    min-height: 80px;
-    margin-bottom: 8px;
-    font-family: inherit;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-
-.comment-input:focus {
-    outline: none;
-    border-color: #3b49df;
-    box-shadow: 0 0 0 2px rgba(59, 73, 223, 0.1);
-}
-
-.login-prompt {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-    background: #f8f9fa;
-    border-radius: 4px;
-    margin-top: 16px;
-}
-
-.login-prompt a {
-    color: #3b49df;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.login-prompt a:hover {
-    text-decoration: underline;
-}
-
-/* User Dropdown Styles */
-.user-dropdown {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    background: white !important;
-    border: 1px solid #e0e0e0 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    min-width: 200px !important;
-    z-index: 1000 !important;
-    margin-top: 8px !important;
-}
-
-.user-dropdown[style*="display: none"] {
-    display: none !important;
-}
-
-.user-dropdown[style*="display: block"] {
-    display: block !important;
-}
-
-.user-menu {
-    position: relative !important;
-}
-
-.user-avatar {
-    cursor: pointer !important;
-    transition: transform 0.2s !important;
-}
-
-.user-avatar:hover {
-    transform: scale(1.05) !important;
-}
-
-/* Animaciones para comentarios */
-.article-card__comments {
-    transition: all 0.3s ease;
-}
-
-.comment {
-    animation: commentSlideIn 0.3s ease;
-}
-
-@keyframes commentSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Estilos para los filtros de posts */
-.active-filter-indicator {
-    margin-left: 16px;
-    display: flex;
-    align-items: center;
-}
-
-.reactions-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.total-reactions {
-    font-size: 11px;
-    color: #666;
-    background: #f8f9fa;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #e9ecef;
-}
-
-/* Mejorar la visibilidad de los tabs activos */
-.tab--active {
-    background: #3b49df !important;
-    color: white !important;
-    font-weight: 600;
-}
-
-.tab--active:hover {
-    background: #2f3ab2 !important;
-}
-
-/* Estilos para los posts ordenados */
-.article-card[data-sort="top"] {
-    border-left: 3px solid #ff6b35;
-}
-
-.article-card[data-sort="trending"] {
-    border-left: 3px solid #e63946;
-}
-
-.article-card[data-sort="latest"] {
-    border-left: 3px solid #3b49df;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .comment__header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .comment__actions {
-        align-self: flex-end;
-    }
-    
-    .comment {
-        padding: 12px;
-    }
-    
-    .comment__avatar {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .user-dropdown {
-        right: 10px !important;
-        left: 10px !important;
-        min-width: unset !important;
-    }
-    
-    .reactions-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .active-filter-indicator {
-        margin-left: 0;
-        margin-top: 8px;
-    }
-}
-`;
-        document.head.appendChild(style);
-    }
-}
-
-// =====================================================================
 // SECCIÓN 14: FUNCIONALIDAD DE LA MINIBAR 
 // =====================================================================
 
@@ -2866,12 +2321,12 @@ function injectCommentCSS() {
  * Funcionalidad de la minibar con previews interactivos
  * Maneja los previews que aparecen al pasar el mouse sobre los íconos
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Obtener todos los elementos de la minibar (íconos como inicio, trending, etc.)
     const minibarItems = document.querySelectorAll('.minibar__item');
     // Variable para trackear el preview actualmente activo
     let activePreview = null;
-    
+
     /**
      * Calcula la posición óptima del preview evitando que se salga de la pantalla
      * @param {HTMLElement} link - Elemento del enlace
@@ -2883,27 +2338,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkRect = link.getBoundingClientRect();
         // Obtener altura de la ventana del navegador
         const viewportHeight = window.innerHeight;
-        
+
         // Posición inicial: misma posición vertical que el enlace
         let topPosition = linkRect.top;
         // Altura estimada del preview (podría calcularse dinámicamente)
         const previewHeight = 320;
-        
+
         // Ajustar si el preview se sale por la parte inferior de la pantalla
         // Se deja 20px de margen con el borde inferior
         if (topPosition + previewHeight > viewportHeight - 20) {
             topPosition = viewportHeight - previewHeight - 20;
         }
-        
+
         // Ajustar si el preview se sale por la parte superior de la pantalla
         // Se deja 20px de margen con el borde superior
         if (topPosition < 20) {
             topPosition = 20;
         }
-        
+
         return topPosition;
     }
-    
+
     /**
      * Muestra el preview de un ítem específico
      * @param {HTMLElement} item - Elemento del ítem de la minibar
@@ -2912,7 +2367,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Buscar elementos del preview y el enlace dentro del ítem
         const preview = item.querySelector('.minibar__preview');
         const link = item.querySelector('.minibar__link');
-        
+
         // Verificar que ambos elementos existan
         if (preview && link) {
             // Ocultar preview anterior si existe y es diferente al actual
@@ -2920,18 +2375,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (activePreview && activePreview !== preview) {
                 activePreview.style.display = 'none';
             }
-            
+
             // Calcular posición óptima y aplicarla al preview
             const topPosition = calculatePreviewPosition(link, preview);
             preview.style.top = topPosition + 'px';
             // Hacer visible el preview
             preview.style.display = 'block';
-            
+
             // Actualizar referencia al preview activo
             activePreview = preview;
         }
     }
-    
+
     /**
      * Oculta un preview específico
      * @param {HTMLElement} preview - Elemento del preview a ocultar
@@ -2941,23 +2396,23 @@ document.addEventListener('DOMContentLoaded', function() {
             preview.style.display = 'none';
         }
     }
-    
+
     // Configurar event listeners para cada ítem de la minibar
     minibarItems.forEach(item => {
         // Buscar elementos dentro de cada ítem
         const link = item.querySelector('.minibar__link');
         const preview = item.querySelector('.minibar__preview');
-        
+
         // Solo configurar eventos si el ítem tiene ambos elementos
         if (link && preview) {
             // Mostrar preview cuando el mouse entra en el ítem
-            item.addEventListener('mouseenter', function() {
+            item.addEventListener('mouseenter', function () {
                 showPreview(item);
             });
-            
+
             // Ocultar preview cuando el mouse sale del ítem
             // Se usa setTimeout para dar tiempo al usuario para mover el mouse al preview
-            item.addEventListener('mouseleave', function(e) {
+            item.addEventListener('mouseleave', function (e) {
                 setTimeout(() => {
                     // Verificar que el mouse no esté sobre el ítem o el preview
                     // Esto evita que el preview se oculte prematuramente
@@ -2966,22 +2421,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }, 100); // Delay de 100ms para mejor experiencia de usuario
             });
-            
+
             // Mantener el preview visible cuando el mouse está sobre él
-            preview.addEventListener('mouseenter', function() {
+            preview.addEventListener('mouseenter', function () {
                 preview.style.display = 'block';
             });
-            
+
             // Ocultar preview cuando el mouse sale del preview
-            preview.addEventListener('mouseleave', function() {
+            preview.addEventListener('mouseleave', function () {
                 hidePreview(preview);
             });
         }
     });
-    
+
     // Ocultar todos los previews cuando el usuario hace scroll
     // Esto mejora la experiencia evitando previews en posiciones incorrectas
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', function () {
         if (activePreview) {
             hidePreview(activePreview);
         }
@@ -3026,7 +2481,7 @@ class PostDeletionSystem {
 
         const currentUserId = this.devCommunity.currentUser.id || this.devCommunity.currentUser._id;
         const authorId = post.author._id || post.author.id;
-        
+
         return currentUserId === authorId;
     }
 
@@ -3054,7 +2509,7 @@ class PostDeletionSystem {
      */
     showDeleteConfirmation(postId) {
         this.log(`Showing delete confirmation for post: ${postId}`);
-        
+
         // Crear modal de confirmación
         const modalHTML = `
             <section id="deletePostModal" class="modal" style="display: flex;">
@@ -3092,7 +2547,7 @@ class PostDeletionSystem {
 
         // Configurar event listeners
         this.setupDeleteModalEvents(postId);
-        
+
         // Prevenir scroll del body
         document.body.style.overflow = 'hidden';
     }
@@ -3150,7 +2605,7 @@ class PostDeletionSystem {
      */
     async deletePost(postId) {
         this.log(`Deleting post: ${postId}`);
-        
+
         try {
             // Mostrar indicador de carga
             this.showDeletionLoading(postId, true);
@@ -3165,7 +2620,7 @@ class PostDeletionSystem {
             if (response.ok) {
                 const data = await response.json();
                 this.log('Delete response data:', data);
-                
+
                 if (data.success) {
                     await this.handlePostDeletionSuccess(postId);
                 } else {
@@ -3195,7 +2650,7 @@ class PostDeletionSystem {
      */
     async handlePostDeletionSuccess(postId) {
         this.log(`Post deletion successful: ${postId}`);
-        
+
         // Encontrar y remover el post del array local
         const postIndex = this.devCommunity.posts.findIndex(post => {
             const id = post._id || post.id;
@@ -3208,7 +2663,7 @@ class PostDeletionSystem {
         }
 
         this.showMessage('Post deleted successfully!', 'success');
-        
+
         // Recargar los posts desde el servidor para asegurar consistencia
         await this.refreshPostsFromServer();
     }
@@ -3226,15 +2681,15 @@ class PostDeletionSystem {
     async refreshPostsFromServer() {
         try {
             this.log('Refreshing posts from server...');
-            
+
             // Resetear estado de paginación
             this.devCommunity.currentPage = 1;
             this.devCommunity.hasMorePosts = true;
             this.devCommunity.posts = [];
-            
+
             // Recargar posts
             await this.devCommunity.loadPosts();
-            
+
             this.log('Posts refreshed successfully');
         } catch (error) {
             console.error('Error refreshing posts:', error);
@@ -3249,9 +2704,9 @@ class PostDeletionSystem {
      */
     handlePostDeletionError(postId, error) {
         this.log(`Post deletion error: ${postId}`, error);
-        
+
         let errorMessage = 'Error deleting post. Please try again.';
-        
+
         if (error.message.includes('Authentication required')) {
             errorMessage = 'You need to be logged in to delete posts.';
             // Redirigir al login
@@ -3321,16 +2776,16 @@ class PostDeletionSystem {
             word-wrap: break-word;
         `;
         toast.textContent = message;
-        
+
         document.body.appendChild(toast);
-        
+
         // Animación de entrada
         toast.style.transform = 'translateX(100%)';
         setTimeout(() => {
             toast.style.transition = 'transform 0.3s ease';
             toast.style.transform = 'translateX(0)';
         }, 10);
-        
+
         setTimeout(() => {
             if (document.body.contains(toast)) {
                 toast.style.transform = 'translateX(100%)';
@@ -3356,80 +2811,6 @@ class PostDeletionSystem {
             info: '#17a2b8'
         };
         return colors[type] || colors.info;
-    }
-
-    /**
-     * Inyecta los estilos CSS para la funcionalidad de eliminación
-     */
-    injectDeletionCSS() {
-        if (!document.querySelector('#post-deletion-css')) {
-            const style = document.createElement('style');
-            style.id = 'post-deletion-css';
-            style.textContent = `
-/* Post Deletion System Styles */
-.article-card__delete-btn {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    margin-left: auto;
-}
-
-.article-card__delete-btn:hover {
-    background: #f8d7da;
-    color: #dc3545;
-}
-
-.article-card__delete-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.article-card__header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.article-card__user-info {
-    flex: 1;
-}
-
-.btn--danger {
-    background: #dc3545;
-    color: white;
-    border: 1px solid #dc3545;
-}
-
-.btn--danger:hover {
-    background: #c82333;
-    border-color: #bd2130;
-}
-
-.modal__icon {
-    text-align: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .article-card__delete-btn {
-        padding: 6px;
-        font-size: 12px;
-    }
-    
-    .post-deletion-toast {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-}
-`;
-            document.head.appendChild(style);
-        }
     }
 }
 
@@ -3472,175 +2853,175 @@ class PostEditSystem {
 
         const currentUserId = this.devCommunity.currentUser.id || this.devCommunity.currentUser._id;
         const authorId = post.author._id || post.author.id;
-        
+
         return currentUserId === authorId;
     }
 
-/**
- * Agrega el botón de editar al HTML del post si el usuario es el autor
- * @param {Object} post - Datos del post
- * @returns {string} HTML del botón de editar
- */
-createEditButtonHTML(post) {
-    if (!this.isUserPostAuthor(post)) {
-        return '';
-    }
+    /**
+     * Agrega el botón de editar al HTML del post si el usuario es el autor
+     * @param {Object} post - Datos del post
+     * @returns {string} HTML del botón de editar
+     */
+    createEditButtonHTML(post) {
+        if (!this.isUserPostAuthor(post)) {
+            return '';
+        }
 
-    // Forzar sincronización de autenticación antes de mostrar el botón
-    if (authManager) {
-        authManager.syncAuthState();
-    }
+        // Forzar sincronización de autenticación antes de mostrar el botón
+        if (authManager) {
+            authManager.syncAuthState();
+        }
 
-    const postId = post._id || post.id;
-    return `
+        const postId = post._id || post.id;
+        return `
         <button class="article-card__edit-btn" onclick="devCommunity.postEditSystem.showEditForm('${postId}')" title="Edit Post">
             <i class="fas fa-edit"></i>
         </button>
     `;
-}
+    }
 
     /**
  * Muestra el formulario de edición para un post - CORREGIDO
  * @param {string} postId - ID del post a editar
  */
-async showEditForm(postId) {
-    try {
-        this.log(`🔄 Iniciando showEditForm para post: ${postId}`);
-        
-        // VERIFICACIÓN MEJORADA DE AUTENTICACIÓN
-        console.log('🔐 Estado completo de autenticación:', {
-            authManager: {
-                isAuthenticated: authManager.isAuthenticated,
-                token: authManager.token ? 'PRESENTE' : 'AUSENTE',
-                tokenLength: authManager.token ? authManager.token.length : 0
-            },
-            devCommunity: {
-                currentUser: this.devCommunity.currentUser ? 'PRESENTE' : 'AUSENTE',
-                currentUserData: this.devCommunity.currentUser
-            },
-            localStorage: {
-                jwtToken: localStorage.getItem('jwtToken') ? 'PRESENTE' : 'AUSENTE'
+    async showEditForm(postId) {
+        try {
+            this.log(`🔄 Iniciando showEditForm para post: ${postId}`);
+
+            // VERIFICACIÓN MEJORADA DE AUTENTICACIÓN
+            console.log('🔐 Estado completo de autenticación:', {
+                authManager: {
+                    isAuthenticated: authManager.isAuthenticated,
+                    token: authManager.token ? 'PRESENTE' : 'AUSENTE',
+                    tokenLength: authManager.token ? authManager.token.length : 0
+                },
+                devCommunity: {
+                    currentUser: this.devCommunity.currentUser ? 'PRESENTE' : 'AUSENTE',
+                    currentUserData: this.devCommunity.currentUser
+                },
+                localStorage: {
+                    jwtToken: localStorage.getItem('jwtToken') ? 'PRESENTE' : 'AUSENTE'
+                }
+            });
+
+            // Verificar autenticación de múltiples maneras
+            const isAuthenticated = authManager.isAuthenticated ||
+                this.devCommunity.currentUser ||
+                localStorage.getItem('jwtToken');
+
+            if (!isAuthenticated) {
+                console.error('❌ Usuario no autenticado en todos los métodos');
+                this.showMessage('Please log in to edit posts', 'error');
+                return;
             }
-        });
 
-        // Verificar autenticación de múltiples maneras
-        const isAuthenticated = authManager.isAuthenticated || 
-                              this.devCommunity.currentUser || 
-                              localStorage.getItem('jwtToken');
-
-        if (!isAuthenticated) {
-            console.error('❌ Usuario no autenticado en todos los métodos');
-            this.showMessage('Please log in to edit posts', 'error');
-            return;
-        }
-
-        // Si authManager no tiene token pero hay uno en localStorage, actualizarlo
-        if (!authManager.token && localStorage.getItem('jwtToken')) {
-            console.log('🔄 Actualizando token en authManager desde localStorage');
-            authManager.token = localStorage.getItem('jwtToken');
-            authManager.isAuthenticated = true;
-        }
-
-        // Mostrar indicador de carga
-        this.showEditLoading(true);
-
-        const url = `/api/posts/${postId}/edit`;
-        console.log('🌐 Realizando request a:', url);
-
-        // Preparar headers de autenticación
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        // Agregar token JWT si está disponible
-        if (authManager.token) {
-            headers['Authorization'] = `Bearer ${authManager.token}`;
-            console.log('🔑 Token JWT agregado a headers');
-        }
-
-        console.log('📋 Headers de la solicitud:', headers);
-
-        // Cargar datos del post con debugging extendido
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: headers,
-            credentials: 'include' // Importante para cookies de sesión
-        });
-
-        console.log('📡 Response recibida:', {
-            status: response.status,
-            statusText: response.statusText,
-            ok: response.ok,
-            url: response.url
-        });
-
-        if (!response.ok) {
-            let errorMessage = `Error ${response.status}: ${response.statusText}`;
-            
-            // Intentar obtener más detalles del error
-            try {
-                const errorData = await response.json();
-                console.log('📡 Error data:', errorData);
-                errorMessage = errorData.error || errorMessage;
-            } catch (parseError) {
-                console.log('📡 No se pudo parsear respuesta de error:', parseError);
+            // Si authManager no tiene token pero hay uno en localStorage, actualizarlo
+            if (!authManager.token && localStorage.getItem('jwtToken')) {
+                console.log('🔄 Actualizando token en authManager desde localStorage');
+                authManager.token = localStorage.getItem('jwtToken');
+                authManager.isAuthenticated = true;
             }
-            
-            throw new Error(errorMessage);
+
+            // Mostrar indicador de carga
+            this.showEditLoading(true);
+
+            const url = `/api/posts/${postId}/edit`;
+            console.log('🌐 Realizando request a:', url);
+
+            // Preparar headers de autenticación
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            // Agregar token JWT si está disponible
+            if (authManager.token) {
+                headers['Authorization'] = `Bearer ${authManager.token}`;
+                console.log('🔑 Token JWT agregado a headers');
+            }
+
+            console.log('📋 Headers de la solicitud:', headers);
+
+            // Cargar datos del post con debugging extendido
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: headers,
+                credentials: 'include' // Importante para cookies de sesión
+            });
+
+            console.log('📡 Response recibida:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok,
+                url: response.url
+            });
+
+            if (!response.ok) {
+                let errorMessage = `Error ${response.status}: ${response.statusText}`;
+
+                // Intentar obtener más detalles del error
+                try {
+                    const errorData = await response.json();
+                    console.log('📡 Error data:', errorData);
+                    errorMessage = errorData.error || errorMessage;
+                } catch (parseError) {
+                    console.log('📡 No se pudo parsear respuesta de error:', parseError);
+                }
+
+                throw new Error(errorMessage);
+            }
+
+            const data = await response.json();
+            console.log('📡 Response data completa:', data);
+
+            if (!data.success) {
+                throw new Error(data.error || 'Error al cargar el post');
+            }
+
+            console.log('✅ Datos del post cargados exitosamente:', {
+                id: data.post._id,
+                title: data.post.title,
+                author: data.post.author.username
+            });
+
+            this.currentEditingPost = data.post;
+            this.renderEditForm(data.post);
+
+        } catch (error) {
+            console.error('❌ Error al cargar post para edición:', error);
+
+            let userMessage = error.message;
+
+            // Mensajes más amigables para el usuario
+            if (error.message.includes('401')) {
+                userMessage = 'Please log in to edit posts';
+                // Forzar recarga para renovar autenticación
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else if (error.message.includes('403')) {
+                userMessage = 'You are not authorized to edit this post';
+            } else if (error.message.includes('404')) {
+                userMessage = 'Post not found';
+            } else if (error.message.includes('500')) {
+                userMessage = 'Server error. Please try again later.';
+            }
+
+            this.showMessage(userMessage, 'error');
+
+        } finally {
+            this.showEditLoading(false);
         }
-
-        const data = await response.json();
-        console.log('📡 Response data completa:', data);
-        
-        if (!data.success) {
-            throw new Error(data.error || 'Error al cargar el post');
-        }
-
-        console.log('✅ Datos del post cargados exitosamente:', {
-            id: data.post._id,
-            title: data.post.title,
-            author: data.post.author.username
-        });
-
-        this.currentEditingPost = data.post;
-        this.renderEditForm(data.post);
-
-    } catch (error) {
-        console.error('❌ Error al cargar post para edición:', error);
-        
-        let userMessage = error.message;
-        
-        // Mensajes más amigables para el usuario
-        if (error.message.includes('401')) {
-            userMessage = 'Please log in to edit posts';
-            // Forzar recarga para renovar autenticación
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-        } else if (error.message.includes('403')) {
-            userMessage = 'You are not authorized to edit this post';
-        } else if (error.message.includes('404')) {
-            userMessage = 'Post not found';
-        } else if (error.message.includes('500')) {
-            userMessage = 'Server error. Please try again later.';
-        }
-        
-        this.showMessage(userMessage, 'error');
-        
-    } finally {
-        this.showEditLoading(false);
     }
-}
 
-/**
- * Renderiza el formulario de edición mejorado
- * @param {Object} post - Datos del post
- */
-renderEditForm(post) {
-    this.log('🎨 Renderizando formulario de edición mejorado para post:', post);
+    /**
+     * Renderiza el formulario de edición mejorado
+     * @param {Object} post - Datos del post
+     */
+    renderEditForm(post) {
+        this.log('🎨 Renderizando formulario de edición mejorado para post:', post);
 
-    // Crear modal de edición mejorado
-    const modalHTML = `
+        // Crear modal de edición mejorado
+        const modalHTML = `
         <section id="editPostModal" class="modal" style="display: flex;">
             <section class="modal__overlay"></section>
             <section class="modal__content modal__content--large">
@@ -3792,118 +3173,118 @@ renderEditForm(post) {
         </section>
     `;
 
-    // Remover modal anterior si existe
-    const existingModal = document.getElementById('editPostModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-
-    // Agregar modal al DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Configurar event listeners mejorados
-    this.setupEditFormEvents();
-
-    // Prevenir scroll del body
-    document.body.style.overflow = 'hidden';
-
-    console.log('✅ Formulario de edición mejorado renderizado exitosamente');
-}
-
-/**
- * Configura los eventos del formulario de edición mejorado
- */
-setupEditFormEvents() {
-    const modal = document.getElementById('editPostModal');
-    const overlay = modal.querySelector('.modal__overlay');
-    const closeBtn = modal.querySelector('.modal__close');
-
-    // Cerrar modal al hacer clic en el overlay
-    overlay.addEventListener('click', () => {
-        this.closeEditForm();
-    });
-
-    // Cerrar modal con el botón de cerrar
-    closeBtn.addEventListener('click', () => {
-        this.closeEditForm();
-    });
-
-    // Cerrar modal con tecla Escape
-    const escapeHandler = (e) => {
-        if (e.key === 'Escape') {
-            this.closeEditForm();
-            document.removeEventListener('keydown', escapeHandler);
+        // Remover modal anterior si existe
+        const existingModal = document.getElementById('editPostModal');
+        if (existingModal) {
+            existingModal.remove();
         }
-    };
-    document.addEventListener('keydown', escapeHandler);
 
-    // Auto-resize del textarea
-    const textarea = document.getElementById('editPostContent');
-    if (textarea) {
-        textarea.addEventListener('input', this.autoResizeTextarea);
-        this.autoResizeTextarea({ target: textarea });
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Configurar event listeners mejorados
+        this.setupEditFormEvents();
+
+        // Prevenir scroll del body
+        document.body.style.overflow = 'hidden';
+
+        console.log('✅ Formulario de edición mejorado renderizado exitosamente');
     }
 
-    // Contador de caracteres para el título
-    const titleInput = document.getElementById('editPostTitle');
-    if (titleInput) {
-        titleInput.addEventListener('input', this.updateTitleCounter);
-        this.updateTitleCounter({ target: titleInput });
-        
-        // Efecto de foco mejorado
-        titleInput.addEventListener('focus', () => {
-            titleInput.parentNode.classList.add('focused');
-        });
-        titleInput.addEventListener('blur', () => {
-            titleInput.parentNode.classList.remove('focused');
-        });
-    }
+    /**
+     * Configura los eventos del formulario de edición mejorado
+     */
+    setupEditFormEvents() {
+        const modal = document.getElementById('editPostModal');
+        const overlay = modal.querySelector('.modal__overlay');
+        const closeBtn = modal.querySelector('.modal__close');
 
-    // Efectos hover para los radio buttons
-    const radioLabels = modal.querySelectorAll('.radio-label');
-    radioLabels.forEach(label => {
-        label.addEventListener('mouseenter', () => {
-            label.style.transform = 'translateY(-2px)';
+        // Cerrar modal al hacer clic en el overlay
+        overlay.addEventListener('click', () => {
+            this.closeEditForm();
         });
-        label.addEventListener('mouseleave', () => {
-            if (!label.querySelector('input').checked) {
-                label.style.transform = 'translateY(0)';
+
+        // Cerrar modal con el botón de cerrar
+        closeBtn.addEventListener('click', () => {
+            this.closeEditForm();
+        });
+
+        // Cerrar modal con tecla Escape
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.closeEditForm();
+                document.removeEventListener('keydown', escapeHandler);
             }
+        };
+        document.addEventListener('keydown', escapeHandler);
+
+        // Auto-resize del textarea
+        const textarea = document.getElementById('editPostContent');
+        if (textarea) {
+            textarea.addEventListener('input', this.autoResizeTextarea);
+            this.autoResizeTextarea({ target: textarea });
+        }
+
+        // Contador de caracteres para el título
+        const titleInput = document.getElementById('editPostTitle');
+        if (titleInput) {
+            titleInput.addEventListener('input', this.updateTitleCounter);
+            this.updateTitleCounter({ target: titleInput });
+
+            // Efecto de foco mejorado
+            titleInput.addEventListener('focus', () => {
+                titleInput.parentNode.classList.add('focused');
+            });
+            titleInput.addEventListener('blur', () => {
+                titleInput.parentNode.classList.remove('focused');
+            });
+        }
+
+        // Efectos hover para los radio buttons
+        const radioLabels = modal.querySelectorAll('.radio-label');
+        radioLabels.forEach(label => {
+            label.addEventListener('mouseenter', () => {
+                label.style.transform = 'translateY(-2px)';
+            });
+            label.addEventListener('mouseleave', () => {
+                if (!label.querySelector('input').checked) {
+                    label.style.transform = 'translateY(0)';
+                }
+            });
         });
-    });
 
-    console.log('✅ Eventos del formulario mejorado configurados');
-}
+        console.log('✅ Eventos del formulario mejorado configurados');
+    }
 
-/**
- * Actualiza el contador de caracteres del título con estilos mejorados
- */
-updateTitleCounter(e) {
-    const input = e.target;
-    const maxLength = 200;
-    const currentLength = input.value.length;
-    const percentage = (currentLength / maxLength) * 100;
-    
-    let counter = input.parentNode.querySelector('.char-counter');
-    if (!counter) {
-        counter = document.createElement('div');
-        counter.className = 'char-counter';
-        input.parentNode.appendChild(counter);
+    /**
+     * Actualiza el contador de caracteres del título con estilos mejorados
+     */
+    updateTitleCounter(e) {
+        const input = e.target;
+        const maxLength = 200;
+        const currentLength = input.value.length;
+        const percentage = (currentLength / maxLength) * 100;
+
+        let counter = input.parentNode.querySelector('.char-counter');
+        if (!counter) {
+            counter = document.createElement('div');
+            counter.className = 'char-counter';
+            input.parentNode.appendChild(counter);
+        }
+
+        counter.textContent = `${currentLength}/${maxLength} characters`;
+
+        // Cambiar colores según el porcentaje usado
+        if (percentage >= 90) {
+            counter.classList.add('error');
+            counter.classList.remove('warning');
+        } else if (percentage >= 75) {
+            counter.classList.add('warning');
+            counter.classList.remove('error');
+        } else {
+            counter.classList.remove('warning', 'error');
+        }
     }
-    
-    counter.textContent = `${currentLength}/${maxLength} characters`;
-    
-    // Cambiar colores según el porcentaje usado
-    if (percentage >= 90) {
-        counter.classList.add('error');
-        counter.classList.remove('warning');
-    } else if (percentage >= 75) {
-        counter.classList.add('warning');
-        counter.classList.remove('error');
-    } else {
-        counter.classList.remove('warning', 'error');
-    }
-}
 
     /**
      * Ajusta automáticamente la altura del textarea
@@ -3922,13 +3303,13 @@ updateTitleCounter(e) {
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
         fileInput.style.display = 'none';
-        
+
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 this.handleCoverImageChange(e.target.files[0]);
             }
         });
-        
+
         document.body.appendChild(fileInput);
         fileInput.click();
         document.body.removeChild(fileInput);
@@ -3959,16 +3340,16 @@ updateTitleCounter(e) {
             if (currentCoverSection) {
                 const img = currentCoverSection.querySelector('img');
                 const coverImageActions = currentCoverSection.querySelector('.cover-image-actions');
-                
+
                 img.src = e.target.result;
                 img.style.display = 'block';
-                
+
                 // Reemplazar input hidden
                 const removeCoverInput = document.getElementById('editRemoveCoverImage');
                 if (removeCoverInput) {
                     removeCoverInput.value = 'false';
                 }
-                
+
                 // Agregar input file para el nuevo archivo
                 let fileInput = document.getElementById('editPostCoverImage');
                 if (!fileInput) {
@@ -3979,7 +3360,7 @@ updateTitleCounter(e) {
                     fileInput.style.display = 'none';
                     currentCoverSection.appendChild(fileInput);
                 }
-                
+
                 // Crear un FileList simulado (esto es un workaround)
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
@@ -3997,18 +3378,18 @@ updateTitleCounter(e) {
         if (currentCoverSection) {
             const img = currentCoverSection.querySelector('img');
             img.style.display = 'none';
-            
+
             const removeCoverInput = document.getElementById('editRemoveCoverImage');
             if (removeCoverInput) {
                 removeCoverInput.value = 'true';
             }
-            
+
             // Remover input file si existe
             const fileInput = document.getElementById('editPostCoverImage');
             if (fileInput) {
                 fileInput.value = '';
             }
-            
+
             this.showMessage('Cover image will be removed', 'info');
         }
     }
@@ -4019,7 +3400,7 @@ updateTitleCounter(e) {
     async updatePost() {
         try {
             this.log('🔄 Iniciando actualización de post...');
-            
+
             if (!this.currentEditingPost) {
                 throw new Error('No hay post seleccionado para editar');
             }
@@ -4105,7 +3486,7 @@ updateTitleCounter(e) {
             }
 
             this.showMessage(data.message, 'success');
-            
+
             // Cerrar modal y recargar posts
             this.closeEditForm();
 
@@ -4143,32 +3524,32 @@ updateTitleCounter(e) {
         console.log('✅ Formulario de edición cerrado');
     }
 
-/**
- * Muestra/oculta el indicador de carga mejorado
- */
-showEditLoading(show) {
-    const updateBtn = document.querySelector('#editPostModal .btn--primary');
-    const draftBtn = document.querySelector('#editPostModal .btn--secondary');
-    const cancelBtn = document.querySelector('#editPostModal .btn--outline');
-    
-    if (updateBtn) {
-        if (show) {
-            updateBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Updating Post...';
-            updateBtn.disabled = true;
-            if (draftBtn) draftBtn.disabled = true;
-            if (cancelBtn) cancelBtn.disabled = true;
-            
-            // Agregar efecto de desvanecimiento
-            updateBtn.style.opacity = '0.8';
-        } else {
-            updateBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Update Post';
-            updateBtn.disabled = false;
-            if (draftBtn) draftBtn.disabled = false;
-            if (cancelBtn) cancelBtn.disabled = false;
-            updateBtn.style.opacity = '1';
+    /**
+     * Muestra/oculta el indicador de carga mejorado
+     */
+    showEditLoading(show) {
+        const updateBtn = document.querySelector('#editPostModal .btn--primary');
+        const draftBtn = document.querySelector('#editPostModal .btn--secondary');
+        const cancelBtn = document.querySelector('#editPostModal .btn--outline');
+
+        if (updateBtn) {
+            if (show) {
+                updateBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Updating Post...';
+                updateBtn.disabled = true;
+                if (draftBtn) draftBtn.disabled = true;
+                if (cancelBtn) cancelBtn.disabled = true;
+
+                // Agregar efecto de desvanecimiento
+                updateBtn.style.opacity = '0.8';
+            } else {
+                updateBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Update Post';
+                updateBtn.disabled = false;
+                if (draftBtn) draftBtn.disabled = false;
+                if (cancelBtn) cancelBtn.disabled = false;
+                updateBtn.style.opacity = '1';
+            }
         }
     }
-}
 
     /**
      * Muestra un mensaje toast
@@ -4195,16 +3576,16 @@ showEditLoading(show) {
             word-wrap: break-word;
         `;
         toast.textContent = message;
-        
+
         document.body.appendChild(toast);
-        
+
         // Animación de entrada
         toast.style.transform = 'translateX(100%)';
         setTimeout(() => {
             toast.style.transition = 'transform 0.3s ease';
             toast.style.transform = 'translateX(0)';
         }, 10);
-        
+
         setTimeout(() => {
             if (document.body.contains(toast)) {
                 toast.style.transform = 'translateX(100%)';
@@ -4243,586 +3624,7 @@ showEditLoading(show) {
             .replace(/'/g, "&#039;");
     }
 
-/**
- * Inyecta los estilos CSS mejorados para la funcionalidad de edición
- */
-injectEditCSS() {
-    if (!document.querySelector('#post-edit-css')) {
-        const style = document.createElement('style');
-        style.id = 'post-edit-css';
-        style.textContent = `
-/* ===== ESTILOS MEJORADOS PARA EDICIÓN DE POSTS ===== */
 
-/* Botón de editar en la tarjeta del post */
-.article-card__edit-btn {
-    background: none;
-    border: none;
-    color: #3b49df;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    margin-left: 8px;
-    border: 1px solid #3b49df;
-}
-
-.article-card__edit-btn:hover {
-    background: #3b49df;
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(59, 73, 223, 0.3);
-}
-
-.article-card__actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-/* Modal mejorado */
-#editPostModal {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-#editPostModal .modal__content--large {
-    max-width: 800px;
-    max-height: 95vh;
-    overflow-y: auto;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-    border: 1px solid #e1e5e9;
-}
-
-#editPostModal .modal__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 32px;
-    border-bottom: 1px solid #f0f0f0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 12px 12px 0 0;
-}
-
-#editPostModal .modal__title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-}
-
-#editPostModal .modal__close {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    font-size: 1.25rem;
-    cursor: pointer;
-    color: white;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.2s;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#editPostModal .modal__close:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
-}
-
-#editPostModal .modal__body {
-    padding: 32px;
-    background: #fafafa;
-}
-
-#editPostModal .modal__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 32px;
-    border-top: 1px solid #f0f0f0;
-    background: white;
-    border-radius: 0 0 12px 12px;
-}
-
-/* Formulario mejorado */
-.post-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-label {
-    font-weight: 600;
-    color: #2d3748;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.form-input, .form-textarea {
-    padding: 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.form-input:focus, .form-textarea:focus {
-    outline: none;
-    border-color: #3b49df;
-    box-shadow: 0 0 0 3px rgba(59, 73, 223, 0.1);
-    transform: translateY(-1px);
-}
-
-.form-input:hover, .form-textarea:hover {
-    border-color: #cbd5e0;
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 200px;
-    line-height: 1.6;
-    font-size: 16px;
-}
-
-.form-help {
-    color: #718096;
-    font-size: 12px;
-    font-style: italic;
-}
-
-/* Tags input mejorado */
-#editPostTags {
-    background: white;
-    border: 2px dashed #e2e8f0;
-}
-
-#editPostTags:focus {
-    border-style: solid;
-    border-color: #3b49df;
-}
-
-/* Sección de imagen de portada */
-.current-cover-image {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    border: 2px dashed #e2e8f0;
-}
-
-.current-cover-image img {
-    max-width: 100%;
-    max-height: 300px;
-    border-radius: 8px;
-    object-fit: cover;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.cover-image-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.cover-image-upload {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    border: 2px dashed #e2e8f0;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.cover-image-upload:hover {
-    border-color: #3b49df;
-    background: #f7faff;
-}
-
-.cover-image-upload .file-input {
-    padding: 12px;
-    border: 2px dashed #cbd5e0;
-    border-radius: 6px;
-    background: #f8f9fa;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.cover-image-upload .file-input:hover {
-    border-color: #3b49df;
-    background: #eef2ff;
-}
-
-/* Radio buttons mejorados */
-.radio-group {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 12px 20px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    background: white;
-    flex: 1;
-    min-width: 120px;
-    justify-content: center;
-}
-
-.radio-label:hover {
-    border-color: #3b49df;
-    background: #f7faff;
-    transform: translateY(-1px);
-}
-
-.radio-label input[type="radio"] {
-    display: none;
-}
-
-.radio-custom {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #cbd5e0;
-    border-radius: 50%;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.radio-label input[type="radio"]:checked + .radio-custom {
-    border-color: #3b49df;
-    background: #3b49df;
-}
-
-.radio-label input[type="radio"]:checked + .radio-custom::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.radio-label input[type="radio"]:checked ~ span {
-    color: #3b49df;
-    font-weight: 600;
-}
-
-/* Información del post */
-.post-info {
-    padding: 20px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    border-radius: 8px;
-    font-size: 14px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.post-info p {
-    margin: 8px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.post-info p:before {
-    content: '📅';
-    font-size: 16px;
-}
-
-.post-info p:nth-child(2):before {
-    content: '✏️';
-}
-
-.post-info p:nth-child(3):before {
-    content: '🚀';
-}
-
-/* Contador de caracteres */
-.char-counter {
-    text-align: right;
-    font-size: 12px;
-    color: #718096;
-    font-weight: 500;
-    margin-top: 4px;
-}
-
-.char-counter.warning {
-    color: #ed8936;
-}
-
-.char-counter.error {
-    color: #f56565;
-    font-weight: 600;
-}
-
-/* Botones mejorados */
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn--outline {
-    background: transparent;
-    color: #4a5568;
-    border: 2px solid #cbd5e0;
-}
-
-.btn--outline:hover:not(:disabled) {
-    background: #4a5568;
-    color: white;
-    border-color: #4a5568;
-    transform: translateY(-1px);
-}
-
-.btn--secondary {
-    background: #718096;
-    color: white;
-    border: 2px solid #718096;
-}
-
-.btn--secondary:hover:not(:disabled) {
-    background: #4a5568;
-    border-color: #4a5568;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
-}
-
-.btn--primary {
-    background: linear-gradient(135deg, #3b49df 0%, #2f3ab2 100%);
-    color: white;
-    border: 2px solid #3b49df;
-}
-
-.btn--primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #2f3ab2 0%, #1e2a78 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 73, 223, 0.4);
-}
-
-.btn--small {
-    padding: 8px 16px;
-    font-size: 12px;
-}
-
-.btn--danger {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-    color: white;
-    border: 2px solid #f56565;
-}
-
-.btn--danger:hover:not(:disabled) {
-    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
-}
-
-/* Toast notifications mejoradas */
-.post-edit-toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 16px 24px;
-    border-radius: 8px;
-    z-index: 10000;
-    font-weight: 600;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    max-width: 400px;
-    animation: slideInRight 0.3s ease;
-}
-
-.post-edit-toast::before {
-    font-size: 18px;
-}
-
-.post-edit-toast.success {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    color: white;
-}
-
-.post-edit-toast.success::before {
-    content: '✅';
-}
-
-.post-edit-toast.error {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-    color: white;
-}
-
-.post-edit-toast.error::before {
-    content: '❌';
-}
-
-.post-edit-toast.info {
-    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-    color: white;
-}
-
-.post-edit-toast.info::before {
-    content: 'ℹ️';
-}
-
-.post-edit-toast.warning {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    color: white;
-}
-
-.post-edit-toast.warning::before {
-    content: '⚠️';
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    #editPostModal .modal__content--large {
-        margin: 10px;
-        max-height: calc(100vh - 20px);
-        border-radius: 8px;
-    }
-    
-    #editPostModal .modal__header {
-        padding: 16px 20px;
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-    }
-    
-    #editPostModal .modal__body {
-        padding: 20px;
-    }
-    
-    #editPostModal .modal__footer {
-        padding: 16px 20px;
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .radio-group {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .radio-label {
-        min-width: auto;
-        justify-content: flex-start;
-    }
-    
-    .cover-image-actions {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .post-edit-toast {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-}
-
-/* Efectos de carga */
-.loading-spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Mejoras visuales adicionales */
-.form-group:focus-within .form-label {
-    color: #3b49df;
-}
-
-/* Transiciones suaves */
-.modal__content--large {
-    animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-/* Efecto de profundidad */
-.modal__overlay {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-}
-`;
-        document.head.appendChild(style);
-        console.log('✅ CSS mejorado de edición de posts inyectado');
-    }
-}
 }
 
 // =====================================================================
@@ -4848,83 +3650,80 @@ window.editPost = (postId) => window.devCommunity?.postEditSystem?.showEditForm(
  */
 function init() {
     console.log('Initializing DEV Community with Comment System...');
-    
+
     // Sincronizar autenticación inmediatamente
     if (authManager) {
         authManager.syncAuthState();
     }
-    
+
     setupImageErrorHandlers();
     initUserDropdown();
     renderTags();
     initMinibar();
-    injectCommentCSS();
-    window.devCommunity?.postDeletionSystem?.injectDeletionCSS();
-    window.devCommunity?.postEditSystem?.injectEditCSS();
-    
+
     // Inicializa la aplicación principal
     window.devCommunity = new DevCommunity();
-    
+
     // Verificar autenticación después de inicializar
     setTimeout(() => {
         if (window.devCommunity) {
             window.devCommunity.checkAndSyncAuth();
         }
     }, 500);
-    
+
     console.log('DEV Community with Comment System initialized successfully');
 }
 
 // Función global para debugging de autenticación
-window.debugAuth = function() {
+window.debugAuth = function () {
     console.log('🔐 DEBUG DE AUTENTICACIÓN COMPLETO:');
     console.log('====================================');
     console.log('1. AuthManager:');
     console.log('   - isAuthenticated:', authManager.isAuthenticated);
     console.log('   - token:', authManager.token ? `PRESENTE (${authManager.token.length} chars)` : 'AUSENTE');
-    
+
     console.log('2. DevCommunity:');
     console.log('   - currentUser:', window.devCommunity?.currentUser ? 'PRESENTE' : 'AUSENTE');
     console.log('   - currentUser data:', window.devCommunity?.currentUser);
-    
+
     console.log('3. localStorage:');
     console.log('   - jwtToken:', localStorage.getItem('jwtToken') ? 'PRESENTE' : 'AUSENTE');
     console.log('   - userLoggedIn:', localStorage.getItem('userLoggedIn'));
-    
+
     console.log('4. Session:');
     console.log('   - sessionStorage user:', sessionStorage.getItem('user'));
-    
+
     console.log('5. Verificando endpoint /api/user...');
-    
+
     // Probar el endpoint de usuario
     fetch('/api/user', {
         headers: {
             'Authorization': `Bearer ${authManager.token}`
         }
     })
-    .then(response => {
-        console.log('   - /api/user status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('   - /api/user response:', data);
-    })
-    .catch(error => {
-        console.log('   - /api/user error:', error);
-    });
+        .then(response => {
+            console.log('   - /api/user status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('   - /api/user response:', data);
+        })
+        .catch(error => {
+            console.log('   - /api/user error:', error);
+        });
 };
 
 // También puedes llamar a debugAuth() desde la consola del navegador
 
 // Inicializar cuando el DOM esté completamente cargado
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setTimeout(init, 100);
 });
 
 // Inicialización adicional para el dropdown del usuario
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM cargado. Inicializando dropdown...");
-  initUserDropdown();
+    console.log("DOM cargado. Inicializando dropdown...");
+    initUserDropdown();
 });
 
 // =====================================================================
@@ -4946,7 +3745,7 @@ function isDesktopDevice() {
 
 
 // Mobile Search Functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const searchToggle = document.getElementById('searchToggle');
     const mobileSearch = document.getElementById('mobileSearch');
     const mobileSearchInput = document.getElementById('mobileSearchInput');
@@ -4955,7 +3754,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (searchToggle && mobileSearch) {
         // Abrir search
-        searchToggle.addEventListener('click', function() {
+        searchToggle.addEventListener('click', function () {
             mobileSearch.classList.add('active');
             body.classList.add('search-open');
             setTimeout(() => {
@@ -4973,7 +3772,7 @@ document.addEventListener('DOMContentLoaded', function() {
         searchClose.addEventListener('click', closeSearch);
 
         // Cerrar con Escape key
-        mobileSearchInput.addEventListener('keydown', function(event) {
+        mobileSearchInput.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeSearch();
                 searchToggle.focus();
@@ -4981,9 +3780,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Cerrar al hacer clic fuera (en el overlay)
-        document.addEventListener('click', function(event) {
-            if (mobileSearch.classList.contains('active') && 
-                !mobileSearch.contains(event.target) && 
+        document.addEventListener('click', function (event) {
+            if (mobileSearch.classList.contains('active') &&
+                !mobileSearch.contains(event.target) &&
                 !searchToggle.contains(event.target)) {
                 closeSearch();
             }

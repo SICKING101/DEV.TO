@@ -1,5 +1,9 @@
+/* =====================================================================
+SECCIÓN 1: VARIABLES CSS Y CONFIGURACIÓN GLOBAL
+===================================================================== */
+
 :root {
-    /* Colors */
+    /* Colores */
     --bg: #f5f5f5;
     --card: #ffffff;
     --muted: #6b6b6b;
@@ -8,11 +12,15 @@
     --border: #e6e6e6;
     --text: #242424;
     
-    /* Spacing & Sizing */
+    /* Espaciado y Tamaños */
     --radius: 8px;
     --shadow: 0 1px 3px rgba(0,0,0,0.1);
     --maxw: 1200px;
 }
+
+/* =====================================================================
+SECCIÓN 2: RESET Y ESTILOS BASE
+===================================================================== */
 
 * {
     margin: 0;
@@ -22,7 +30,7 @@
 }
 
 body {
-    background-color: #f5f5f5;
+    background-color: var(--bg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,12 +38,20 @@ body {
     padding: 20px;
 }
 
+/* =====================================================================
+SECCIÓN 3: CONTENEDOR PRINCIPAL DE LOGIN
+===================================================================== */
+
 .login-container {
     width: 100%;
     max-width: 420px;
     position: relative;
     z-index: 10;
 }
+
+/* =====================================================================
+SECCIÓN 4: CABECERA DE LOGIN
+===================================================================== */
 
 .login-header {
     text-align: center;
@@ -55,17 +71,25 @@ body {
 }
 
 .highlight {
-    color: #3b49df;
+    color: var(--accent);
     font-weight: 600;
 }
 
+/* =====================================================================
+SECCIÓN 5: TARJETA DE LOGIN
+===================================================================== */
+
 .login-card {
-    background-color: white;
-    border-radius: 8px;
+    background-color: var(--card);
+    border-radius: var(--radius);
     padding: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e5e5;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
 }
+
+/* =====================================================================
+SECCIÓN 6: BOTONES DE LOGIN SOCIAL
+===================================================================== */
 
 .social-login {
     display: flex;
@@ -86,34 +110,16 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    color: #000000;
+    text-decoration: none;
+    width: 100%;
 }
 
 .social-btn:hover {
     background-color: #f9f9f9;
 }
 
-.social-btn.apple {
-    color: #000;
-}
-
-.social-btn.facebook {
-    color: #000000;
-}
-
-.social-btn.forum {
-    color: #000000;
-}
-
-.social-btn.github {
-    color: #000000;
-}
-
-.social-btn.google {
-    color: #000000;
-    width: 100%;
-}
-
-.social-google {text-decoration: none;}
+/* Eliminadas clases específicas redundantes ya que todos los botones son iguales */
 
 .divider {
     display: flex;
@@ -135,14 +141,18 @@ body {
     padding: 0 16px;
 }
 
-/* ===== CORRECCIONES CRÍTICAS PARA FORMULARIO ===== */
+/* =====================================================================
+SECCIÓN 7: FORMULARIO Y CONTROLES
+===================================================================== */
+
+/* CORRECCIONES CRÍTICAS PARA FORMULARIO */
 .form-section {
     margin-bottom: 24px;
     position: relative;
-    border: none !important; /* Elimina bordes del fieldset */
-    padding: 0 !important; /* Elimina padding por defecto */
-    margin: 0 0 24px 0 !important; /* Reset de márgenes */
-    min-width: 0 !important; /* Elimina ancho mínimo */
+    border: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+    min-width: 0;
 }
 
 /* Elimina estilos por defecto de fieldset */
@@ -153,32 +163,11 @@ fieldset {
     min-width: 0;
 }
 
-/* Elimina el marker del li */
-.remember-me menu,
-.remember-me ul {
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.remember-me li {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.remember-me li::before,
-.remember-me li::after,
-.remember-me li::marker {
-    display: none !important;
-    content: none !important;
-}
-
 .form-label {
     display: block;
     margin-bottom: 12px;
     font-weight: 600;
-    color: #242424;
+    color: var(--text);
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -197,11 +186,29 @@ fieldset {
 
 .form-input:focus {
     outline: none;
-    border-color: #3b49df;
+    border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(59, 73, 223, 0.1);
 }
 
-/* Enlace de olvidar contraseña */
+.form-input:invalid {
+    border-color: #ff6b6b;
+}
+
+.form-input:valid {
+    border-color: var(--accent);
+}
+
+.form-help {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+    display: block;
+}
+
+/* =====================================================================
+SECCIÓN 8: SECCIÓN DE CONTRASEÑA
+===================================================================== */
+
 .password-section {
     margin-bottom: 8px;
 }
@@ -211,7 +218,7 @@ fieldset {
     text-align: right;
     margin-top: 12px;
     font-size: 14px;
-    color: #3b49df;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 500;
 }
@@ -220,38 +227,37 @@ fieldset {
     text-decoration: underline;
 }
 
-/* Checkbox Recordarme - COMPLETAMENTE CORREGIDO */
+/* =====================================================================
+SECCIÓN 9: CHECKBOX RECORDARME - COMPLETAMENTE CORREGIDO
+===================================================================== */
+
 .remember-me {
     display: flex;
     align-items: center;
     margin: 16px 0 24px 0;
-    border: none !important;
-    padding: 0 !important;
+    border: none;
+    padding: 0;
 }
 
-.remember-me menu {
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    list-style: none !important;
+/* Elimina completamente cualquier marker o punto */
+.remember-me menu,
+.remember-me ul,
+.remember-me li,
+.remember-me li::marker,
+.remember-me menu::marker,
+.remember-me *::marker {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: none;
+    display: none;
+    content: none;
+    font-size: 0;
 }
 
 .remember-me li {
     display: flex;
     align-items: center;
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-}
-
-/* Elimina completamente cualquier marker o punto */
-.remember-me li::marker,
-.remember-me menu::marker,
-.remember-me *::marker {
-    display: none !important;
-    content: none !important;
-    font-size: 0 !important;
 }
 
 .remember-me input[type="checkbox"] {
@@ -270,8 +276,8 @@ fieldset {
 }
 
 .remember-me input[type="checkbox"]:checked {
-    background-color: #3b49df;
-    border-color: #3b49df;
+    background-color: var(--accent);
+    border-color: var(--accent);
 }
 
 .remember-me input[type="checkbox"]:checked::after {
@@ -287,15 +293,19 @@ fieldset {
 
 .remember-me label {
     font-size: 14px;
-    color: #242424;
+    color: var(--text);
     cursor: pointer;
     font-weight: 500;
 }
 
+/* =====================================================================
+SECCIÓN 10: BOTONES Y ENLACES
+===================================================================== */
+
 .login-btn {
     width: 100%;
     padding: 12px 16px;
-    background-color: #3b49df;
+    background-color: var(--accent);
     color: white;
     border: none;
     border-radius: 6px;
@@ -307,7 +317,12 @@ fieldset {
 }
 
 .login-btn:hover {
-    background-color: #2f3ab2;
+    background-color: var(--accent-hover);
+}
+
+.login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .register-link {
@@ -316,7 +331,7 @@ fieldset {
 }
 
 .register-link a {
-    color: #3b49df;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 500;
 }
@@ -334,7 +349,7 @@ fieldset {
 }
 
 .terms a {
-    color: #3b49df;
+    color: var(--accent);
     text-decoration: none;
 }
 
@@ -342,280 +357,277 @@ fieldset {
     text-decoration: underline;
 }
 
-/* Estilos para mensajes */
-        .message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            display: none;
-            text-align: center;
-        }
+/* =====================================================================
+SECCIÓN 11: MENSAJES Y ESTADOS
+===================================================================== */
 
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+.message {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    font-size: 14px;
+    display: none;
+    text-align: center;
+}
 
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
 
-        /* Loading states */
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
 
-        .form-input:invalid {
-            border-color: #ff6b6b;
-        }
+.password-match {
+    color: #28a745;
+}
 
-        .form-input:valid {
-            border-color: #3b49df;
-        }
+.password-mismatch {
+    color: #dc3545;
+}
 
-        .form-help {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 4px;
-            display: block;
-        }
+/* =====================================================================
+SECCIÓN 12: MINIBAR STYLES 
+===================================================================== */
 
-        .password-match {
-            color: #28a745;
-        }
+.minibar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 64px;
+    height: 100vh;
+    background: #fff;
+    border-right: 1px solid var(--border);
+    z-index: 1000;
+    padding: 0.75rem 0;
+    display: flex;
+    flex-direction: column;
+}
 
-        .password-mismatch {
-            color: #dc3545;
-        }
+.minibar__nav {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}
 
-        /* =====================================================================
-        MINIBAR STYLES 
-        ===================================================================== */
-        .minibar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 64px;
-            height: 100vh;
-            background: #fff;
-            border-right: 1px solid var(--border);
-            z-index: 1000;
-            padding: 0.75rem 0;
-            display: flex;
-            flex-direction: column;
-        }
+.minibar__nav::-webkit-scrollbar {
+    width: 4px;
+}
 
-        .minibar__nav {
-            flex: 1;
-            width: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: #ccc transparent;
-        }
+.minibar__nav::-webkit-scrollbar-track {
+    background: transparent;
+}
 
-        .minibar__nav::-webkit-scrollbar {
-            width: 4px;
-        }
+.minibar__nav::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
 
-        .minibar__nav::-webkit-scrollbar-track {
-            background: transparent;
-        }
+.minibar__nav::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+}
 
-        .minibar__nav::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 3px;
-        }
+.minibar__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+}
 
-        .minibar__nav::-webkit-scrollbar-thumb:hover {
-            background: #a1a1aa;
-        }
+.minibar__item {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
 
-        .minibar__list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            margin: 0;
-            padding: 0;
-        }
+.minibar__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: relative;
+    color: inherit;
+    cursor: pointer;
+}
 
-        .minibar__item {
-            position: relative;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
+.minibar__link:hover {
+    background: #f5f5f5;
+    transform: scale(1.05);
+}
 
-        .minibar__link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
-            text-decoration: none;
-            position: relative;
-            color: inherit;
-            cursor: pointer;
-        }
+.minibar__item--active .minibar__link {
+    background: #f5f6fd;
+    color: var(--accent);
+}
 
-        .minibar__link:hover {
-            background: #f5f5f5;
-            transform: scale(1.05);
-        }
+.minibar__image {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
+}
 
-        .minibar__item--active .minibar__link {
-            background: #f5f6fd;
-            color: var(--accent);
-        }
+.minibar__icon {
+    color: currentColor;
+    width: 24px;
+    height: 24px;
+}
 
-        .minibar__image {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
+/* =====================================================================
+SECCIÓN 13: PREVIEWS DE MINIBAR
+===================================================================== */
 
-        .minibar__icon {
-            color: currentColor;
-            width: 24px;
-            height: 24px;
-        }
+.minibar__preview {
+    position: fixed;
+    left: 76px;
+    width: 320px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 9999;
+    overflow: hidden;
+    pointer-events: auto;
+    animation: fadeIn 0.2s ease-out;
+}
 
-        /* PREVIEW*/
-        .minibar__preview {
-            position: fixed;
-            left: 76px;
-            width: 320px;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 9999;
-            overflow: hidden;
-            pointer-events: auto;
-            animation: fadeIn 0.2s ease-out;
-        }
+.minibar__item:hover .minibar__preview {
+    display: block;
+}
 
-        .minibar__item:hover .minibar__preview {
-            display: block;
-        }
+.preview__header {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
 
-        .preview__header {
-            width: 100%;
-            height: 150px;
-            overflow: hidden;
-            border-radius: var(--radius) var(--radius) 0 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+.preview__header-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
-        .preview__header-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+.preview__icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem 0 1rem;
+    background: #f8f9fa;
+}
 
-        .preview__icon-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem 0 1rem;
-            background: #f8f9fa;
-        }
+.preview__icon {
+    color: var(--accent);
+    width: 48px;
+    height: 48px;
+}
 
-        .preview__icon {
-            color: var(--accent);
-            width: 48px;
-            height: 48px;
-        }
+.preview__content {
+    padding: 1.25rem;
+}
 
-        .preview__content {
-            padding: 1.25rem;
-        }
+.preview__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
 
-        .preview__title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
+.preview__description {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
 
-        .preview__description {
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-        }
+.preview__btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+}
 
-        .preview__btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            font-size: 0.9rem;
-        }
+.preview__btn:hover {
+    background: var(--accent-hover);
+}
 
-        .preview__btn:hover {
-            background: var(--accent-hover);
-        }
+/* =====================================================================
+SECCIÓN 14: BOTONES ADICIONALES DEL MINIBAR
+===================================================================== */
 
-        /* BOTONES ADICIONALES */
-        .minibar__footer {
-            padding: 0.75rem 0;
-            border-top: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            flex-shrink: 0;
-        }
+.minibar__footer {
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
 
-        .minibar__action-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius);
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--muted);
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
+.minibar__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--muted);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
 
-        .minibar__action-btn:hover {
-            background: #f5f5f5;
-            color: var(--accent);
-        }
+.minibar__action-btn:hover {
+    background: #f5f5f5;
+    color: var(--accent);
+}
 
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateX(-10px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateX(0); 
-            }
-        }
+/* =====================================================================
+SECCIÓN 15: ANIMACIONES
+===================================================================== */
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+/* =====================================================================
+SECCIÓN 16: LAYOUT PRINCIPAL (PARA CONSISTENCIA)
+===================================================================== */
 
 .layout {
     max-width: var(--maxw);
@@ -626,6 +638,10 @@ fieldset {
     padding: 2rem 1rem 2rem 5rem;
     min-height: calc(100vh - 56px);
 }
+
+/* =====================================================================
+SECCIÓN 17: ESTILOS RESPONSIVE
+===================================================================== */
 
 @media (max-width: 580px) {
     .login-card {
