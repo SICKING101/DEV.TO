@@ -28,6 +28,10 @@
             <form class="search" role="search">
                 <i class="search__icon fas fa-search" aria-hidden="true"></i>
                 <input class="search__input" id="searchInput" type="search" placeholder="Search...">
+                <section class="search__algolia">
+                    <span>Powered by Algolia</span>
+                    <sup>®</sup>
+                </section>
             </form>
 
             <!-- Authentication Actions (Logged Out) -->
@@ -93,18 +97,17 @@
                     <!-- Item: DEV Community 1 -->
                     <li class="minibar__item minibar__item--active">
                         <a href="#" class="minibar__link" data-preview="DEV Community">
-                            <img src="/IMAGENES/image-no-exists.png" alt="DEV Community" class="minibar__image">
+                            <img src="/IMAGENES/forem-feed.png" alt="DEV Community" class="minibar__image">
                         </a>
                         <article class="minibar__preview">
                             <header class="preview__header">
-                                <img src="/IMAGENES/dev-header.png" alt="DEV Community Header"
+                                <img src="/IMAGENES/forem-feed-header.png" alt="DEV Community Header"
                                     class="preview__header-image">
                             </header>
                             <section class="preview__content">
                                 <h3 class="preview__title">Forem Feed</h3>
                                 <p class="preview__description">
-                                    A space to discuss and keep up with software development and manage your software
-                                    career.
+                                    A place to discuss and keep up with software development and manage your software
                                 </p>
                                 <button class="preview__btn">Follow</button>
                             </section>
@@ -461,6 +464,17 @@
             <!-- Lateral Menu -->
             <nav class="contenedor">
                 <ul class="subnav">
+                    <article class="dev-promo" id="promoGuest">
+                        <h3 class="dev-promo__title">
+                            DEV Community is a community of 3,583,906 amazing developers
+                        </h3>
+                        <p class="dev-promo__text">
+                            We're a place where coders share, stay up-to-date and grow their careers.
+                        </p>
+                        <a href="/signup.html" class="dev-promo__btn dev-promo__btn--primary">Create account</a>
+                        <a href="/Login.html" class="dev-promo__login">Log in</a>
+                    </article>
+
                     <li><a href="#"><span class="emoji">🏠</span> Home</a></li>
                     <li><a href="#"><span class="emoji">🛠️</span> DEV++</a></li>
                     <li><a href="#"><span class="emoji">📚</span> Reading List</a></li>
@@ -584,13 +598,40 @@
         SECCION 5: RIGHTBAR
         ===================================================================== -->
         <aside class="rightbar">
-            <!-- Promo Card Section -->
-            <article class="card promo">
-                <p class="promo__tag">REGISTRATION OPEN • STARTS NOW TO</p>
-                <h3 class="promo__title">Kaggle G</h3>
-                <p class="promo__desc">AI Agents Intensive Course Writing Challenge</p>
-                <button class="btn btn--white">Learn More</button>
-            </article>
+            <!-- Challenges Section -->
+            <section class="card">
+                <h4 class="card__title">Active discussions</h4>
+                <ul class="small-list">
+                    <li class="small-list__item">
+                        <a href="#" class="small-list__link">Show DEV: I built an Image-to-3D SaaS Using Tencent's New
+                            Hunyuan 3D AI</a>
+                        <p class="challenge-desc">9 comments</p>
+                    </li>
+                    <li class="small-list__item">
+                        <a href="#" class="small-list__link">The Hard Truth About Learning to Code (That No One Tells
+                            You)</a>
+                        <p class="challenge-desc">61 comments</p>
+                    </li>
+                    <li class="small-list__item">
+                        <a href="#" class="small-list__link">Laravel Eloquent's create() Methods</a>
+                        <p class="challenge-desc">1 comment</p>
+                    </li>
+                    <li class="small-list__item">
+                        <a href="#" class="small-list__link">"2026", Al Users vs The Unemployed.</a>
+                        <p class="challenge-desc">18 comments</p>
+                    </li>
+                    <li class="small-list__item">
+                        <a href="#" class="small-list__link">Has Anyone Else Seen a Suspicious Follower Spike
+                            Recently?</a>
+                        <p class="challenge-desc">4 comments</p>
+                    </li>
+                    <li class="small-list__item">
+                        <a href="#" class="small-list__link">"Technical Debt Will Bite Us in the Ass": How to Make
+                            Non-Technical Stakeholders Actually Care</a>
+                        <p class="challenge-desc">7 comments</p>
+                    </li>
+                </ul>
+            </section>
 
             <!-- Challenges Section -->
             <section class="card">

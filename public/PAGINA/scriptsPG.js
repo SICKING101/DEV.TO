@@ -174,6 +174,160 @@ class AuthManager {
     }
 }
 
+// =====================================================================
+// SISTEMA MEJORADO DE MANEJO DE IMÁGENES DE PERFIL
+// =====================================================================
+
+/**
+ * Maneja imágenes de perfil con soporte para Google OAuth
+ */
+class ProfileImageManager {
+    constructor() {
+        this.defaultAvatar = '/IMAGENES/default-avatar.png';
+    }
+
+    /**
+     * Normaliza la URL de la imagen de perfil para diferentes proveedores OAuth
+     */
+    normalizeProfilePicture(profilePicture, userData = null) {
+        if (!profilePicture || profilePicture === 'null' || profilePicture === 'undefined') {
+            return this.defaultAvatar;
+        }
+
+        console.log('🖼️ Procesando imagen de perfil:', {
+            original: profilePicture,
+            userData: userData
+        });
+
+        // Si ya es una URL completa y válida
+        if (profilePicture.startsWith('http')) {
+            return this.processOAuthImage(profilePicture, userData);
+        }
+
+        // Si es una ruta relativa
+        if (profilePicture.startsWith('/')) {
+            return profilePicture;
+        }
+
+        return this.defaultAvatar;
+    }
+
+    /**
+     * Procesa imágenes de proveedores OAuth
+     */
+    processOAuthImage(url, userData) {
+        try {
+            // GOOGLE - Asegurar tamaño adecuado y formato
+            if (url.includes('googleusercontent.com')) {
+                return this.processGoogleImage(url);
+            }
+
+            // GITHUB - Ya funciona bien
+            if (url.includes('githubusercontent.com')) {
+                return url;
+            }
+
+            // FACEBOOK - Ya funciona bien  
+            if (url.includes('fbcdn.net') || url.includes('facebook.com')) {
+                return url;
+            }
+
+            // Imagen genérica - asegurar que sea accesible
+            return this.ensureImageAccessibility(url);
+
+        } catch (error) {
+            console.error('❌ Error procesando imagen OAuth:', error);
+            return this.defaultAvatar;
+        }
+    }
+
+    /**
+     * Procesa específicamente imágenes de Google
+     */
+    processGoogleImage(googleUrl) {
+        console.log('🔧 Procesando imagen de Google:', googleUrl);
+        
+        try {
+            // Si ya tiene parámetros de tamaño, dejarla como está
+            if (googleUrl.includes('=s96-c') || googleUrl.includes('=s100') || googleUrl.includes('=s200')) {
+                return googleUrl;
+            }
+
+            // Si es la URL básica de Google, agregar parámetro de tamaño
+            if (googleUrl.includes('googleusercontent.com/a/')) {
+                // Para URLs de Google Workspace - asegurar acceso público
+                return googleUrl.replace('/a/', '/a/s100/') + '?authuser=0';
+            }
+
+            // Para URLs regulares de Google, agregar parámetro de tamaño
+            if (!googleUrl.includes('=')) {
+                return googleUrl + '=s100-c';
+            }
+
+            // Si ya tiene parámetros pero no de tamaño, agregar el nuestro
+            if (googleUrl.includes('?')) {
+                return googleUrl + '&sz=100';
+            }
+
+            return googleUrl;
+
+        } catch (error) {
+            console.error('❌ Error procesando imagen Google:', error);
+            return googleUrl; // Devolver original si hay error
+        }
+    }
+
+    /**
+     * Asegura que la imagen sea accesible
+     */
+    ensureImageAccessibility(url) {
+        // Agregar timestamp para evitar cache si es necesario
+        if (url.includes('googleusercontent.com')) {
+            // Para Google, agregar parámetro de no-cache
+            return url + (url.includes('?') ? '&' : '?') + 'timestamp=' + new Date().getTime();
+        }
+        
+        return url;
+    }
+
+    /**
+     * Maneja errores de carga de imágenes con reintentos
+     */
+    setupImageWithRetry(imgElement, src, alt = 'User Avatar', maxRetries = 2) {
+        let retries = 0;
+        
+        // Usar la URL normalizada
+        const normalizedSrc = this.normalizeProfilePicture(src);
+        imgElement.src = normalizedSrc;
+        imgElement.alt = alt;
+        
+        const handleError = () => {
+            retries++;
+            console.warn(`🖼️ Error cargando imagen (intento ${retries}/${maxRetries}):`, normalizedSrc);
+            
+            if (retries <= maxRetries) {
+                // Reintentar con timestamp diferente para evitar cache
+                const timestamp = new Date().getTime();
+                const retrySrc = normalizedSrc + (normalizedSrc.includes('?') ? '&' : '?') + `retry=${timestamp}`;
+                imgElement.src = retrySrc;
+            } else {
+                // Usar imagen por defecto después de todos los reintentos
+                imgElement.src = this.defaultAvatar;
+                imgElement.alt = 'Default Avatar';
+                console.log('🖼️ Usando imagen por defecto después de reintentos');
+            }
+        };
+
+        imgElement.onerror = handleError;
+        imgElement.onload = () => {
+            console.log('✅ Imagen cargada exitosamente:', normalizedSrc);
+        };
+    }
+}
+
+// Instancia global
+const profileImageManager = new ProfileImageManager();
+
 // Instancia global del AuthManager
 const authManager = new AuthManager();
 
@@ -3790,5 +3944,176 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// =====================================================================
+// SECCIÓN: MANEJO DE PROMO PARA USUARIOS GUEST
+// =====================================================================
 
+class PromoManager {
+    constructor() {
+        this.promo = document.getElementById("promoGuest");
+        this.isInitialized = false;
+        this.init();
+    }
 
+    init() {
+        if (!this.promo) {
+            console.log("❌ Promo element not found");
+            return;
+        }
+
+        console.log("✅ PromoManager inicializado");
+        this.isInitialized = true;
+        
+        // Verificación inmediata
+        this.checkAndToggle();
+        
+        // Escuchar cambios en authManager
+        this.setupAuthListener();
+        
+        // Escuchar cambios en localStorage
+        this.setupStorageListener();
+        
+        // Observar cambios en devCommunity
+        this.setupDevCommunityObserver();
+    }
+
+    checkAndToggle() {
+        if (!this.isInitialized) return;
+
+        const isAuthenticated = this.checkAuthentication();
+        console.log("🔐 Estado de autenticación:", isAuthenticated);
+        
+        // Transición suave pero inmediata
+        if (isAuthenticated) {
+            this.hidePromo();
+        } else {
+            this.showPromo();
+        }
+    }
+
+    checkAuthentication() {
+        // Múltiples verificaciones para mayor precisión
+        return (
+            localStorage.getItem("jwtToken") !== null ||
+            localStorage.getItem("userLoggedIn") === 'true' ||
+            (window.devCommunity && window.devCommunity.currentUser) ||
+            (authManager && authManager.isAuthenticated) ||
+            document.body.classList.contains('user-logged-in')
+        );
+    }
+
+    hidePromo() {
+        if (this.promo.style.display !== "none") {
+            this.promo.style.display = "none";
+            console.log("🎯 Promo ocultada inmediatamente");
+        }
+    }
+
+    showPromo() {
+        if (this.promo.style.display !== "block") {
+            this.promo.style.display = "block";
+            console.log("🎯 Promo mostrada inmediatamente");
+        }
+    }
+
+    setupAuthListener() {
+        // Sobrescribir métodos del AuthManager para detectar cambios
+        const originalSetToken = authManager.setToken;
+        const originalClearToken = authManager.clearToken;
+
+        authManager.setToken = function(token) {
+            originalSetToken.call(this, token);
+            console.log("🔄 Token establecido - ocultando promo");
+            window.promoManager?.hidePromo();
+        };
+
+        authManager.clearToken = function() {
+            originalClearToken.call(this);
+            console.log("🔄 Token eliminado - mostrando promo");
+            window.promoManager?.showPromo();
+        };
+    }
+
+    setupStorageListener() {
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'jwtToken' || e.key === 'userLoggedIn') {
+                console.log("📦 Cambio en localStorage detectado");
+                setTimeout(() => this.checkAndToggle(), 10);
+            }
+        });
+
+        this.interceptLocalStorage();
+    }
+
+    interceptLocalStorage() {
+        const originalSetItem = localStorage.setItem;
+        const originalRemoveItem = localStorage.removeItem;
+
+        localStorage.setItem = function(key, value) {
+            originalSetItem.call(this, key, value);
+            if (key === 'jwtToken' || key === 'userLoggedIn') {
+                console.log("✏️ Escritura en localStorage:", key);
+                setTimeout(() => window.promoManager?.checkAndToggle(), 10);
+            }
+        };
+
+        localStorage.removeItem = function(key) {
+            originalRemoveItem.call(this, key);
+            if (key === 'jwtToken' || key === 'userLoggedIn') {
+                console.log("🗑️ Eliminación de localStorage:", key);
+                setTimeout(() => window.promoManager?.checkAndToggle(), 10);
+            }
+        };
+    }
+
+    setupDevCommunityObserver() {
+        // Observar cuando devCommunity se inicialice o cambie
+        let checkCount = 0;
+        const maxChecks = 50; // Máximo 5 segundos
+
+        const checkDevCommunity = () => {
+            checkCount++;
+            
+            if (window.devCommunity && window.devCommunity.currentUser) {
+                console.log("🎯 DevCommunity detectado - ocultando promo");
+                this.hidePromo();
+                return;
+            }
+
+            if (checkCount < maxChecks) {
+                setTimeout(checkDevCommunity, 100);
+            }
+        };
+
+        checkDevCommunity();
+    }
+}
+
+// Inicialización inmediata
+document.addEventListener("DOMContentLoaded", () => {
+    window.promoManager = new PromoManager();
+});
+
+function enhanceAuthSystem() {
+    // Sobrescribir funciones de login/logout globales
+    const originalLogout = authManager.logout;
+    
+    authManager.logout = async function() {
+        console.log("🚪 Logout iniciado - mostrando promo");
+        // Mostrar promo inmediatamente al iniciar logout
+        window.promoManager?.showPromo();
+        await originalLogout.call(this);
+    };
+
+    if (window.handleLoginSuccess) {
+        const originalLoginSuccess = window.handleLoginSuccess;
+        window.handleLoginSuccess = function(userData) {
+            console.log("🔑 Login exitoso - ocultando promo");
+            window.promoManager?.hidePromo();
+            return originalLoginSuccess(userData);
+        };
+    }
+}
+
+// Ejecutar las mejoras después de que cargue todo
+setTimeout(enhanceAuthSystem, 1000);
