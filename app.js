@@ -1,144 +1,228 @@
 /******************************************************
- *                IMPORTACIÓN DE MÓDULOS
+ * SECCIÓN 1: IMPORTACIÓN DE MÓDULOS Y DEPENDENCIAS
  ******************************************************/
+
+// Framework web para Node.js - maneja rutas, middlewares, etc.
 const express = require('express');
+
+// Módulo nativo de Node.js para manejar rutas de archivos y directorios
 const path = require('path');
+
+// Middleware para parsear cuerpos de solicitudes HTTP
 const bodyParser = require('body-parser');
+
+// Middleware para manejo de sesiones de usuario
 const session = require('express-session');
+
+// Configuración de Passport para autenticación (archivo local)
 const passport = require('./passportConfig');
+
+// ODM (Object Document Mapper) para MongoDB
 const mongoose = require('mongoose');
+
+// Modelo de Usuario para interactuar con la colección de usuarios en MongoDB
 const User = require('./public/user');
+
+// Modelo de Post para interactuar con la colección de posts en MongoDB
 const Post = require('./public/post');
+
+// Enrutador de Express para organizar rutas modularmente
 const router = express.Router();
+
+// Middleware para manejar uploads de archivos
 const multer = require('multer');
+
+// Middleware JWT para autenticación basada en tokens
 const { authenticateJWT } = require('./config/jwtConfig');
+
+// Inicialización de la aplicación Express
 const app = express();
 
 /******************************************************
- *             CONFIGURACIÓN DE MULTER
+ * SECCIÓN 2: CONFIGURACIÓN DE MULTER PARA SUBIDA DE ARCHIVOS
  ******************************************************/
+
+// Módulo nativo para operaciones del sistema de archivos
 const fs = require('fs');
+
+// Ruta donde se almacenarán los archivos subidos
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 
+// Crear directorio de uploads si no existe
 if (!fs.existsSync(uploadsDir)) {
+    // Crear directorio recursivamente (incluyendo directorios padres si no existen)
     fs.mkdirSync(uploadsDir, { recursive: true });
     console.log('✅ Carpeta uploads creada');
 }
 
+// Configuración de almacenamiento para Multer
 const storage = multer.diskStorage({
+    /**
+     * Define el directorio de destino para los archivos subidos
+     * @param {Object} req - Objeto de solicitud Express
+     * @param {Object} file - Información del archivo subido
+     * @param {Function} cb - Función callback
+     */
     destination: function (req, file, cb) {
         cb(null, uploadsDir);
     },
+    /**
+     * Define el nombre del archivo guardado
+     * @param {Object} req - Objeto de solicitud Express
+     * @param {Object} file - Información del archivo subido
+     * @param {Function} cb - Función callback
+     */
     filename: function (req, file, cb) {
+        // Crear nombre único con timestamp y número aleatorio
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        // Mantener extensión original del archivo
         cb(null, 'cover-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
+// Configuración completa de Multer
 const upload = multer({ 
-    storage: storage,
+    storage: storage,                    // Estrategia de almacenamiento definida arriba
     limits: {
-        fileSize: 5 * 1024 * 1024
+        fileSize: 5 * 1024 * 1024       // Límite de 5MB por archivo
     },
+    /**
+     * Filtro para validar tipos de archivo
+     * @param {Object} req - Objeto de solicitud Express
+     * @param {Object} file - Información del archivo subido
+     * @param {Function} cb - Función callback
+     */
     fileFilter: function (req, file, cb) {
+        // Solo permitir archivos que comiencen con 'image/'
         if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
+            cb(null, true);              // Aceptar archivo
         } else {
-            cb(new Error('Solo se permiten archivos de imagen'));
+            cb(new Error('Solo se permiten archivos de imagen')); // Rechazar archivo
         }
     }
 });
 
+// Middleware para manejar errores específicos de Multer
 app.use((error, req, res, next) => {
+    // Verificar si el error es de Multer
     if (error instanceof multer.MulterError) {
+        // Error específico por tamaño de archivo excedido
         if (error.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({ error: 'El archivo es demasiado grande' });
         }
     }
+    // Pasar otros errores al siguiente middleware
     next(error);
 });
 
 /******************************************************
- *             CONFIGURACIÓN DE MIDDLEWARES
+ * SECCIÓN 3: CONFIGURACIÓN DE MIDDLEWARES GLOBALES
  ******************************************************/
+
+// Middleware para parsear cuerpos JSON en solicitudes (límite de 10MB)
 app.use(bodyParser.json({ limit: '10mb' }));
+
+// Middleware para parsear datos de formularios URL-encoded
 app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
 
+// Configuración de sesiones
 app.use(session({
-    secret: 'dev-community-secret-key-2024',
-    resave: true,
-    saveUninitialized: true,
+    secret: 'dev-community-secret-key-2024', // Clave secreta para firmar cookies de sesión
+    resave: true,                           // Forzar resave de sesión incluso si no cambió
+    saveUninitialized: true,                // Guardar sesiones nuevas aunque estén vacías
     cookie: { 
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: 'lax'
+        secure: false,                      // true en producción con HTTPS
+        maxAge: 24 * 60 * 60 * 1000,       // Tiempo de vida de la cookie (24 horas)
+        httpOnly: true,                     // Prevenir acceso via JavaScript
+        sameSite: 'lax'                     // Política SameSite para cookies
     },
-    name: 'devcommunity.sid'
+    name: 'devcommunity.sid'               // Nombre personalizado para la cookie de sesión
 }));
 
+// Inicializar Passport para autenticación
 app.use(passport.initialize());
+
+// Permitir a Passport usar sesiones persistentes
 app.use(passport.session());
 
-// 🔥 MIDDLEWARE PARA DEBUGGING DE SESIONES
+// 🔥 MIDDLEWARE PERSONALIZADO PARA DEBUGGING DE SESIONES
 app.use((req, res, next) => {
     console.log('🔍 Middleware de sesión - Estado:');
-    console.log('   - Session ID:', req.sessionID);
-    console.log('   - req.session.user:', req.session.user ? req.session.user.username : 'No');
-    console.log('   - req.isAuthenticated():', req.isAuthenticated());
-    console.log('   - req.user:', req.user ? req.user.username : 'No');
-    next();
+    console.log('   - Session ID:', req.sessionID);                    // ID único de la sesión
+    console.log('   - req.session.user:', req.session.user ? req.session.user.username : 'No'); // Usuario en sesión
+    console.log('   - req.isAuthenticated():', req.isAuthenticated()); // Estado de autenticación Passport
+    console.log('   - req.user:', req.user ? req.user.username : 'No'); // Usuario Passport
+    next(); // Continuar al siguiente middleware
 });
 
+// Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
 /******************************************************
- *              CONEXIÓN A MONGODB
+ * SECCIÓN 4: CONEXIÓN A LA BASE DE DATOS MONGODB
  ******************************************************/
+
+// URL de conexión a MongoDB
 const mongo_url = 'mongodb://localhost/mongo1_curso';
+
+// Conectar a MongoDB usando Mongoose
 mongoose.connect(mongo_url)
     .then(() => console.log(`✅ Conectado a MongoDB en ${mongo_url}`))
     .catch((err) => console.error('❌ Error al conectar a MongoDB:', err));
 
 /******************************************************
- *         MIDDLEWARE DE AUTENTICACIÓN HÍBRIDO
+ * SECCIÓN 5: MIDDLEWARE DE AUTENTICACIÓN HÍBRIDA
  ******************************************************/
+
+/**
+ * Middleware de autenticación híbrido que soporta múltiples métodos:
+ * 1. JWT (JSON Web Tokens) - Para APIs y aplicaciones móviles
+ * 2. Sesiones - Para aplicaciones web tradicionales
+ * 3. Passport - Para autenticación con OAuth (Google, Facebook, GitHub)
+ * 
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @param {Function} next - Función para continuar al siguiente middleware
+ */
 const requireAuthHybrid = (req, res, next) => {
     console.log('🔐 Middleware de autenticación híbrido ejecutándose...');
     
-    // Primero verificar JWT
+    // PRIMERO: Verificar autenticación via JWT (para APIs y móviles)
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
+        const token = authHeader.substring(7); // Extraer token sin 'Bearer '
         const { verifyToken } = require('./config/jwtConfig');
         
         try {
+            // Verificar y decodificar token JWT
             const decoded = verifyToken(token);
-            req.user = decoded;
-            req.jwtToken = token;
-            req.authMethod = 'jwt';
+            req.user = decoded;           // Agregar usuario decodificado al request
+            req.jwtToken = token;         // Guardar token para posible revocación
+            req.authMethod = 'jwt';       // Indicar método de autenticación usado
             console.log('✅ Autenticado via JWT:', decoded.username);
-            return next();
+            return next(); // Continuar, autenticación exitosa
         } catch (error) {
             console.log('❌ JWT inválido, probando otros métodos...');
+            // Continuar con otros métodos si JWT falla
         }
     }
     
-    // Si no hay JWT válido, verificar sesión
+    // SEGUNDO: Verificar autenticación via Sesión (aplicaciones web)
     if (req.session.user) {
         req.user = req.session.user;
         req.authMethod = 'session';
         console.log('✅ Autenticado via Session:', req.session.user.username);
-        return next();
+        return next(); // Continuar, autenticación exitosa
     }
     
-    // Si no hay sesión, verificar Passport
+    // TERCERO: Verificar autenticación via Passport (OAuth)
     if (req.isAuthenticated() && req.user) {
         req.authMethod = 'passport';
         console.log('✅ Autenticado via Passport:', req.user.username);
-        return next();
+        return next(); // Continuar, autenticación exitosa
     }
     
+    // SI NINGÚN MÉTODO FUNCIONA: Retornar error de no autenticado
     console.log('❌ No autenticado - Sin JWT, sesión ni Passport');
     return res.status(401).json({ 
         success: false,
@@ -147,38 +231,58 @@ const requireAuthHybrid = (req, res, next) => {
 };
 
 /******************************************************
- *                RUTAS PRINCIPALES
+ * SECCIÓN 6: RUTAS PRINCIPALES DE LA APLICACIÓN
  ******************************************************/
+
+/**
+ * Ruta raíz - Redirige según estado de autenticación
+ * Si el usuario está autenticado, va al index, sino al login
+ */
 app.get('/', (req, res) => {
     if (req.session.user || req.isAuthenticated()) {
+        // Usuario autenticado: servir página principal
         res.sendFile(path.join(__dirname, 'public', 'PAGINA', 'index.html'));
     } else {
+        // Usuario no autenticado: servir página de login
         res.sendFile(path.join(__dirname, 'public', 'Login.html'));
     }
 });
 
+/**
+ * Ruta del índice - Página principal de la aplicación
+ */
 app.get('/index', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'PAGINA', 'index.html'));
 });
 
+/**
+ * Ruta para crear posts - Requiere autenticación
+ */
 app.get('/createPost', requireAuthHybrid, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'PERFIL', 'createPost.html'));
 });
 
 /******************************************************
- *              RUTAS DE AUTENTICACIÓN CON JWT
+ * SECCIÓN 7: RUTAS DE AUTENTICACIÓN Y REGISTRO
  ******************************************************/
+
+/**
+ * Endpoint para registro de nuevos usuarios
+ * POST /register
+ */
 app.post('/register', async (req, res) => {
     try {
         console.log('📝 === INICIANDO REGISTRO DE USUARIO ===');
         const { username, email, password } = req.body;
 
+        // Log de datos recibidos (sin exponer contraseña)
         console.log('📋 Datos recibidos:', { 
             username, 
             email: email || 'No proporcionado', 
             password: password ? '***' : 'No proporcionada' 
         });
 
+        // Validaciones básicas
         if (!username || !password) {
             console.log('❌ Faltan campos requeridos');
             return res.status(400).json({ 
@@ -195,6 +299,7 @@ app.post('/register', async (req, res) => {
             });
         }
 
+        // Verificar si el usuario ya existe
         console.log('🔍 Verificando si el usuario existe...');
         const existingUser = await User.findOne({ 
             $or: [
@@ -211,6 +316,7 @@ app.post('/register', async (req, res) => {
             });
         }
 
+        // Crear nuevo usuario
         console.log('✅ Usuario no existe, creando nuevo usuario...');
         const user = new User({ 
             username, 
@@ -221,6 +327,7 @@ app.post('/register', async (req, res) => {
         await user.save();
         console.log('✅ Usuario registrado exitosamente:', user.username);
 
+        // Respuesta exitosa
         res.status(200).json({
             success: true,
             message: 'Usuario registrado exitosamente. Ahora puedes iniciar sesión.'
@@ -229,7 +336,9 @@ app.post('/register', async (req, res) => {
     } catch (err) {
         console.error('❌ ERROR AL REGISTRAR USUARIO:', err);
         
+        // Manejo de errores específicos
         if (err.code === 11000) {
+            // Error de duplicado en MongoDB
             return res.status(400).json({ 
                 success: false,
                 error: 'El usuario o email ya están registrados' 
@@ -237,6 +346,7 @@ app.post('/register', async (req, res) => {
         }
         
         if (err.name === 'ValidationError') {
+            // Error de validación de Mongoose
             return res.status(400).json({ 
                 success: false,
                 error: 'Datos de usuario inválidos',
@@ -244,6 +354,7 @@ app.post('/register', async (req, res) => {
             });
         }
 
+        // Error genérico del servidor
         res.status(500).json({ 
             success: false,
             error: 'Error interno del servidor al registrar usuario'
@@ -251,17 +362,23 @@ app.post('/register', async (req, res) => {
     }
 });
 
+/**
+ * Endpoint para autenticación de usuarios (login)
+ * POST /authenticate
+ */
 app.post('/authenticate', async (req, res) => {
     try {
         console.log('🔐 === INICIANDO AUTENTICACIÓN LOCAL CON JWT ===');
         const { username, password, device = 'web' } = req.body;
 
+        // Log de datos de login
         console.log('📋 Datos de login:', { 
             username, 
             password: password ? '***' : 'No proporcionada',
             device
         });
 
+        // Validar credenciales
         if (!username || !password) {
             console.log('❌ Faltan credenciales');
             return res.status(400).json({ 
@@ -270,11 +387,12 @@ app.post('/authenticate', async (req, res) => {
             });
         }
 
+        // Buscar usuario en la base de datos
         console.log('🔍 Buscando usuario en la base de datos...');
         const user = await User.findOne({
             $or: [
                 { username: username },
-                { email: username }
+                { email: username } // Permitir login con email también
             ]
         });
 
@@ -289,6 +407,7 @@ app.post('/authenticate', async (req, res) => {
         console.log('✅ Usuario encontrado:', user.username);
         console.log('🔑 Verificando contraseña...');
 
+        // Verificar contraseña usando el método del modelo User
         const isPasswordCorrect = await user.isCorrectPassword(password);
         
         if (!isPasswordCorrect) {
@@ -301,13 +420,13 @@ app.post('/authenticate', async (req, res) => {
 
         console.log('✅ Contraseña correcta, generando tokens...');
 
-        // Actualizar último login
+        // Actualizar último login del usuario
         await user.updateLastLogin();
 
-        // 🔥 GENERAR TOKEN JWT
+        // 🔥 GENERAR TOKEN JWT para autenticación futura
         const jwtToken = await user.generateAuthToken(device);
         
-        // Configurar sesión (para compatibilidad)
+        // Configurar sesión tradicional (para compatibilidad)
         req.session.user = {
             id: user._id,
             username: user.username,
@@ -317,7 +436,7 @@ app.post('/authenticate', async (req, res) => {
             lastLogin: user.lastLogin
         };
 
-        // Autenticar con Passport (para compatibilidad)
+        // Autenticar con Passport (para compatibilidad con OAuth)
         req.login(user, (err) => {
             if (err) {
                 console.error('❌ Error en req.login:', err);
@@ -330,11 +449,12 @@ app.post('/authenticate', async (req, res) => {
             console.log('✅ Autenticación completa - Sesión, Passport y JWT configurados');
             console.log('🔄 Redirigiendo a /index...');
 
+            // Respuesta exitosa con todos los tokens y datos
             res.json({
                 success: true,
                 message: 'Usuario autenticado correctamente',
                 user: req.session.user,
-                token: jwtToken, // 🔥 NUEVO: Incluir token JWT
+                token: jwtToken, // 🔥 NUEVO: Incluir token JWT para APIs
                 expiresIn: '24h',
                 redirect: '/index'
             });
@@ -351,8 +471,13 @@ app.post('/authenticate', async (req, res) => {
 });
 
 /******************************************************
- *         ENDPOINTS JWT - NUEVOS
+ * SECCIÓN 8: ENDPOINTS JWT - AUTENTICACIÓN MODERNA
  ******************************************************/
+
+/**
+ * Endpoint para verificar validez de token JWT
+ * GET /api/auth/verify
+ */
 app.get('/api/auth/verify', authenticateJWT, (req, res) => {
     res.json({
         success: true,
@@ -361,6 +486,10 @@ app.get('/api/auth/verify', authenticateJWT, (req, res) => {
     });
 });
 
+/**
+ * Endpoint para refrescar token JWT
+ * POST /api/auth/refresh
+ */
 app.post('/api/auth/refresh', authenticateJWT, async (req, res) => {
     try {
         const oldToken = req.jwtToken;
@@ -373,6 +502,7 @@ app.post('/api/auth/refresh', authenticateJWT, async (req, res) => {
             });
         }
 
+        // Revocar token antiguo y generar uno nuevo
         await user.revokeToken(oldToken);
         const newToken = await user.generateAuthToken(req.body.device || 'web');
         
@@ -392,15 +522,21 @@ app.post('/api/auth/refresh', authenticateJWT, async (req, res) => {
     }
 });
 
+/**
+ * Endpoint para cerrar sesión y revocar token JWT
+ * POST /api/auth/logout
+ */
 app.post('/api/auth/logout', authenticateJWT, async (req, res) => {
     try {
         const token = req.jwtToken;
         const user = await User.findById(req.user.id);
         
+        // Revocar token JWT específico
         if (user) {
             await user.revokeToken(token);
         }
         
+        // Destruir sesión y cerrar sesión de Passport
         req.session.destroy(() => {
             req.logout(() => {
                 res.json({
@@ -420,8 +556,13 @@ app.post('/api/auth/logout', authenticateJWT, async (req, res) => {
 });
 
 /******************************************************
- *         RUTA PARA OBTENER DATOS DEL USUARIO
+ * SECCIÓN 9: RUTAS PARA OBTENER DATOS DE USUARIO
  ******************************************************/
+
+/**
+ * Endpoint para obtener datos del usuario autenticado
+ * GET /api/user
+ */
 app.get('/api/user', requireAuthHybrid, (req, res) => {
     console.log('🔍 Estado de autenticación:');
     console.log('   - Método:', req.authMethod);
@@ -434,21 +575,25 @@ app.get('/api/user', requireAuthHybrid, (req, res) => {
 });
 
 /******************************************************
- *              RUTAS DE POSTS CON AUTENTICACIÓN HÍBRIDA
+ * SECCIÓN 10: RUTAS PARA GESTIÓN DE POSTS
  ******************************************************/
-// Crear nuevo post
+
+/**
+ * Endpoint para crear nuevo post
+ * POST /api/posts
+ */
 app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (req, res) => {
     try {
         console.log('=== INICIANDO CREACIÓN DE POST ===');
         
         const { title, content, tags, published } = req.body;
         
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según el método de autenticación usado
         let userId;
         if (req.authMethod === 'jwt') {
-            userId = req.user.id;
+            userId = req.user.id; // JWT almacena ID en 'id'
         } else {
-            userId = req.session.user ? req.session.user.id : req.user._id;
+            userId = req.session.user ? req.session.user.id : req.user._id; // Sesión/Passport
         }
 
         console.log('📝 Datos recibidos:', {
@@ -460,6 +605,7 @@ app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (re
             authMethod: req.authMethod
         });
 
+        // Validaciones de datos
         if (!title || !title.trim()) {
             return res.status(400).json({
                 success: false,
@@ -481,14 +627,16 @@ app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (re
             });
         }
 
+        // Procesar tags - convertir string a array y limpiar
         let tagsArray = [];
         if (tags && tags.trim()) {
             tagsArray = tags.split(',')
                 .map(tag => tag.trim().toLowerCase())
                 .filter(tag => tag.length > 0)
-                .slice(0, 4);
+                .slice(0, 4); // Limitar a 4 tags máximo
         }
 
+        // Preparar datos del post
         const postData = {
             title: title.trim(),
             content: content.trim(),
@@ -498,18 +646,21 @@ app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (re
             publishedAt: published === 'true' ? new Date() : null
         };
 
+        // Manejar imagen de portada si se subió
         if (req.file) {
             postData.coverImage = `/uploads/${req.file.filename}`;
             console.log('🖼️ Imagen de portada guardada:', postData.coverImage);
         }
 
+        // Guardar post en la base de datos
         console.log('💾 Guardando post en la base de datos...');
         const post = new Post(postData);
         await post.save();
-        await post.populate('author', 'username profilePicture');
+        await post.populate('author', 'username profilePicture'); // Popular datos del autor
 
         console.log('✅ Post creado exitosamente - ID:', post._id);
 
+        // Respuesta exitosa
         res.status(201).json({
             success: true,
             message: published === 'true' ? '🎉 Post publicado exitosamente' : '💾 Post guardado como borrador',
@@ -525,6 +676,7 @@ app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (re
     } catch (error) {
         console.error('❌ ERROR AL CREAR POST:', error);
         
+        // Manejo de errores específicos
         if (error.name === 'ValidationError') {
             return res.status(400).json({
                 success: false,
@@ -533,6 +685,7 @@ app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (re
             });
         }
 
+        // Error genérico del servidor
         res.status(500).json({
             success: false,
             error: 'Error interno del servidor al crear el post',
@@ -541,14 +694,17 @@ app.post('/api/posts', requireAuthHybrid, upload.single('coverImage'), async (re
     }
 });
 
-// Agregar reacción a post
+/**
+ * Endpoint para agregar reacción a un post
+ * POST /api/posts/:id/reactions
+ */
 app.post('/api/posts/:id/reactions', requireAuthHybrid, async (req, res) => {
     try {
         console.log('🎭 === INICIANDO AGREGADO DE REACCIÓN ===');
         
         const { reactionType } = req.body;
         
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según método de autenticación
         let userId;
         if (req.authMethod === 'jwt') {
             userId = req.user.id;
@@ -565,6 +721,7 @@ app.post('/api/posts/:id/reactions', requireAuthHybrid, async (req, res) => {
             authMethod: req.authMethod
         });
 
+        // Validar tipo de reacción
         const validReactions = ['like', 'unicorn', 'exploding_head', 'fire', 'heart', 'rocket'];
         if (!validReactions.includes(reactionType)) {
             return res.status(400).json({ 
@@ -573,6 +730,7 @@ app.post('/api/posts/:id/reactions', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Buscar post
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ 
@@ -581,9 +739,11 @@ app.post('/api/posts/:id/reactions', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Agregar reacción usando método del modelo
         post.addReaction(userId, reactionType);
         await post.save();
 
+        // Obtener conteos actualizados
         const reactionCounts = post.getReactionCounts();
         const hasReacted = post.hasUserReacted(userId);
 
@@ -605,21 +765,28 @@ app.post('/api/posts/:id/reactions', requireAuthHybrid, async (req, res) => {
     }
 });
 
-// Obtener todos los posts publicados
+/**
+ * Endpoint para obtener posts publicados (paginado)
+ * GET /api/posts
+ */
 app.get('/api/posts', async (req, res) => {
     try {
+        // Configuración de paginación
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
+        // Buscar posts publicados con paginación
         const posts = await Post.find({ published: true })
-            .populate('author', 'username profilePicture')
-            .sort({ createdAt: -1 })
+            .populate('author', 'username profilePicture') // Incluir datos del autor
+            .sort({ createdAt: -1 })                      // Ordenar por más reciente
             .skip(skip)
             .limit(limit)
-            .lean();
+            .lean(); // Convertir a objetos JavaScript simples
 
+        // Procesar reacciones y favoritos para cada post
         const postsWithReactions = posts.map(post => {
+            // Contar reacciones por tipo
             const reactionCounts = {
                 like: 0,
                 unicorn: 0,
@@ -633,6 +800,7 @@ app.get('/api/posts', async (req, res) => {
                 reactionCounts[reaction.type]++;
             });
 
+            // Verificar si el usuario actual reaccionó/favoriteó
             const currentUserId = req.session.user ? req.session.user.id : null;
             
             return {
@@ -647,6 +815,7 @@ app.get('/api/posts', async (req, res) => {
             };
         });
 
+        // Contar total de posts para paginación
         const totalPosts = await Post.countDocuments({ published: true });
 
         res.json({
@@ -664,9 +833,13 @@ app.get('/api/posts', async (req, res) => {
     }
 });
 
-// Obtener post individual
+/**
+ * Endpoint para obtener un post individual
+ * GET /api/posts/:id
+ */
 app.get('/api/posts/:id', async (req, res) => {
     try {
+        // Buscar post por ID y popular datos relacionados
         const post = await Post.findById(req.params.id)
             .populate('author', 'username profilePicture')
             .populate('comments.userId', 'username profilePicture');
@@ -678,14 +851,16 @@ app.get('/api/posts/:id', async (req, res) => {
             });
         }
 
+        // Incrementar contador de lecturas
         post.readCount += 1;
         await post.save();
 
+        // Preparar datos de reacciones y favoritos
         const currentUserId = req.session.user ? req.session.user.id : null;
         const reactionCounts = post.getReactionCounts();
 
         const postWithDetails = {
-            ...post.toObject(),
+            ...post.toObject(), // Convertir documento Mongoose a objeto simple
             reactionCounts,
             hasReacted: currentUserId ? post.hasUserReacted(currentUserId) : false,
             hasFavorited: currentUserId ? post.hasUserFavorited(currentUserId) : false,
@@ -706,14 +881,21 @@ app.get('/api/posts/:id', async (req, res) => {
     }
 });
 
-// Agregar comentario
+/******************************************************
+ * SECCIÓN 11: RUTAS PARA GESTIÓN DE COMENTARIOS
+ ******************************************************/
+
+/**
+ * Endpoint para agregar comentario a un post
+ * POST /api/posts/:id/comments
+ */
 app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
     try {
         console.log('💬 === INICIANDO AGREGADO DE COMENTARIO ===');
         
         const { content } = req.body;
         
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según método de autenticación
         let userId;
         if (req.authMethod === 'jwt') {
             userId = req.user.id;
@@ -731,6 +913,7 @@ app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
             authMethod: req.authMethod
         });
 
+        // Validaciones del comentario
         if (!content || content.trim().length === 0) {
             return res.status(400).json({ 
                 success: false,
@@ -745,6 +928,7 @@ app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Buscar post
         const post = await Post.findById(postId);
         if (!post) {
             console.log('❌ Post no encontrado:', postId);
@@ -756,6 +940,7 @@ app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
 
         console.log('✅ Post encontrado, agregando comentario...');
 
+        // Crear nuevo comentario
         const newComment = {
             userId: userId,
             content: content.trim(),
@@ -763,11 +948,13 @@ app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
             updatedAt: new Date()
         };
 
+        // Agregar comentario al array de comentarios del post
         post.comments.push(newComment);
         await post.save();
 
         console.log('✅ Comentario guardado en la base de datos');
 
+        // Obtener post actualizado con datos del usuario del comentario
         const savedPost = await Post.findById(postId)
             .populate('comments.userId', 'username profilePicture');
         
@@ -809,16 +996,20 @@ app.post('/api/posts/:id/comments', requireAuthHybrid, async (req, res) => {
     }
 });
 
-// Obtener comentarios de un post
+/**
+ * Endpoint para obtener comentarios de un post
+ * GET /api/posts/:id/comments
+ */
 app.get('/api/posts/:id/comments', async (req, res) => {
     try {
         const { id } = req.params;
         
         console.log('📥 Solicitando comentarios para post:', id);
 
+        // Buscar post y popular datos de usuarios de comentarios
         const post = await Post.findById(id)
             .populate('comments.userId', 'username profilePicture')
-            .select('comments');
+            .select('comments'); // Solo seleccionar campo de comentarios
 
         if (!post) {
             console.log('❌ Post no encontrado:', id);
@@ -832,6 +1023,7 @@ app.get('/api/posts/:id/comments', async (req, res) => {
         
         console.log(`✅ Encontrados ${comments.length} comentarios para post ${id}`);
 
+        // Formatear comentarios para respuesta
         const formattedComments = comments.map(comment => ({
             _id: comment._id,
             content: comment.content,
@@ -861,12 +1053,15 @@ app.get('/api/posts/:id/comments', async (req, res) => {
     }
 });
 
-// Eliminar comentario
+/**
+ * Endpoint para eliminar comentario
+ * DELETE /api/comments/:id
+ */
 app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
     try {
         const commentId = req.params.id;
         
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según método de autenticación
         let userId;
         if (req.authMethod === 'jwt') {
             userId = req.user.id;
@@ -876,6 +1071,7 @@ app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
 
         console.log('🗑️ Intentando eliminar comentario:', { commentId, userId, authMethod: req.authMethod });
 
+        // Buscar post que contiene el comentario
         const post = await Post.findOne({ 
             'comments._id': new mongoose.Types.ObjectId(commentId) 
         });
@@ -888,6 +1084,7 @@ app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Encontrar el comentario específico
         const comment = post.comments.find(c => 
             c._id.toString() === commentId
         );
@@ -900,6 +1097,7 @@ app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Verificar que el usuario es el autor del comentario
         if (comment.userId.toString() !== userId.toString()) {
             console.log('❌ Usuario no autorizado para eliminar comentario');
             return res.status(403).json({ 
@@ -908,6 +1106,7 @@ app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Eliminar comentario usando operación de MongoDB
         const result = await Post.updateOne(
             { _id: post._id },
             { $pull: { comments: { _id: new mongoose.Types.ObjectId(commentId) } } }
@@ -936,13 +1135,16 @@ app.delete('/api/comments/:id', requireAuthHybrid, async (req, res) => {
     }
 });
 
-// Actualizar comentario
+/**
+ * Endpoint para actualizar comentario
+ * PUT /api/comments/:id
+ */
 app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
     try {
         const commentId = req.params.id;
         const { content } = req.body;
         
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según método de autenticación
         let userId;
         if (req.authMethod === 'jwt') {
             userId = req.user.id;
@@ -952,6 +1154,7 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
 
         console.log('✏️ Intentando actualizar comentario:', { commentId, userId, authMethod: req.authMethod });
 
+        // Validaciones del contenido
         if (!content || content.trim().length === 0) {
             return res.status(400).json({ 
                 success: false,
@@ -966,6 +1169,7 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Buscar post que contiene el comentario
         const post = await Post.findOne({ 
             'comments._id': new mongoose.Types.ObjectId(commentId) 
         });
@@ -978,6 +1182,7 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Encontrar comentario específico
         const comment = post.comments.find(c => 
             c._id.toString() === commentId
         );
@@ -990,6 +1195,7 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Verificar que el usuario es el autor del comentario
         if (comment.userId.toString() !== userId.toString()) {
             console.log('❌ Usuario no autorizado para editar comentario');
             return res.status(403).json({ 
@@ -998,6 +1204,7 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Actualizar comentario usando operación de MongoDB
         const result = await Post.updateOne(
             { 
                 _id: post._id, 
@@ -1005,8 +1212,8 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
             },
             { 
                 $set: { 
-                    'comments.$.content': content.trim(),
-                    'comments.$.updatedAt': new Date()
+                    'comments.$.content': content.trim(),        // Actualizar contenido
+                    'comments.$.updatedAt': new Date()          // Actualizar timestamp
                 } 
             }
         );
@@ -1019,6 +1226,7 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
 
         console.log('✅ Comentario actualizado exitosamente en la base de datos');
 
+        // Obtener comentario actualizado con datos del usuario
         const updatedPost = await Post.findOne({ 
             'comments._id': new mongoose.Types.ObjectId(commentId) 
         }).populate('comments.userId', 'username profilePicture');
@@ -1052,10 +1260,13 @@ app.put('/api/comments/:id', requireAuthHybrid, async (req, res) => {
     }
 });
 
-// Toggle favorito
+/**
+ * Endpoint para agregar/remover post de favoritos
+ * POST /api/posts/:id/favorite
+ */
 app.post('/api/posts/:id/favorite', requireAuthHybrid, async (req, res) => {
     try {
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según método de autenticación
         let userId;
         if (req.authMethod === 'jwt') {
             userId = req.user.id;
@@ -1067,6 +1278,7 @@ app.post('/api/posts/:id/favorite', requireAuthHybrid, async (req, res) => {
 
         console.log('🔖 Toggle favorito:', { userId, postId, authMethod: req.authMethod });
 
+        // Buscar post
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ 
@@ -1075,6 +1287,7 @@ app.post('/api/posts/:id/favorite', requireAuthHybrid, async (req, res) => {
             });
         }
 
+        // Alternar favorito usando método del modelo
         const addedToFavorites = post.toggleFavorite(userId);
         await post.save();
 
@@ -1095,17 +1308,20 @@ app.post('/api/posts/:id/favorite', requireAuthHybrid, async (req, res) => {
 });
 
 /******************************************************
- *              RUTAS DE EDICIÓN DE POSTS CON DEBUGGING
+ * SECCIÓN 12: RUTAS PARA EDICIÓN DE POSTS
  ******************************************************/
 
-// Obtener post para edición - CON DEBUGGING EXTENDIDO
+/**
+ * Endpoint para obtener post para edición
+ * GET /api/posts/:id/edit
+ */
 app.get('/api/posts/:id/edit', requireAuthHybrid, async (req, res) => {
   try {
     console.log('📝 === SOLICITANDO POST PARA EDICIÓN ===');
     
     const postId = req.params.id;
     
-    // Obtener user ID del método de autenticación usado
+    // Obtener user ID según método de autenticación
     let userId;
     if (req.authMethod === 'jwt') {
       userId = req.user.id;
@@ -1120,6 +1336,7 @@ app.get('/api/posts/:id/edit', requireAuthHybrid, async (req, res) => {
       headers: req.headers
     });
 
+    // Buscar post y popular datos del autor
     console.log('🔍 Buscando post en la base de datos...');
     const post = await Post.findById(postId)
       .populate('author', 'username profilePicture');
@@ -1140,7 +1357,7 @@ app.get('/api/posts/:id/edit', requireAuthHybrid, async (req, res) => {
       currentUserId: userId
     });
 
-    // Verificar que el usuario es el autor
+    // Verificar que el usuario es el autor del post
     if (post.author._id.toString() !== userId.toString()) {
       console.log('❌ Usuario no autorizado para editar este post');
       console.log('   - Autor del post:', post.author._id.toString());
@@ -1154,6 +1371,7 @@ app.get('/api/posts/:id/edit', requireAuthHybrid, async (req, res) => {
 
     console.log('✅ Usuario autorizado para editar');
 
+    // Preparar datos del post para respuesta
     const postData = {
       _id: post._id,
       title: post.title,
@@ -1204,7 +1422,10 @@ app.get('/api/posts/:id/edit', requireAuthHybrid, async (req, res) => {
   }
 });
 
-// Actualizar post - CON DEBUGGING EXTENDIDO
+/**
+ * Endpoint para actualizar post existente
+ * PUT /api/posts/:id
+ */
 app.put('/api/posts/:id', requireAuthHybrid, upload.single('coverImage'), async (req, res) => {
   try {
     console.log('✏️ === INICIANDO ACTUALIZACIÓN DE POST ===');
@@ -1212,7 +1433,7 @@ app.put('/api/posts/:id', requireAuthHybrid, upload.single('coverImage'), async 
     const postId = req.params.id;
     const { title, content, tags, published, removeCoverImage } = req.body;
     
-    // Obtener user ID del método de autenticación usado
+    // Obtener user ID según método de autenticación
     let userId;
     if (req.authMethod === 'jwt') {
       userId = req.user.id;
@@ -1263,7 +1484,7 @@ app.put('/api/posts/:id', requireAuthHybrid, upload.single('coverImage'), async 
 
     console.log('✅ Usuario autorizado, validando datos...');
 
-    // Validaciones
+    // Validaciones de datos
     if (!title || !title.trim()) {
       console.log('❌ Validación fallida: título vacío');
       return res.status(400).json({
@@ -1294,7 +1515,7 @@ app.put('/api/posts/:id', requireAuthHybrid, upload.single('coverImage'), async 
       tagsArray = tags.split(',')
         .map(tag => tag.trim().toLowerCase())
         .filter(tag => tag.length > 0)
-        .slice(0, 4);
+        .slice(0, 4); // Limitar a 4 tags máximo
     }
 
     console.log('🏷️ Tags procesados:', tagsArray);
@@ -1376,16 +1597,17 @@ app.put('/api/posts/:id', requireAuthHybrid, upload.single('coverImage'), async 
   }
 });
 
-/******************************************************
- *              ELIMINAR POST
- ******************************************************/
+/**
+ * Endpoint para eliminar post
+ * DELETE /api/posts/:id
+ */
 app.delete('/api/posts/:id', requireAuthHybrid, async (req, res) => {
     try {
         console.log('🗑️ === INICIANDO ELIMINACIÓN DE POST ===');
         
         const postId = req.params.id;
         
-        // Obtener user ID del método de autenticación usado
+        // Obtener user ID según método de autenticación
         let userId;
         if (req.authMethod === 'jwt') {
             userId = req.user.id;
@@ -1426,7 +1648,7 @@ app.delete('/api/posts/:id', requireAuthHybrid, async (req, res) => {
         await Post.findByIdAndDelete(postId);
         console.log('✅ Post eliminado de la base de datos');
 
-        // También eliminar comentarios asociados (opcional pero recomendado)
+        // Opcional: eliminar comentarios asociados en otros posts
         await Post.updateMany(
             { 'comments.postId': postId },
             { $pull: { comments: { postId: postId } } }
@@ -1457,54 +1679,33 @@ app.delete('/api/posts/:id', requireAuthHybrid, async (req, res) => {
 });
 
 /******************************************************
- *              CIERRE DE SESIÓN
+ * SECCIÓN 13: RUTAS DE AUTENTICACIÓN CON OAUTH
  ******************************************************/
-app.get('/logout', (req, res) => {
-    console.log('🚪 Cerrando sesión para usuario:', req.session.user?.username);
-    
-    req.logout(function(err) {
-        if (err) {
-            console.error('❌ Error en req.logout:', err);
-        }
-        
-        req.session.destroy(function(err) {
-            if (err) {
-                console.error('❌ Error al destruir sesión:', err);
-                return res.status(500).json({ 
-                    success: false,
-                    error: 'Error al cerrar sesión' 
-                });
-            }
-            
-            res.clearCookie('connect.sid');
-            console.log('✅ Sesión cerrada exitosamente');
-            res.json({
-                success: true,
-                message: 'Sesión cerrada exitosamente',
-                redirect: '/'
-            });
-        });
-    });
-});
 
-/******************************************************
- *        AUTENTICACIÓN CON GOOGLE
- ******************************************************/
+/**
+ * Ruta para iniciar autenticación con Google
+ * GET /auth/google
+ */
 app.get('/auth/google',
     passport.authenticate('google', { 
-        scope: ['profile', 'email']
+        scope: ['profile', 'email'] // Permisos solicitados a Google
     })
 );
 
+/**
+ * Callback de Google OAuth después de la autenticación
+ * GET /auth/google/callback
+ */
 app.get('/auth/google/callback',
     passport.authenticate('google', { 
-        failureRedirect: '/Login.html'
+        failureRedirect: '/Login.html' // Redirigir en caso de error
     }),
     (req, res) => {
         if (!req.user) {
             return res.redirect('/Login.html');
         }
 
+        // Configurar sesión con datos del usuario de Google
         const userSessionData = {
             id: req.user._id,
             username: req.user.username,
@@ -1514,19 +1715,25 @@ app.get('/auth/google/callback',
         };
 
         req.session.user = userSessionData;
+        // Redirigir al index con parámetros para evitar cache
         res.redirect('/index?oauth=google&t=' + Date.now());
     }
 );
 
-/******************************************************
- *        AUTENTICACIÓN CON FACEBOOK
- ******************************************************/
+/**
+ * Ruta para iniciar autenticación con Facebook
+ * GET /auth/facebook
+ */
 app.get('/auth/facebook', 
     passport.authenticate('facebook', { 
-        scope: ['email', 'public_profile']
+        scope: ['email', 'public_profile'] // Permisos solicitados a Facebook
     })
 );
 
+/**
+ * Callback de Facebook OAuth después de la autenticación
+ * GET /auth/facebook/callback
+ */
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { 
         failureRedirect: '/Login.html'
@@ -1536,6 +1743,7 @@ app.get('/auth/facebook/callback',
             return res.redirect('/Login.html');
         }
 
+        // Configurar sesión con datos del usuario de Facebook
         const userSessionData = {
             id: req.user._id,
             username: req.user.username,
@@ -1549,15 +1757,20 @@ app.get('/auth/facebook/callback',
     }
 );
 
-/******************************************************
- *        AUTENTICACIÓN CON GITHUB
- ******************************************************/
+/**
+ * Ruta para iniciar autenticación con GitHub
+ * GET /auth/github
+ */
 app.get('/auth/github',
     passport.authenticate('github', { 
-        scope: ['user:email']
+        scope: ['user:email'] // Permisos solicitados a GitHub
     })
 );
 
+/**
+ * Callback de GitHub OAuth después de la autenticación
+ * GET /auth/github/callback
+ */
 app.get('/auth/github/callback',
     passport.authenticate('github', { 
         failureRedirect: '/Login.html'
@@ -1567,6 +1780,7 @@ app.get('/auth/github/callback',
             return res.redirect('/Login.html');
         }
 
+        // Configurar sesión con datos del usuario de GitHub
         const userSessionData = {
             id: req.user._id,
             username: req.user.username,
@@ -1581,8 +1795,51 @@ app.get('/auth/github/callback',
 );
 
 /******************************************************
- *              INICIO DEL SERVIDOR
+ * SECCIÓN 14: RUTA DE CIERRE DE SESIÓN
  ******************************************************/
+
+/**
+ * Ruta para cerrar sesión
+ * GET /logout
+ */
+app.get('/logout', (req, res) => {
+    console.log('🚪 Cerrando sesión para usuario:', req.session.user?.username);
+    
+    // Cerrar sesión de Passport
+    req.logout(function(err) {
+        if (err) {
+            console.error('❌ Error en req.logout:', err);
+        }
+        
+        // Destruir sesión
+        req.session.destroy(function(err) {
+            if (err) {
+                console.error('❌ Error al destruir sesión:', err);
+                return res.status(500).json({ 
+                    success: false,
+                    error: 'Error al cerrar sesión' 
+                });
+            }
+            
+            // Limpiar cookie de sesión
+            res.clearCookie('connect.sid');
+            console.log('✅ Sesión cerrada exitosamente');
+            res.json({
+                success: true,
+                message: 'Sesión cerrada exitosamente',
+                redirect: '/'
+            });
+        });
+    });
+});
+
+/******************************************************
+ * SECCIÓN 15: INICIO DEL SERVIDOR
+ ******************************************************/
+
+/**
+ * Iniciar servidor en puerto 3000
+ */
 app.listen(3000, () => {
     console.log('🚀 Servidor iniciado en el puerto 3000');
     console.log('📝 Create Post: http://localhost:3000/createPost');
@@ -1603,4 +1860,5 @@ app.listen(3000, () => {
     console.log('   DELETE /api/posts/:id');
 });
 
+// Exportar aplicación para testing o uso en otros módulos
 module.exports = app;

@@ -1,74 +1,144 @@
 /* =====================================================================
-SECCION 1: VARIABLES CSS Y CONFIGURACIÓN GLOBAL
+SECCIÓN 1: VARIABLES CSS Y CONFIGURACIÓN GLOBAL
 ===================================================================== */
 
+/**
+ * Define variables CSS reutilizables para toda la aplicación
+ * Facilita el mantenimiento y consistencia visual
+ */
+
 :root {
-    /* Colores */
+    /* ================================
+       PALETA DE COLORES PRINCIPAL
+       ================================ */
+
+    /* Color de fondo principal de la aplicación */
     --bg: #f5f5f5;
+
+    /* Color para tarjetas y elementos en primer plano */
     --card: #ffffff;
+
+    /* Color para texto secundario y elementos muted */
     --muted: #6b6b6b;
+
+    /* Color de acento principal (azul Dev.to) */
     --accent: #3b49df;
+
+    /* Color de acento en estado hover */
     --accent-hover: #2f3ab2;
+
+    /* Color para bordes y separadores */
     --border: #e6e6e6;
+
+    /* Color para texto principal */
     --text: #242424;
-    
-    /* Espaciado y Tamaños */
+
+    /* ================================
+       SISTEMA DE DISEÑO Y ESPACIADO
+       ================================ */
+
+    /* Radio de borde estándar para elementos */
     --radius: 8px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.1);
-    --maxw: 1200px;
+
+    /* Sombra estándar para elevación */
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    /* Ancho máximo del contenido */
+    --maxw: 1400px;
 }
 
 /* =====================================================================
-SECCION 2: RESET Y ESTILOS BASE
+SECCIÓN 2: RESET Y ESTILOS BASE
 ===================================================================== */
 
+/**
+ * Reset CSS y estilos base para normalizar el comportamiento
+ * entre diferentes navegadores
+ */
+
+/* Reset universal - elimina márgenes y padding por defecto */
 * {
     box-sizing: border-box;
+    /* Incluye padding y border en el width/height */
     margin: 0;
     padding: 0;
+
+    /* Stack de fuentes moderno para mejor renderizado cross-platform */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
 }
 
+/**
+ * Estilos base del cuerpo del documento
+ * Define la apariencia fundamental de la aplicación
+ */
 body {
     background: var(--bg);
+    /* Usa variable CSS para fondo */
     color: var(--text);
+    /* Usa variable CSS para color de texto */
     line-height: 1.5;
+    /* Altura de línea para mejor legibilidad */
     -webkit-font-smoothing: antialiased;
+    /* Suavizado de fuentes en WebKit */
     padding-top: 56px;
+    /* Espacio para topbar fija */
 }
 
 /* =====================================================================
-SECCION 3: COMPONENTES DE CABECERA
+SECCIÓN 3: COMPONENTES DE CABECERA
 ===================================================================== */
+
+/**
+ * Sistema de cabecera fija (topbar)
+ * Proporciona navegación principal y búsqueda
+ */
 
 .topbar {
     position: fixed;
+    /* Fija la barra en la parte superior */
     top: 0;
     left: 0;
     right: 0;
     background: #ffffff;
+    /* Fondo blanco sólido */
     border-bottom: 1px solid var(--border);
+    /* Borde inferior sutil */
     z-index: 1;
+    /* Asegura que esté por encima del contenido */
     height: 56px;
+    /* Altura fija */
     width: 100%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* Ancho completo */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Sombra sutil para elevación */
 }
 
+/* Contenedor interno de la topbar */
 .topbar__inner {
     width: var(--maxw);
+    /* Usa el ancho máximo definido */
     margin: 0 auto;
+    /* Centra el contenedor */
+    margin-left: 100px;
+    /* Compensa la minibar lateral */
     padding: 0 1rem;
+    /* Padding horizontal */
     display: flex;
     align-items: center;
     height: 100%;
     gap: 1.5rem;
+    /* Espacio entre elementos hijos */
 }
 
-/* Logo */
+/* ================================
+   COMPONENTE LOGO
+   ================================ */
+
 .brand {
     display: flex;
     align-items: center;
     text-decoration: none;
+    /* Elimina subrayado del enlace */
 }
 
 .brand img {
@@ -76,46 +146,73 @@ SECCION 3: COMPONENTES DE CABECERA
     height: 40px;
     display: block;
     border-radius: 5px;
+    /* Esquinas ligeramente redondeadas */
 }
 
-/* Barra de búsqueda */
+/* ================================
+   SISTEMA DE BÚSQUEDA
+   ================================ */
+
 .search {
-    flex: 2;          /* MAS ancho */
-    max-width: none;  /* sin limite */
+    flex: 2;
+    /* Ocupa más espacio que otros elementos */
+    max-width: none;
+    /* Sin límite de ancho máximo */
     position: relative;
-    transform: translateX(-155px); /* mueve a la izquierda */
+    transform: translateX(-155px);
+    /* Desplazamiento para compensar layout */
 }
 
+/* Ícono de lupa dentro del input de búsqueda */
 .search__icon {
     position: absolute;
     left: 12px;
+    /* Posiciona desde la izquierda */
     top: 50%;
+    /* Centra verticalmente */
     transform: translateY(-50%);
+    /* Ajuste fino para centrado perfecto */
     color: var(--muted);
+    /* Color discreto */
     font-size: 0.9rem;
 }
 
+/* Campo de entrada de búsqueda */
 .search__input {
     width: 100%;
+    /* Ancho completo del contenedor */
     padding: 0.5rem 1rem 0.5rem 2.5rem;
+    /* Padding izquierdo extra para el ícono */
     border-radius: var(--radius);
+    /* Bordes redondeados */
     border: 1px solid var(--border);
+    /* Borde sutil */
     background: #f9f9f9;
+    /* Fondo ligeramente gris */
     font-size: 0.9rem;
     height: 36px;
+    /* Altura consistente */
     transition: all 0.2s;
+    /* Transición suave para interacciones */
 }
 
+/* Estados del campo de búsqueda */
 .search__input:focus {
     outline: none;
+    /* Elimina outline por defecto */
     border-color: var(--accent);
+    /* Borde de acento al enfocar */
     background: white;
+    /* Fondo blanco al enfocar */
     box-shadow: 0 0 0 2px rgba(59, 73, 223, 0.1);
+    /* Sombra de enfoque */
 }
 
+/* Badge de Algolia para búsqueda */
 .search__algolia {
     position: absolute;
     right: 12px;
+    /* Posiciona desde la derecha */
     top: 50%;
     transform: translateY(-50%);
     font-size: 0.8rem;
@@ -124,7 +221,9 @@ SECCION 3: COMPONENTES DE CABECERA
     align-items: center;
     gap: 2px;
     pointer-events: none;
+    /* No interfiere con clics */
     z-index: 2;
+    /* Por encima del input */
 }
 
 .search__algolia sup {
@@ -133,9 +232,15 @@ SECCION 3: COMPONENTES DE CABECERA
 }
 
 /* =====================================================================
-SECCION 4: SISTEMA DE BOTONES
+SECCIÓN 4: SISTEMA DE BOTONES
 ===================================================================== */
 
+/**
+ * Sistema completo de botones reutilizables
+ * Define variantes y estados para todos los botones de la aplicación
+ */
+
+/* Clase base para todos los botones */
 .btn {
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
@@ -148,11 +253,20 @@ SECCION 4: SISTEMA DE BOTONES
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    /* Espacio entre ícono y texto */
     transition: all 0.2s;
+    /* Transición suave para hover */
     height: 36px;
+    /* Altura consistente */
     white-space: nowrap;
+    /* Evita salto de línea */
 }
 
+/* ================================
+   VARIANTES DE BOTONES
+   ================================ */
+
+/* Botón primario - acción principal */
 .btn--primary {
     background: var(--accent);
     color: white;
@@ -161,8 +275,10 @@ SECCION 4: SISTEMA DE BOTONES
 .btn--primary:hover {
     background: var(--accent-hover);
     transform: translateY(-1px);
+    /* Efecto de elevación al hover */
 }
 
+/* Botón outline - acción secundaria */
 .btn--outline {
     background: transparent;
     border: 1px solid var(--accent);
@@ -171,18 +287,22 @@ SECCION 4: SISTEMA DE BOTONES
 
 .btn--outline:hover {
     background: #f5f6fd;
+    /* Fondo muy sutil al hover */
 }
 
+/* Botón blanco - para fondos oscuros */
 .btn--white {
     background: white;
     color: var(--accent);
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    /* Borde muy sutil */
 }
 
 .btn--white:hover {
     background: #f5f5f5;
 }
 
+/* Botón secundario - menos prominente */
 .btn--secondary {
     background: #718096;
     color: white;
@@ -194,10 +314,13 @@ SECCION 4: SISTEMA DE BOTONES
     border-color: #4a5568;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
+    /* Sombra al hover */
 }
 
+/* Botón peligro - acciones destructivas */
 .btn--danger {
     background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    /* Gradiente rojo */
     color: white;
     border: 2px solid #f56565;
 }
@@ -208,80 +331,117 @@ SECCION 4: SISTEMA DE BOTONES
     box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
 }
 
+/* Botón pequeño - para espacios reducidos */
 .btn--small {
     padding: 8px 16px;
     font-size: 12px;
 }
 
+/* Estados de botones */
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none !important;
+    /* Anima transform en disabled */
 }
 
-/* Acciones de autenticación */
+/* ================================
+   CONTENEDOR DE ACCIONES DE AUTENTICACIÓN
+   ================================ */
+
 .actions {
     display: flex;
     gap: 0.75rem;
     margin-left: auto;
+    /* Empuja a la derecha */
 }
 
 /* =====================================================================
-SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
+SECCIÓN 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
 ===================================================================== */
+
+/**
+ * Sistema de navegación de usuario autenticado
+ * Incluye avatar, dropdown menu y estados
+ */
 
 .user-nav {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-left: auto;
+    /* Posiciona a la derecha */
 }
 
+/* Contenedor del menú de usuario */
 .user-menu {
     position: relative;
+    /* Para posicionar el dropdown absolutamente */
 }
 
+/* Avatar del usuario en la barra superior */
 .user-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    /* Forma circular */
     cursor: pointer;
     border: 2px solid transparent;
     transition: all 0.2s;
     object-fit: cover;
+    /* Asegura que la imagen cubra el círculo */
 }
 
 .user-avatar:hover {
     border-color: var(--accent);
     transform: scale(1.05);
+    /* Efecto de escala al hover */
 }
+
+/* ================================
+   DROPDOWN MENU
+   ================================ */
 
 .user-dropdown {
     display: none;
+    /* Oculto por defecto */
     position: absolute;
     top: 100%;
+    /* Justo debajo del avatar */
     right: 0;
     background: white;
     border: 1px solid #e5e5e5;
     border-radius: var(--radius);
     list-style: none;
+    /* Elimina bullets de lista */
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    /* Sombra elevada */
     min-width: 220px;
+    /* Ancho mínimo */
     z-index: 1000;
+    /* Por encima de otros elementos */
     margin-top: 8px;
+    /* Separación del trigger */
     padding: 0.5rem 0;
 }
 
+/* Estado visible del dropdown */
 .user-dropdown.show {
     display: block;
 }
+
+/* ================================
+   INFORMACIÓN DEL USUARIO EN DROPDOWN
+   ================================ */
 
 .user-info {
     padding: 12px 16px;
     display: flex;
     align-items: center;
     background: #f8f9fa;
+    /* Fondo sutil diferenciado */
     border-bottom: 1px solid #e9ecef;
+    /* Separador */
     margin-bottom: 8px;
 }
 
@@ -292,6 +452,7 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
     overflow: hidden;
     margin-right: 12px;
     flex-shrink: 0;
+    /* Evita que se reduzca */
 }
 
 .user-info__avatar img {
@@ -303,6 +464,7 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
 .user-info__details {
     flex: 1;
     min-width: 0;
+    /* Permite text-overflow */
 }
 
 .user-info__name {
@@ -313,6 +475,7 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Puntos suspensivos si es muy largo */
 }
 
 .user-info__email {
@@ -323,11 +486,16 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
     text-overflow: ellipsis;
 }
 
+/* ================================
+   ELEMENTOS DEL DROPDOWN
+   ================================ */
+
 .dropdown-divider {
     height: 1px;
     background: #e9ecef;
     margin: 8px 0;
     list-style: none;
+    /* Para cuando se usa en <li> */
 }
 
 .dropdown-item {
@@ -352,12 +520,15 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
 
 .dropdown-item i {
     width: 20px;
+    /* Ancho fijo para alineación */
     margin-right: 8px;
     color: #6c757d;
 }
 
+/* Variante logout - acción peligrosa */
 .dropdown-item--logout {
     color: #d1242f;
+    /* Rojo para logout */
 }
 
 .dropdown-item--logout i {
@@ -366,9 +537,11 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
 
 .dropdown-item--logout:hover {
     background: #fff0f0;
+    /* Fondo rojo muy suave */
     color: #d1242f;
 }
 
+/* Overlay para cerrar dropdown al hacer clic fuera */
 .user-dropdown-overlay {
     position: fixed;
     top: 50px;
@@ -379,11 +552,16 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
     z-index: 1000;
     display: none;
     backdrop-filter: blur(2px);
+    /* Efecto de desenfoque del fondo */
 }
 
 .user-dropdown-overlay.active {
     display: block;
 }
+
+/* ================================
+   BOTONES DE ÍCONO
+   ================================ */
 
 .icon-btn {
     background: none;
@@ -407,8 +585,13 @@ SECCION 5: NAVEGACIÓN DE USUARIO Y DROPDOWN
 }
 
 /* =====================================================================
-SECCION 6: BARRA LATERAL MINI (MINIBAR)
+SECCIÓN 6: BARRA LATERAL MINI (MINIBAR)
 ===================================================================== */
+
+/**
+ * Barra lateral de navegación minimalista
+ * Proporciona acceso rápido a secciones principales
+ */
 
 .minibar {
     position: fixed;
@@ -416,23 +599,30 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     top: 0;
     width: 64px;
     height: 100vh;
+    /* Altura completa de la ventana */
     background: #fff;
     border-right: 1px solid var(--border);
     z-index: 1000;
+    /* Alto z-index para estar por encima */
     padding: 0.75rem 0;
     display: flex;
     flex-direction: column;
 }
 
+/* Contenedor de navegación con scroll */
 .minibar__nav {
     flex: 1;
+    /* Ocupa todo el espacio disponible */
     width: 100%;
     overflow-y: auto;
+    /* Scroll vertical si es necesario */
     overflow-x: hidden;
     scrollbar-width: thin;
+    /* Scrollbar delgada en Firefox */
     scrollbar-color: #ccc transparent;
 }
 
+/* Personalización de scrollbar Webkit */
 .minibar__nav::-webkit-scrollbar {
     width: 4px;
 }
@@ -450,23 +640,27 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     background: #a1a1aa;
 }
 
+/* Lista de elementos del minibar */
 .minibar__list {
     list-style: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
+    /* Espacio reducido entre elementos */
     margin: 0;
     padding: 0;
 }
 
 .minibar__item {
     position: relative;
+    /* Para posicionar previews */
     width: 100%;
     display: flex;
     justify-content: center;
 }
 
+/* Enlaces/ítems del minibar */
 .minibar__link {
     display: flex;
     align-items: center;
@@ -484,13 +678,17 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
 .minibar__link:hover {
     background: #f5f5f5;
     transform: scale(1.05);
+    /* Efecto de escala al hover */
 }
 
+/* Estado activo del ítem */
 .minibar__item--active .minibar__link {
     background: #f5f6fd;
+    /* Fondo azul muy suave */
     color: var(--accent);
 }
 
+/* Imágenes e íconos del minibar */
 .minibar__image {
     width: 28px;
     height: 28px;
@@ -500,36 +698,50 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
 
 .minibar__icon {
     color: currentColor;
+    /* Hereda el color del contenedor */
     width: 24px;
     height: 24px;
 }
 
-/* Previews de minibar */
+/* ================================
+   PREVIEWS DE MINIBAR (HOVER)
+   ================================ */
+
 .minibar__preview {
     position: fixed;
     left: 76px;
+    /* A la derecha del minibar */
     width: 320px;
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 8px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    /* Sombra elevada */
     display: none;
+    /* Oculto por defecto */
     z-index: 9999;
+    /* Muy alto z-index */
     overflow: hidden;
     pointer-events: auto;
+    /* Permite interacción */
     animation: fadeIn 0.2s ease-out;
+    /* Animación de entrada */
 }
 
+/* Mostrar preview al hacer hover */
 .minibar__item:hover .minibar__preview {
     display: block;
 }
 
+/* Cabecera del preview con imagen/gradiente */
 .preview__header {
     width: 100%;
     height: 120px;
     overflow: hidden;
     border-radius: var(--radius) var(--radius) 0 0;
+    /* Redondea solo arriba */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Gradiente de fallback */
 }
 
 .preview__header-image {
@@ -539,12 +751,14 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     display: block;
 }
 
+/* Contenedor de ícono del preview */
 .preview__icon-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 1.5rem 0 1rem;
     background: #f8f9fa;
+    /* Fondo sutil */
 }
 
 .preview__icon {
@@ -553,6 +767,7 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     height: 48px;
 }
 
+/* Contenido principal del preview */
 .preview__content {
     padding: 1.25rem;
 }
@@ -571,6 +786,7 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     line-height: 1.4;
 }
 
+/* Botón de acción del preview */
 .preview__btn {
     width: 100%;
     padding: 0.75rem;
@@ -588,15 +804,20 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     background: var(--accent-hover);
 }
 
-/* Botones adicionales del minibar */
+/* ================================
+   BOTONES ADICIONALES DEL MINIBAR
+   ================================ */
+
 .minibar__footer {
     padding: 0.75rem 0;
     border-top: 1px solid var(--border);
+    /* Separador visual */
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     flex-shrink: 0;
+    /* Evita que se reduzca */
 }
 
 .minibar__action-btn {
@@ -620,48 +841,74 @@ SECCION 6: BARRA LATERAL MINI (MINIBAR)
     color: var(--accent);
 }
 
+/* Animación de entrada para previews */
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(-10px); 
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+        /* Entrada desde la izquierda */
     }
-    to { 
-        opacity: 1; 
-        transform: translateX(0); 
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
 /* =====================================================================
-SECCION 7: SISTEMA DE LAYOUT PRINCIPAL
+SECCIÓN 7: SISTEMA DE LAYOUT PRINCIPAL
 ===================================================================== */
+
+/**
+ * Sistema de grid layout principal de 3 columnas
+ * Leftbar - Content - Rightbar
+ */
 
 .layout {
     max-width: var(--maxw);
+    /* Ancho máximo definido */
     margin: 0 auto;
+    /* Centrado */
     display: grid;
     grid-template-columns: 240px 1fr 320px;
+    /* 3 columnas: leftbar, contenido flexible, rightbar */
     gap: 1.5rem;
+    /* Espacio entre columnas */
     padding: 2rem 1rem 2rem 5rem;
+    /* Padding que compensa la minibar */
     min-height: calc(100vh - 56px);
+    /* Altura mínima menos topbar */
 }
 
 /* =====================================================================
-SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
+SECCIÓN 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
 ===================================================================== */
+
+/**
+ * Barra lateral izquierda con navegación y widgets
+ * Posicionamiento sticky para seguir al hacer scroll
+ */
 
 .leftbar {
     position: sticky;
+    /* Se mantiene visible al hacer scroll */
     top: 88px;
+    /* Posición desde el top (topbar + margen) */
     height: fit-content;
+    /* Altura según contenido */
 }
 
-/* Navegación principal */
+/* ================================
+   NAVEGACIÓN PRINCIPAL
+   ================================ */
+
 .section--navigation {
     padding: 0;
     background: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     margin-bottom: 1rem;
+    /* Separación con siguiente sección */
 }
 
 .navlist {
@@ -670,6 +917,7 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
 
 .navlist__item {
     margin-bottom: 0;
+    /* Reset para control espaciado con gap */
 }
 
 .navlist__link {
@@ -686,6 +934,7 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     text-align: left;
     font-size: 0.9rem;
     border-radius: 0;
+    /* Reset para bordes específicos en active */
 }
 
 .navlist__link:hover {
@@ -693,18 +942,24 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     color: var(--accent);
 }
 
+/* Estado activo del ítem de navegación */
 .navlist__item--active .navlist__link {
     background: #f5f6fd;
+    /* Fondo azul muy suave */
     color: var(--accent);
     font-weight: 600;
     border-left: 3px solid var(--accent);
+    /* Indicador lateral */
 }
 
+/* Íconos de navegación */
 .navlist__icon {
     color: currentColor;
+    /* Hereda color del enlace */
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+    /* Evita que se reduzca */
 }
 
 .navlist__text {
@@ -712,9 +967,13 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Puntos suspensivos si es muy largo */
 }
 
-/* Tarjeta de perfil */
+/* ================================
+   TARJETA DE PERFIL
+   ================================ */
+
 .profilecard {
     background: var(--card);
     padding: 1.5rem;
@@ -728,8 +987,11 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     width: 64px;
     height: 64px;
     border-radius: 50%;
+    /* Circular */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Gradiente de fallback */
     margin: 0 auto 0.75rem;
+    /* Centrado y margen inferior */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -751,7 +1013,10 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     line-height: 1.4;
 }
 
-/* Secciones generales */
+/* ================================
+   SECCIONES GENERALES
+   ================================ */
+
 .section {
     background: var(--card);
     padding: 1.25rem;
@@ -767,18 +1032,28 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    /* Espaciado para mejor legibilidad */
 }
 
-/* Listas de elementos */
-.taglist, .topiclist, .resourceList {
+/* ================================
+   LISTAS DE ELEMENTOS
+   ================================ */
+
+.taglist,
+.topiclist,
+.resourceList {
     list-style: none;
 }
 
-.taglist__item, .topiclist__item, .resourceList__item {
+.taglist__item,
+.topiclist__item,
+.resourceList__item {
     margin-bottom: 0.5rem;
 }
 
-.taglist__link, .topiclist__link, .resourceList__link {
+.taglist__link,
+.topiclist__link,
+.resourceList__link {
     color: var(--accent);
     text-decoration: none;
     font-weight: 500;
@@ -787,15 +1062,21 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     display: inline-block;
 }
 
-.taglist__link:hover, .topiclist__link:hover, .resourceList__link:hover {
+.taglist__link:hover,
+.topiclist__link:hover,
+.resourceList__link:hover {
     color: var(--accent-hover);
     transform: translateX(2px);
+    /* Efecto de desplazamiento sutil */
 }
 
+/* Estilos específicos para tags */
 .taglist__link {
     padding: 0.35rem 0.75rem;
     background: #f3f5ff;
+    /* Fondo azul muy suave */
     border-radius: 999px;
+    /* Forma de píldora */
     font-size: 0.8rem;
 }
 
@@ -805,6 +1086,7 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
 
 .resourceList__link {
     color: var(--muted);
+    /* Color más discreto */
     font-size: 0.85rem;
 }
 
@@ -812,7 +1094,10 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     color: var(--accent);
 }
 
-/* Menú lateral específico */
+/* ================================
+   MENÚ LATERAL ESPECÍFICO
+   ================================ */
+
 .contenedor {
     display: block;
     margin-bottom: 1.5rem;
@@ -832,6 +1117,7 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
 .subnav .emoji {
     font-size: 16px;
     width: 20px;
+    /* Ancho fijo para alineación */
     display: inline-block;
     text-align: center;
     margin-right: 8px;
@@ -860,14 +1146,17 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
 
 .subnav a:hover {
     background-color: transparent;
+    /* Solo cambia color, no fondo */
     color: #3b49df;
 }
 
+/* Separador de secciones */
 .section-divider {
     margin-top: 16px;
     margin-bottom: 8px;
     padding-top: 16px;
     border-top: 1px solid #e9e9ff;
+    /* Separador sutil */
 }
 
 .section-title {
@@ -880,7 +1169,10 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     margin-bottom: 8px;
 }
 
-/* Redes sociales */
+/* ================================
+   REDES SOCIALES
+   ================================ */
+
 .social-section {
     margin-top: 16px;
 }
@@ -894,6 +1186,7 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
     flex-wrap: wrap;
     gap: 8px;
     width: 152px;
+    /* Ancho fijo para 4 íconos */
 }
 
 .social-icon {
@@ -913,23 +1206,30 @@ SECCION 8: BARRA LATERAL IZQUIERDA (LEFTBAR)
 .social-icon:hover {
     color: #3b49df;
     background-color: #3b49df1a;
+    /* Azul muy transparente */
     transform: translateY(-1px);
+    /* Efecto de elevación */
 }
 
 .bsky-icon {
     width: 14px;
     height: 14px;
+    /* Tamaño específico para Bluesky */
 }
 
 /* =====================================================================
-SECCION 9: CONTENIDO PRINCIPAL
+SECCIÓN 9: CONTENIDO PRINCIPAL
 ===================================================================== */
 
 .content {
     min-height: 400px;
+    /* Altura mínima para evitar colapso */
 }
 
-/* Sección Hero */
+/* ================================
+   SECCIÓN HERO
+   ================================ */
+
 .hero {
     background: var(--card);
     padding: 2rem;
@@ -954,48 +1254,56 @@ SECCION 9: CONTENIDO PRINCIPAL
     line-height: 1.5;
 }
 
-/* Controles del feed */
+/* ================================
+   CONTROLES DEL FEED
+   ================================ */
+
 .feed-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-    background: var(--card);
-    padding: 1rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
+/* Sistema de tabs/pestañas - DEV.to Style */
 .tabs {
     display: flex;
     gap: 0;
-    background: #f9f9f9;
+    background: var(--card);
     border-radius: var(--radius);
     padding: 0.25rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
 }
 
 .tab {
     padding: 0.5rem 1rem;
     border: none;
     background: transparent;
-    border-radius: 6px;
+    border-radius: 4px;
     font-weight: 500;
     cursor: pointer;
     color: var(--muted);
     font-size: 0.9rem;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .tab:hover {
-    color: var(--accent);
+    color: var(--text);
+    background-color: rgba(59, 73, 223, 0.05);
 }
 
 .tab--active {
-    background: white;
-    color: var(--accent);
-    box-shadow: var(--shadow);
+    background: var(--accent);
+    color: white;
+    box-shadow: none;
 }
 
+/* Control de ordenamiento - DEV.to Style */
 .sort {
     display: flex;
     align-items: center;
@@ -1011,6 +1319,7 @@ SECCION 9: CONTENIDO PRINCIPAL
     background: white;
     font-size: 0.85rem;
     cursor: pointer;
+    color: var(--text);
 }
 
 .sort__select:focus {
@@ -1018,15 +1327,61 @@ SECCION 9: CONTENIDO PRINCIPAL
     border-color: var(--accent);
 }
 
+/* Barra de búsqueda 2*/
+.search-container {
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    width: 100%;
+    box-shadow: var(--shadow);
+    margin-bottom: 1rem;
+}
+
+.search__input--second{
+    width: 100%;
+    /* Ancho completo del contenedor */
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    /* Padding izquierdo extra para el ícono */
+    border-radius: var(--radius);
+    /* Bordes redondeados */
+    border: 1px solid var(--border);
+    /* Borde sutil */
+    background: #f9f9f9;
+    /* Fondo ligeramente gris */
+    font-size: 0.9rem;
+    height: 36px;
+    /* Altura consistente */
+    transition: all 0.2s;
+    /* Transición suave para interacciones */
+    padding-left: 10px;
+}
+
+.search-input::placeholder {
+    color: var(--muted);
+}
+
 /* =====================================================================
-SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
+SECCIÓN 10: SISTEMA DE ARTÍCULOS Y TARJETAS
 ===================================================================== */
+
+/**
+ * Sistema completo de tarjetas de artículo
+ * Diseño IDÉNTICO a Dev.to con todas sus características
+ */
 
 .articles {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    /* Espacio consistente entre artículos */
 }
+
+/* ================================
+   TARJETAS DE ARTÍCULO (LEGACY)
+   ================================ */
 
 .article {
     background: var(--card);
@@ -1035,12 +1390,16 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     box-shadow: var(--shadow);
     transition: all 0.2s;
     border: 1px solid transparent;
+    /* Borde transparente para hover */
 }
 
 .article:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    /* Efecto de elevación */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Sombra más pronunciada */
     border-color: var(--border);
+    /* Borde visible al hover */
 }
 
 .article__header {
@@ -1095,6 +1454,7 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     color: var(--accent);
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
+    /* Forma de píldora */
     font-size: 0.75rem;
     font-weight: 600;
     transition: all 0.2s;
@@ -1113,6 +1473,7 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--border);
+    /* Separador */
 }
 
 .reactions {
@@ -1147,27 +1508,101 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     font-weight: 500;
 }
 
-/* Tarjetas de artículo mejoradas */
+/* ================================
+   TARJETAS DE ARTÍCULO IDÉNTICAS A DEV.TO
+   ================================ */
+
 .article-card {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: 3px;
+    /* Radio específico de Dev.to */
+    padding: 0;
+    /* Sin padding, se controla internamente */
     margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    border: 1px solid #e0e0e0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    /* Borde sutil con shadow */
+    border: none;
     opacity: 1;
     position: relative;
     z-index: 0;
+    transition: all 0.15s ease;
+    overflow: hidden;
+}
+
+.article-card:hover {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Sombra adicional al hover */
 }
 
 .article-card__inner {
     position: relative;
 }
 
+/* ================================
+   SISTEMA DE IMAGEN DE PORTADA
+   ================================ */
+
+.article-card__cover {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    --cover-image-height: 200px;
+    /* Variable CSS - altura por defecto */
+}
+
+.article-card__cover img {
+    width: 100%;
+    height: var(--cover-image-height);
+    /* Usa variable CSS */
+    object-fit: cover;
+    /* Cubre el contenedor manteniendo proporción */
+    display: block;
+    --cover-image-height: 300px;
+    /* Valor por defecto específico para img */
+}
+
+/* ================================
+   VARIANTES DE ALTURA DE IMAGEN
+   ================================ */
+
+.article-card__cover--small img {
+    --cover-image-height: 150px;
+}
+
+.article-card__cover--medium img {
+    --cover-image-height: 250px;
+}
+
+.article-card__cover--large img {
+    --cover-image-height: 350px;
+}
+
+.article-card__cover--xlarge img {
+    --cover-image-height: 450px;
+}
+
+.article-card__cover--full img {
+    --cover-image-height: 500px;
+}
+
+/* ================================
+   CONTENIDO DEL POST
+   ================================ */
+
+.article-card__content {
+    padding: 24px;
+    padding-top: 16px;
+    /* Padding top reducido */
+}
+
+/* ================================
+   HEADER CON AVATAR, NOMBRE Y FECHA
+   ================================ */
+
 .article-card__header {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     position: relative;
 }
 
@@ -1175,50 +1610,208 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    margin-right: 12px;
+    margin-right: 8px;
     object-fit: cover;
 }
 
 .article-card__user-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .article-card__username {
-    font-weight: 600;
+    font-weight: 500;
     color: #242424;
     display: block;
     font-size: 14px;
+    line-height: 1.3;
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.article-card__username:hover {
+    color: #3b49df;
 }
 
 .article-card__date {
     font-size: 12px;
-    color: #666;
+    color: #717171;
+    line-height: 1.3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .article-card__actions {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
 }
+
+/* ================================
+   TÍTULO DEL POST
+   ================================ */
+
+.article-card__title {
+    margin-bottom: 8px;
+}
+
+.article-card__title a {
+    font-size: 22px;
+    font-weight: 700;
+    color: #242424;
+    text-decoration: none;
+    line-height: 1.3;
+    letter-spacing: -0.011em;
+    /* Kerning específico de Dev.to */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.article-card__title a:hover {
+    color: #3b49df;
+}
+
+/* ================================
+   TAGS
+   ================================ */
+
+.article-card__tags {
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    display: inline-block;
+    background: #f0f0f0;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.tag:hover {
+    background: #e0e0e0;
+    color: #242424;
+}
+
+/* ================================
+   FOOTER CON REACCIONES Y META INFORMACIÓN
+   ================================ */
+
+.article-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    /* Separador sutil */
+}
+
+.article-card__reactions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.reaction-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    /* Forma de píldora */
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    color: #666;
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.reaction-btn:hover {
+    background: #e9ecef;
+    color: #242424;
+}
+
+.reaction-btn--active {
+    background: #3b49df;
+    color: white;
+    border-color: #3b49df;
+}
+
+.reaction-emoji {
+    font-size: 14px;
+}
+
+.reaction-count {
+    font-weight: 500;
+}
+
+.article-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #666;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.article-card__reading-time {
+    font-size: 12px;
+    color: #717171;
+}
+
+.article-card__comments-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.article-card__comments-btn:hover {
+    color: #3b49df;
+    background: #f0f0f0;
+}
+
+/* ================================
+   BOTONES DE EDICIÓN Y ELIMINACIÓN
+   ================================ */
 
 .article-card__edit-btn {
     background: none;
     border: none;
     color: #3b49df;
     cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
     font-size: 14px;
     transition: all 0.2s ease;
-    margin-left: 8px;
     border: 1px solid #3b49df;
+    /* Borde outline */
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .article-card__edit-btn:hover {
     background: #3b49df;
     color: white;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(59, 73, 223, 0.3);
 }
 
 .article-card__delete-btn {
@@ -1226,16 +1819,18 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     border: none;
     color: #3b49df;
     cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
     font-size: 14px;
     transition: all 0.2s ease;
-    margin-left: 8px;
     border: 1px solid #3b49df;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .article-card__delete-btn:hover {
     background: #f8d7da;
+    /* Fondo rojo muy suave */
     color: #dc3545;
 }
 
@@ -1262,128 +1857,94 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     color: #3b49df;
 }
 
-.article-card__content {
+/* ================================
+   SECCIÓN DE COMENTARIOS
+   ================================ */
+
+.article-card__comments {
+    margin-top: 0;
+    padding: 0 24px 24px 24px;
+    /* Padding que coincide con el contenido */
+    border-top: none;
+    /* Sin borde superior */
+}
+
+.comments-container {
     margin-bottom: 16px;
 }
 
-.article-card__title {
-    margin-bottom: 12px;
-}
-
-.article-card__title a {
-    font-size: 20px;
-    font-weight: 700;
-    color: #242424;
-    text-decoration: none;
-    line-height: 1.3;
-}
-
-.article-card__title a:hover {
-    color: #3b49df;
-}
-
-.article-card__cover {
-    margin-bottom: 12px;
-}
-
-.article-card__cover img {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-
-.article-card__tags {
-    margin-bottom: 12px;
-}
-
-.tag {
-    display: inline-block;
-    background: #f0f0f0;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #666;
-    margin-right: 8px;
-    margin-bottom: 4px;
-}
-
-.article-card__footer {
+.comment-form {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f0;
-}
-
-.article-card__reactions {
-    display: flex;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: wrap;
 }
 
-.reaction-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: #f8f9fa;
+.comment-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
     border: 1px solid #e0e0e0;
-    border-radius: 20px;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s;
+    border-radius: 4px;
+    resize: vertical;
+    /* Solo redimension vertical */
+    font-family: inherit;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.reaction-btn:hover {
-    background: #e9ecef;
-}
-
-.reaction-btn--active {
-    background: #3b49df;
-    color: white;
+.comment-input:focus {
+    outline: none;
     border-color: #3b49df;
 }
 
-.reaction-emoji {
+/* Botones base reutilizables */
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
     font-size: 14px;
-}
-
-.reaction-count {
     font-weight: 500;
+    transition: all 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.article-card__meta {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    color: #666;
-    font-size: 14px;
+.btn--primary {
+    background: #3b49df;
+    color: white;
 }
 
-.article-card__reading-time {
+.btn--primary:hover {
+    background: #2f3ab2;
+}
+
+.btn--small {
+    padding: 6px 12px;
     font-size: 12px;
 }
 
-.article-card__comments-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
+/* Prompt de login para comentarios */
+.login-prompt {
+    text-align: center;
+    padding: 16px;
     color: #666;
-    cursor: pointer;
     font-size: 14px;
-    padding: 4px;
-    transition: color 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.article-card__comments-btn:hover {
+.login-prompt a {
     color: #3b49df;
+    text-decoration: none;
 }
 
-/* Indicadores de filtros activos */
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+/* ================================
+   INDICADORES Y ESTADOS ADICIONALES
+   ================================ */
+
 .active-filter-indicator {
     margin-left: 16px;
     display: flex;
@@ -1403,37 +1964,53 @@ SECCION 10: SISTEMA DE ARTÍCULOS Y TARJETAS
     padding: 2px 6px;
     border-radius: 4px;
     border: 1px solid #e9ecef;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Estilos para posts ordenados */
+/* Indicadores visuales para posts ordenados */
 .article-card[data-sort="top"] {
     border-left: 3px solid #ff6b35;
+    /* Naranja para top */
 }
 
 .article-card[data-sort="trending"] {
     border-left: 3px solid #e63946;
+    /* Rojo para trending */
 }
 
 .article-card[data-sort="latest"] {
     border-left: 3px solid #3b49df;
+    /* Azul para latest */
 }
 
 /* =====================================================================
-SECCION 11: SISTEMA DE COMENTARIOS
+SECCIÓN 11: SISTEMA DE COMENTARIOS
 ===================================================================== */
+
+/**
+ * Sistema completo de comentarios
+ * Incluye estilos para comentarios, formularios y estados
+ */
 
 .article-card__comments {
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid #f0f0f0;
+    /* Separador del contenido principal */
     transition: all 0.3s ease;
+    /* Transición suave para toggle */
 }
 
 .comments-container {
     margin-bottom: 16px;
     max-height: 400px;
+    /* Altura máxima con scroll */
     overflow-y: auto;
 }
+
+/* ================================
+   COMENTARIO INDIVIDUAL
+   ================================ */
 
 .comment {
     display: flex;
@@ -1441,9 +2018,12 @@ SECCION 11: SISTEMA DE COMENTARIOS
     margin-bottom: 16px;
     padding: 16px;
     background: #f8f9fa;
+    /* Fondo sutil diferenciado */
     border-radius: 8px;
     border-left: 3px solid #3b49df;
+    /* Indicador lateral */
     animation: commentSlideIn 0.3s ease;
+    /* Animación de entrada */
 }
 
 .comment:last-child {
@@ -1462,7 +2042,12 @@ SECCION 11: SISTEMA DE COMENTARIOS
 .comment__content {
     flex: 1;
     min-width: 0;
+    /* Permite text-overflow */
 }
+
+/* ================================
+   HEADER DEL COMENTARIO
+   ================================ */
 
 .comment__header {
     display: flex;
@@ -1526,12 +2111,17 @@ SECCION 11: SISTEMA DE COMENTARIOS
     white-space: nowrap;
 }
 
+/* ================================
+   CONTENIDO Y FOOTER DEL COMENTARIO
+   ================================ */
+
 .comment__text {
     color: #242424;
     line-height: 1.5;
     font-size: 14px;
     margin-bottom: 8px;
     word-wrap: break-word;
+    /* Rompe palabras largas */
 }
 
 .comment__edited {
@@ -1579,6 +2169,10 @@ SECCION 11: SISTEMA DE COMENTARIOS
     font-weight: 500;
 }
 
+/* ================================
+   FORMULARIO DE EDICIÓN DE COMENTARIOS
+   ================================ */
+
 .comment-edit-form {
     margin-bottom: 8px;
 }
@@ -1605,10 +2199,15 @@ SECCION 11: SISTEMA DE COMENTARIOS
     gap: 8px;
 }
 
+/* ================================
+   FORMULARIO DE NUEVO COMENTARIO
+   ================================ */
+
 .comment-form {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
+    /* Separador de comentarios existentes */
 }
 
 .comment-input {
@@ -1628,7 +2227,12 @@ SECCION 11: SISTEMA DE COMENTARIOS
     outline: none;
     border-color: #3b49df;
     box-shadow: 0 0 0 2px rgba(59, 73, 223, 0.1);
+    /* Sombra de enfoque */
 }
+
+/* ================================
+   ESTADOS ESPECIALES DE COMENTARIOS
+   ================================ */
 
 .no-comments {
     text-align: center;
@@ -1665,11 +2269,13 @@ SECCION 11: SISTEMA DE COMENTARIOS
     text-decoration: underline;
 }
 
+/* Animación de entrada para comentarios */
 @keyframes commentSlideIn {
     from {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1677,15 +2283,17 @@ SECCION 11: SISTEMA DE COMENTARIOS
 }
 
 /* =====================================================================
-SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
+SECCIÓN 12: BARRA LATERAL DERECHA (RIGHTBAR)
 ===================================================================== */
 
 .rightbar {
     position: sticky;
     top: 88px;
+    /* Misma posición que leftbar */
     height: fit-content;
 }
 
+/* Componente de tarjeta base */
 .card {
     background: var(--card);
     padding: 1.5rem;
@@ -1701,13 +2309,18 @@ SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
     color: var(--text);
 }
 
-/* Tarjeta promocional */
+/* ================================
+   TARJETA PROMOCIONAL
+   ================================ */
+
 .dev-promo {
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
+    /* Radio más pronunciado */
     padding: 1.25rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    /* Sombra más sutil */
     margin-bottom: 1.5rem;
 }
 
@@ -1727,9 +2340,11 @@ SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
 .dev-promo__btn {
     display: block;
     width: 100%;
+    /* Ancho completo */
     text-align: center;
     padding: 0.6rem 1rem;
     border-radius: 10px;
+    /* Radio específico */
     font-weight: 600;
     margin-bottom: 0.75rem;
     font-size: 1rem;
@@ -1738,6 +2353,7 @@ SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
 .dev-promo__btn--primary {
     background: #ffffff;
     border: 2px solid #3b49df;
+    /* Borde más grueso */
     color: #3b49df;
 }
 
@@ -1757,7 +2373,10 @@ SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
     text-decoration: underline;
 }
 
-/* Listas pequeñas */
+/* ================================
+   LISTAS PEQUEÑAS
+   ================================ */
+
 .small-list {
     list-style: none;
 }
@@ -1766,12 +2385,14 @@ SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
+    /* Separador entre ítems */
 }
 
 .small-list__item:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
+    /* Sin separador en el último */
 }
 
 .small-list__link {
@@ -1797,7 +2418,7 @@ SECCION 12: BARRA LATERAL DERECHA (RIGHTBAR)
 }
 
 /* =====================================================================
-SECCION 13: PIE DE PÁGINA
+SECCIÓN 13: PIE DE PÁGINA
 ===================================================================== */
 
 .sitefooter {
@@ -1834,8 +2455,13 @@ SECCION 13: PIE DE PÁGINA
 }
 
 /* =====================================================================
-SECCION 14: SISTEMA DE MODALES
+SECCIÓN 14: SISTEMA DE MODALES
 ===================================================================== */
+
+/**
+ * Sistema completo de modales reutilizables
+ * Incluye overlay, animaciones y variantes de tamaño
+ */
 
 .modal {
     position: fixed;
@@ -1844,11 +2470,14 @@ SECCION 14: SISTEMA DE MODALES
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
+    /* Overlay semi-transparente */
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    /* Z-index muy alto */
     padding: 1rem;
+    /* Padding para móviles */
 }
 
 .modal[open] {
@@ -1862,7 +2491,9 @@ SECCION 14: SISTEMA DE MODALES
     width: 100%;
     height: 100%;
     background-color: rgb(235, 235, 235);
+    /* Color de fallback */
     backdrop-filter: blur(2px);
+    /* Efecto de desenfoque */
 }
 
 .modal__content {
@@ -1870,23 +2501,35 @@ SECCION 14: SISTEMA DE MODALES
     background: var(--card);
     border-radius: 8px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    /* Sombra elevada */
     max-width: 420px;
+    /* Ancho máximo por defecto */
     width: 100%;
     border: 1px solid var(--border);
     animation: modalFadeIn 0.15s ease-out;
+    /* Animación rápida de entrada */
 }
 
+/* Variante large para formularios complejos */
 .modal__content--large {
     max-width: 800px;
     max-height: 95vh;
+    /* Altura máxima viewport */
     overflow-y: auto;
+    /* Scroll interno si es necesario */
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    /* Sombra más pronunciada */
     border: 1px solid #e1e5e9;
 }
 
+/* ================================
+   ESTRUCTURA DEL MODAL
+   ================================ */
+
 .modal__header {
     padding: 1.25rem 1.5rem 0;
+    /* Padding superior extra */
     border: none;
 }
 
@@ -1921,9 +2564,14 @@ SECCION 14: SISTEMA DE MODALES
 
 .modal__footer .btn {
     min-width: 80px;
+    /* Ancho mínimo para botones */
     height: 36px;
     font-weight: 500;
 }
+
+/* ================================
+   VARIANTE CENTRADA (PARA CONFIRMACIONES)
+   ================================ */
 
 .modal__center {
     display: flex;
@@ -1948,6 +2596,7 @@ SECCION 14: SISTEMA DE MODALES
     color: white;
     padding: 8px;
     border-radius: 50%;
+    /* Forma circular */
     transition: all 0.2s;
     width: 40px;
     height: 40px;
@@ -1959,17 +2608,24 @@ SECCION 14: SISTEMA DE MODALES
 .modal__close:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: rotate(90deg);
+    /* Efecto de rotación */
 }
 
 .modal__icon {
     text-align: center;
 }
 
+/* ================================
+   ANIMACIONES DE MODALES
+   ================================ */
+
 @keyframes modalFadeIn {
     from {
         opacity: 0;
         transform: translateY(-10px) scale(0.98);
+        /* Escala y desplazamiento */
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -1981,6 +2637,7 @@ SECCION 14: SISTEMA DE MODALES
         opacity: 0;
         transform: scale(0.9) translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -1988,13 +2645,19 @@ SECCION 14: SISTEMA DE MODALES
 }
 
 /* =====================================================================
-SECCION 15: FORMULARIOS Y EDICIÓN
+SECCIÓN 15: FORMULARIOS Y EDICIÓN
 ===================================================================== */
+
+/**
+ * Sistema de formularios para creación y edición de posts
+ * Incluye estilos para todos los tipos de inputs
+ */
 
 .post-form {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    /* Espacio consistente entre grupos */
 }
 
 .form-group {
@@ -2011,32 +2674,44 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     letter-spacing: 0.5px;
 }
 
-.form-input, .form-textarea {
+.form-input,
+.form-textarea {
     padding: 16px;
     border: 2px solid #e2e8f0;
+    /* Borde más grueso */
     border-radius: 8px;
     font-family: inherit;
     font-size: 16px;
+    /* Tamaño mínimo para evitar zoom en iOS */
     transition: all 0.3s ease;
+    /* Transición más larga */
     background: white;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Sombra sutil */
 }
 
-.form-input:focus, .form-textarea:focus {
+.form-input:focus,
+.form-textarea:focus {
     outline: none;
     border-color: #3b49df;
     box-shadow: 0 0 0 3px rgba(59, 73, 223, 0.1);
+    /* Sombra de enfoque */
     transform: translateY(-1px);
+    /* Efecto de elevación */
 }
 
-.form-input:hover, .form-textarea:hover {
+.form-input:hover,
+.form-textarea:hover {
     border-color: #cbd5e0;
+    /* Borde más oscuro al hover */
 }
 
 .form-textarea {
     resize: vertical;
+    /* Solo redimension vertical */
     min-height: 200px;
     line-height: 1.6;
+    /* Mejor legibilidad para texto largo */
     font-size: 16px;
 }
 
@@ -2056,14 +2731,19 @@ SECCION 15: FORMULARIOS Y EDICIÓN
 
 .char-counter.warning {
     color: #ed8936;
+    /* Naranja para advertencia */
 }
 
 .char-counter.error {
     color: #f56565;
+    /* Rojo para error */
     font-weight: 600;
 }
 
-/* Grupos de radio buttons */
+/* ================================
+   GRUPOS DE RADIO BUTTONS
+   ================================ */
+
 .radio-group {
     display: flex;
     gap: 24px;
@@ -2089,11 +2769,13 @@ SECCION 15: FORMULARIOS Y EDICIÓN
 .radio-label:hover {
     border-color: #3b49df;
     background: #f7faff;
+    /* Fondo azul muy suave */
     transform: translateY(-1px);
 }
 
 .radio-label input[type="radio"] {
     display: none;
+    /* Oculta el radio nativo */
 }
 
 .radio-custom {
@@ -2105,12 +2787,13 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     transition: all 0.3s ease;
 }
 
-.radio-label input[type="radio"]:checked + .radio-custom {
+/* Estado checked del radio personalizado */
+.radio-label input[type="radio"]:checked+.radio-custom {
     border-color: #3b49df;
     background: #3b49df;
 }
 
-.radio-label input[type="radio"]:checked + .radio-custom::after {
+.radio-label input[type="radio"]:checked+.radio-custom::after {
     content: '';
     width: 8px;
     height: 8px;
@@ -2122,12 +2805,15 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     transform: translate(-50%, -50%);
 }
 
-.radio-label input[type="radio"]:checked ~ span {
+.radio-label input[type="radio"]:checked~span {
     color: #3b49df;
     font-weight: 600;
 }
 
-/* Gestión de imágenes de portada */
+/* ================================
+   GESTIÓN DE IMÁGENES DE PORTADA
+   ================================ */
+
 .current-cover-image {
     display: flex;
     flex-direction: column;
@@ -2136,6 +2822,7 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     background: white;
     border-radius: 8px;
     border: 2px dashed #e2e8f0;
+    /* Borde dashed para área de drop */
 }
 
 .current-cover-image img {
@@ -2144,6 +2831,7 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     border-radius: 8px;
     object-fit: cover;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Sombra para imagen */
 }
 
 .cover-image-actions {
@@ -2183,15 +2871,20 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     background: #eef2ff;
 }
 
-/* Información del post */
+/* ================================
+   INFORMACIÓN DEL POST
+   ================================ */
+
 .post-info {
     padding: 20px;
     background: linear-gradient(135deg, #000000 0%, #707070 100%);
+    /* Gradiente oscuro */
     border-radius: 8px;
     font-size: 14px;
     color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     margin-bottom: 40px;
+    /* Separación extra */
 }
 
 .post-info p {
@@ -2201,6 +2894,7 @@ SECCION 15: FORMULARIOS Y EDICIÓN
     gap: 8px;
 }
 
+/* Íconos con emoji para cada tipo de información */
 .post-info p:before {
     content: '📅';
     font-size: 16px;
@@ -2215,8 +2909,12 @@ SECCION 15: FORMULARIOS Y EDICIÓN
 }
 
 /* =====================================================================
-SECCION 16: NOTIFICACIONES Y ESTADOS
+SECCIÓN 16: NOTIFICACIONES Y ESTADOS
 ===================================================================== */
+
+/**
+ * Sistema de estados de UI: loading, empty states, notificaciones
+ */
 
 .loading {
     text-align: center;
@@ -2243,7 +2941,10 @@ SECCION 16: NOTIFICACIONES Y ESTADOS
     margin-bottom: 16px;
 }
 
-/* Notificaciones Toast */
+/* ================================
+   NOTIFICACIONES TOAST
+   ================================ */
+
 .post-edit-toast {
     position: fixed;
     top: 20px;
@@ -2251,21 +2952,27 @@ SECCION 16: NOTIFICACIONES Y ESTADOS
     padding: 16px 24px;
     border-radius: 8px;
     z-index: 10000;
+    /* Z-index muy alto */
     font-weight: 600;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(10px);
+    /* Efecto de vidrio esmerilado */
     border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Borde sutil */
     display: flex;
     align-items: center;
     gap: 12px;
     max-width: 400px;
     animation: slideInRight 0.3s ease;
+    /* Animación desde la derecha */
 }
 
+/* Íconos para diferentes tipos de toast */
 .post-edit-toast::before {
     font-size: 18px;
 }
 
+/* Variantes de toast por tipo */
 .post-edit-toast.success {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
@@ -2302,59 +3009,84 @@ SECCION 16: NOTIFICACIONES Y ESTADOS
     content: '⚠️';
 }
 
+/* Animación de entrada para toast */
 @keyframes slideInRight {
     from {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
     }
 }
 
+/* Spinner de carga */
 .loading-spinner {
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* =====================================================================
-SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
+SECCIÓN 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
 ===================================================================== */
 
+/**
+ * Sistema completo de estilos responsive para dispositivos móviles
+ * Reorganiza layout, navegación y componentes para pantallas pequeñas
+ */
+
 @media (max-width: 768px) {
-    
-    /* Ajustes generales */
+
+    /* ================================
+       AJUSTES GENERALES MÓVIL
+       ================================ */
+
     body {
         overflow-x: hidden;
+        /* Previene scroll horizontal */
         padding-top: 60px;
+        /* Ajuste de padding para topbar móvil */
     }
 
     main {
         padding-top: 60px;
     }
-    
+
     body.menu-open {
         overflow: hidden;
+        /* Previene scroll cuando menú está abierto */
     }
 
+    /* Ocultar badge de Algolia en móvil */
     .search__algolia {
         display: none !important;
     }
 
-    .search{
-        transform: translateX(0); /* mueve a la izquierda */
+    /* Reset de transform para search en móvil */
+    .search {
+        transform: translateX(0);
     }
 
+    /* Ocultar texto del botón crear post en móvil */
     .user-nav .btn--create-post {
         display: none !important;
     }
-    
-    /* Header móvil */
+
+    /* ================================
+       HEADER MÓVIL
+       ================================ */
+
     .topbar {
         height: 56px;
         margin-left: 0;
@@ -2367,18 +3099,23 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         right: 0;
         z-index: 1000;
     }
-    
+
     .topbar__inner {
         width: 100%;
+        margin-left: 0;
         padding: 0 16px;
         gap: 12px;
         justify-content: space-between;
+        /* Distribución espaciada */
         height: 100%;
         align-items: center;
         display: flex;
     }
-    
-    /* Hamburguesa */
+
+    /* ================================
+       BOTÓN HAMBURGUESA
+       ================================ */
+
     .hambtn {
         display: flex;
         align-items: center;
@@ -2393,46 +3130,60 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         border-radius: 4px;
         transition: background-color 0.2s;
         order: 1;
+        /* Posición en flexbox */
     }
-    
+
     .hambtn:hover {
         background: #f5f5f5;
     }
-    
-    /* Logo centrado */
+
+    /* ================================
+       LOGO CENTRADO
+       ================================ */
+
     .brand {
         position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
         order: 2;
+        /* Segunda posición */
         flex: 1;
+        /* Ocupa espacio disponible */
         margin: 0 auto;
     }
 
     .brand img {
         width: 40px;
         height: 30px;
+        /* Tamaño reducido para móvil */
     }
-    
-    /* Navegación de usuario */
+
+    /* ================================
+       NAVEGACIÓN DE USUARIO MÓVIL
+       ================================ */
+
     .user-nav {
         display: flex;
         align-items: center;
         gap: 8px;
         margin-left: 0;
         order: 3;
+        /* Tercera posición */
     }
-    
+
+    /* Botón crear post compacto en móvil */
     .user-nav .btn--create-post span {
         display: none;
+        /* Oculta texto */
     }
-    
+
     .user-nav .btn--create-post {
         width: 36px;
         height: 36px;
         padding: 0;
         border-radius: 50%;
+        /* Forma circular */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2440,7 +3191,7 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         color: white;
         border: none;
     }
-    
+
     .user-nav .icon-btn {
         width: 36px;
         height: 36px;
@@ -2454,20 +3205,24 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         border-radius: 4px;
         cursor: pointer;
     }
-    
+
     .user-nav .icon-btn:hover {
         background: #f5f5f5;
     }
-    
+
     .user-avatar {
         width: 32px;
         height: 32px;
+        /* Tamaño reducido */
         border-radius: 50%;
         border: 2px solid #e0e0e0;
         cursor: pointer;
     }
-    
-    /* Botones de autenticación */
+
+    /* ================================
+       BOTONES DE AUTENTICACIÓN MÓVIL
+       ================================ */
+
     .actions {
         gap: 8px;
         margin-left: 0;
@@ -2475,7 +3230,7 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         display: flex;
         align-items: center;
     }
-    
+
     .btn {
         padding: 8px 16px;
         font-size: 14px;
@@ -2489,24 +3244,29 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         align-items: center;
         justify-content: center;
     }
-    
+
     .btn--outline {
         display: none;
+        /* Oculta botón outline en móvil */
     }
-    
+
     .btn--primary {
         background: #3b49df;
         color: white;
         font-weight: 600;
     }
-    
+
     .btn--primary:hover {
         background: #2f3ab2;
     }
-    
-    /* Minibar móvil */
+
+    /* ================================
+       MINIBAR MÓVIL
+       ================================ */
+
     .minibar {
         transform: translateX(-100%);
+        /* Oculta fuera de pantalla */
         transition: transform 0.3s ease;
         width: 60px;
         z-index: 1001;
@@ -2515,22 +3275,31 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         background: #fff;
         border-right: 1px solid #e0e0e0;
     }
-    
+
     .minibar--open {
         transform: translateX(0);
+        /* Muestra al activar */
     }
-    
-    /* Layout móvil */
+
+    /* ================================
+       LAYOUT MÓVIL
+       ================================ */
+
     .layout {
         grid-template-columns: 1fr;
+        /* Layout de una columna */
         padding: 16px;
         gap: 16px;
         margin-left: 0;
         max-width: 100%;
         padding-top: 120px;
+        /* Compensa topbar móvil */
     }
-    
-    /* Leftbar móvil */
+
+    /* ================================
+       LEFTBAR MÓVIL (MENÚ LATERAL)
+       ================================ */
+
     .leftbar {
         position: fixed;
         top: 50px;
@@ -2540,30 +3309,33 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         background: #fff;
         z-index: 1000;
         transform: translateX(-100%);
+        /* Oculta inicialmente */
         overflow-y: auto;
         padding: 0;
-        box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
         border-right: 1px solid #e0e0e0;
         transition: transform 0.3s ease;
     }
-    
+
     .leftbar.open {
         transform: translateX(0);
+        /* Muestra al activar */
     }
-    
+
     .contenedor {
         padding: 16px;
         margin-bottom: 0;
         border-bottom: 1px solid #f0f0f0;
     }
-    
+
     .subnav li {
         margin-bottom: 0;
     }
-    
+
     .subnav a {
         padding: 12px 0;
         font-size: 16px;
+        /* Tamaño de fuente aumentado para móvil */
         color: #333;
         font-weight: 400;
         border-radius: 0;
@@ -2572,25 +3344,25 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         align-items: center;
         text-decoration: none;
     }
-    
+
     .subnav a:hover {
         background: transparent;
         color: #3b49df;
     }
-    
+
     .emoji {
         font-size: 18px;
         width: 24px;
         margin-right: 12px;
     }
-    
+
     .section-divider {
         margin-top: 20px;
         margin-bottom: 12px;
         padding-top: 20px;
         border-top: 1px solid #f0f0f0;
     }
-    
+
     .section-title {
         font-size: 12px;
         font-weight: 700;
@@ -2598,18 +3370,19 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     .social-icons {
         width: 100%;
         justify-content: flex-start;
         gap: 12px;
     }
-    
+
     .social-icon {
         width: 32px;
         height: 32px;
         font-size: 16px;
         background: #f5f5f5;
+        /* Fondo visible en móvil */
         border-radius: 6px;
         display: flex;
         align-items: center;
@@ -2617,12 +3390,13 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         text-decoration: none;
         color: #333;
     }
-    
+
     .social-icon:hover {
         background: #3b49df;
         color: white;
     }
-    
+
+    /* Overlay para cerrar menú al tocar fuera */
     .mobile-overlay {
         position: fixed;
         top: 50px;
@@ -2634,57 +3408,66 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         display: none;
         backdrop-filter: blur(2px);
     }
-    
+
     .mobile-overlay.active {
         display: block;
     }
-    
+
+    /* Ajustes de secciones en leftbar móvil */
     .leftbar .section {
         margin: 0;
         border-radius: 0;
         box-shadow: none;
         border-bottom: 1px solid #f0f0f0;
         background: #fafafa;
+        /* Fondo ligeramente diferente */
         padding: 16px;
     }
-    
+
     .leftbar .section:last-child {
         border-bottom: none;
     }
-    
+
     .section__title {
         font-size: 12px;
         margin-bottom: 12px;
         color: #666;
         font-weight: 700;
     }
-    
-    .taglist__link, .topiclist__link, .resourceList__link {
+
+    .taglist__link,
+    .topiclist__link,
+    .resourceList__link {
         font-size: 14px;
         color: #333;
         text-decoration: none;
     }
-    
-    .taglist__link:hover, .topiclist__link:hover, .resourceList__link:hover {
+
+    .taglist__link:hover,
+    .topiclist__link:hover,
+    .resourceList__link:hover {
         color: #3b49df;
     }
-    
-    /* Contenido móvil */
+
+    /* ================================
+       CONTENIDO MÓVIL
+       ================================ */
+
     .content {
         width: 100%;
         padding: 0;
     }
-    
+
     .hero {
         padding: 24px 20px;
         border-radius: 8px;
         background: #fff;
         color: #242424;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border: 1px solid #e0e0e0;
     }
-    
+
     .hero__title {
         font-size: 20px;
         font-weight: 700;
@@ -2692,36 +3475,40 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         color: #242424;
         line-height: 1.4;
     }
-    
+
     .hero__description {
         font-size: 16px;
         color: #666;
         margin: 0;
         line-height: 1.5;
     }
-    
+
     .feed-controls {
         display: flex;
         flex-direction: column;
+        /* Apilado vertical */
         gap: 16px;
         align-items: stretch;
+        /* Elementos a ancho completo */
         padding: 16px;
         margin-bottom: 20px;
         background: #fff;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-    
+
     .tabs {
         display: flex;
         width: 100%;
+        /* Ancho completo */
         background: #f5f5f5;
         border-radius: 8px;
         padding: 4px;
     }
-    
+
     .tab {
         flex: 1;
+        /* Distribución equitativa */
         text-align: center;
         font-size: 14px;
         font-weight: 500;
@@ -2732,13 +3519,13 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         border-radius: 6px;
         color: #666;
     }
-    
+
     .tab--active {
         background: white;
         color: #3b49df;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-    
+
     .sort {
         display: flex;
         justify-content: center;
@@ -2747,7 +3534,7 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         gap: 8px;
         color: #666;
     }
-    
+
     .sort__select {
         padding: 6px 8px;
         font-size: 14px;
@@ -2755,29 +3542,29 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         border-radius: 4px;
         background: white;
     }
-    
+
     .articles {
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
-    
+
     .article {
         padding: 20px;
         margin-bottom: 0;
         border-radius: 8px;
         background: #fff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border: 1px solid #f0f0f0;
     }
-    
+
     .article__header {
         display: flex;
         align-items: center;
         margin-bottom: 12px;
         gap: 12px;
     }
-    
+
     .article__avatar {
         width: 32px;
         height: 32px;
@@ -2791,18 +3578,18 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         font-size: 14px;
         flex-shrink: 0;
     }
-    
+
     .article__author {
         font-weight: 600;
         font-size: 14px;
         color: #242424;
     }
-    
+
     .article__date {
         color: #666;
         font-size: 12px;
     }
-    
+
     .article__title {
         font-size: 18px;
         line-height: 1.4;
@@ -2810,20 +3597,20 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         color: #242424;
         font-weight: 700;
     }
-    
+
     .article__content {
         color: #444;
         line-height: 1.5;
         margin-bottom: 12px;
     }
-    
+
     .article__tags {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         margin-bottom: 12px;
     }
-    
+
     .article__tag {
         background: #f5f6fd;
         color: #3b49df;
@@ -2832,7 +3619,7 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         font-size: 12px;
         font-weight: 500;
     }
-    
+
     .article__footer {
         display: flex;
         justify-content: space-between;
@@ -2841,12 +3628,12 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         margin-top: 16px;
         border-top: 1px solid #f0f0f0;
     }
-    
+
     .reactions {
         display: flex;
         gap: 16px;
     }
-    
+
     .reaction {
         background: transparent;
         border: none;
@@ -2860,61 +3647,74 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         gap: 6px;
         font-size: 14px;
     }
-    
+
     .reaction:hover {
         background: #f9f9f9;
         color: #3b49df;
     }
-    
+
     .meta-right {
         color: #666;
         font-size: 12px;
         font-weight: 500;
     }
-    
-    /* Rightbar oculto en móvil */
+
+    /* ================================
+       RIGHTBAR OCULTO EN MÓVIL
+       ================================ */
+
     .rightbar {
         display: none;
+        /* Oculta rightbar en móvil */
     }
-    
-    /* Footer móvil */
+
+    /* ================================
+       FOOTER MÓVIL
+       ================================ */
+
     .sitefooter {
         margin-top: 40px;
         padding: 24px 16px;
         background: #fff;
         border-top: 1px solid #e0e0e0;
     }
-    
+
     .sitefooter__inner {
         flex-direction: column;
+        /* Apilado vertical */
         gap: 16px;
         text-align: center;
         max-width: 100%;
     }
-    
+
     .sitefooter__nav {
         justify-content: center;
         flex-wrap: wrap;
         gap: 16px;
     }
-    
+
     .sitefooter__link {
         font-size: 14px;
         color: #666;
         text-decoration: none;
     }
-    
-    /* User Menu móvil */
+
+    /* ================================
+       USER MENU MÓVIL
+       ================================ */
+
     .user-menu {
         position: static;
+        /* Reset para posicionamiento móvil */
     }
-    
+
     .user-avatar {
         width: 32px;
         height: 32px;
         border-width: 1px;
+        /* Borde más delgado */
     }
-    
+
     .user-dropdown {
         position: fixed !important;
         top: 60px !important;
@@ -2922,6 +3722,7 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         transform: translateX(-90%) !important;
         width: 280px !important;
         max-width: calc(100vw - 32px);
+        /* Ancho máximo con margen */
         margin-top: 0;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         border-radius: 12px;
@@ -2933,36 +3734,41 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
     .user-dropdown.show {
         display: block;
     }
-    
+
+    /* Animación específica para dropdown móvil */
     @keyframes mobileDropdownFadeIn {
         from {
             opacity: 0;
             transform: translateX(-50%) translateY(-20px) scale(0.95);
         }
+
         to {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
         }
     }
-    
+
     .user-info {
         padding: 16px;
         margin-bottom: 0;
         border-radius: 12px 12px 0 0;
+        /* Redondeo solo arriba */
         background: #f8f9fa;
         border-bottom: 1px solid #e9ecef;
     }
-    
+
     .user-info__name {
         font-size: 16px;
         font-weight: 600;
         color: #24292f;
     }
-    
+
     .dropdown-item {
         padding: 14px 16px;
         font-size: 16px;
+        /* Tamaño aumentado para móvil */
         min-height: 48px;
+        /* Altura táctil mínima */
         display: flex;
         align-items: center;
         color: #24292f;
@@ -2974,31 +3780,31 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         text-align: left;
         cursor: pointer;
     }
-    
+
     .dropdown-item i {
         width: 24px;
         font-size: 16px;
         color: #6c757d;
     }
-    
+
     .dropdown-item:hover {
         background: #f8f9fa;
         color: #3b49df;
     }
-    
+
     .dropdown-item--logout {
         color: #d1242f;
     }
-    
+
     .dropdown-item--logout:hover {
         background: #fff0f0;
         color: #d1242f;
     }
-    
+
     .dropdown-item--logout i {
         color: #d1242f;
     }
-    
+
     .user-dropdown-overlay {
         position: fixed;
         top: 50px;
@@ -3010,17 +3816,19 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         display: none;
         backdrop-filter: blur(2px);
     }
-    
+
     .user-dropdown-overlay.active {
         display: block;
     }
-    
+
     .user-dropdown {
         max-height: calc(100vh - 100px);
+        /* Altura máxima con margen */
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        /* Scroll suave en iOS */
     }
-    
+
     .dropdown-divider {
         background-color: #e9ecef;
         margin: 8px 0;
@@ -3028,128 +3836,144 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         border: none;
         list-style: none;
     }
-    
-    /* Modales móvil */
+
+    /* ================================
+       MODALES MÓVIL
+       ================================ */
+
     .modal__content {
         margin: 20px;
         width: calc(100% - 40px);
+        /* Ancho con margen */
         max-width: none;
+        /* Sin límite máximo */
     }
-    
+
     .modal__center {
         padding: 24px;
         gap: 16px;
     }
-    
+
     .modal__actions {
         flex-direction: column;
+        /* Botones apilados */
         width: 100%;
     }
-    
+
     .modal__actions .btn {
         min-width: auto;
         width: 100%;
+        /* Botones a ancho completo */
         margin: 0;
     }
-    
+
     .modal__actions .btn--outline,
     .modal__actions .btn--primary {
         display: block;
         opacity: 1;
         visibility: visible;
     }
-    
-    /* Comentarios móvil */
+
+    /* ================================
+       COMENTARIOS MÓVIL
+       ================================ */
+
     .comment__header {
         flex-direction: column;
+        /* Apilado vertical */
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .comment__actions {
         align-self: flex-end;
+        /* Acciones a la derecha */
     }
-    
+
     .comment {
         padding: 12px;
     }
-    
+
     .comment__avatar {
         width: 32px;
         height: 32px;
     }
-    
+
     .user-dropdown {
         right: 10px !important;
         left: 10px !important;
         min-width: unset !important;
     }
-    
+
     .reactions-section {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .active-filter-indicator {
         margin-left: 0;
         margin-top: 8px;
     }
-    
-    /* Formularios móvil */
+
+    /* ================================
+       FORMULARIOS MÓVIL
+       ================================ */
+
     #editPostModal .modal__content--large {
         margin: 10px;
         max-height: calc(100vh - 20px);
         border-radius: 8px;
     }
-    
+
     #editPostModal .modal__header {
         padding: 16px 20px;
         flex-direction: column;
         gap: 12px;
         text-align: center;
     }
-    
+
     #editPostModal .modal__body {
         padding: 20px;
     }
-    
+
     #editPostModal .modal__footer {
         padding: 16px 20px;
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .radio-group {
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .radio-label {
         min-width: auto;
         justify-content: flex-start;
     }
-    
+
     .cover-image-actions {
         flex-direction: column;
     }
-    
+
     .btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .post-edit-toast {
         right: 10px;
         left: 10px;
         max-width: none;
+        /* Toast a ancho completo */
     }
-    
+
     .article-card__delete-btn {
         padding: 6px;
         font-size: 12px;
     }
-    
+
     .post-deletion-toast {
         right: 10px;
         left: 10px;
@@ -3158,48 +3982,61 @@ SECCION 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
 }
 
 /* =====================================================================
-SECCION 18: MÓVIL PEQUEÑO (480px y menores)
+SECCIÓN 18: MÓVIL PEQUEÑO (480px y menores)
 ===================================================================== */
 
+/**
+ * Ajustes específicos para pantallas muy pequeñas (smartphones pequeños)
+ */
+
 @media (max-width: 480px) {
-    
+
     .topbar__inner {
         padding: 0 12px;
+        /* Padding más reducido */
     }
-    
+
     .brand img {
         width: 35px;
         height: 26px;
+        /* Logo más pequeño */
     }
-    
-    /* Botones más pequeños */
+
+    /* ================================
+       BOTONES MÁS PEQUEÑOS
+       ================================ */
+
     .hambtn {
         width: 32px;
         height: 32px;
         font-size: 16px;
     }
-    
+
     .user-nav .btn--create-post,
     .user-nav .icon-btn {
         width: 32px;
         height: 32px;
     }
-    
+
     .user-avatar {
         width: 30px;
         height: 30px;
     }
-    
-    /* Botón Create Account más pequeño */
+
+    /* Botón Create Account más compacto */
     .btn--primary {
         padding: 6px 12px;
         font-size: 13px;
         height: 32px;
     }
-    
-    /* Menú lateral */
+
+    /* ================================
+       MENÚ LATERAL MÁS ANCHO
+       ================================ */
+
     .leftbar {
         width: 85%;
+        /* Porcentaje del viewport */
         max-width: 300px;
     }
 
@@ -3207,52 +4044,64 @@ SECCION 18: MÓVIL PEQUEÑO (480px y menores)
         left: 0;
         width: 100%;
     }
-    
-    /* Layout más compacto */
+
+    /* ================================
+       LAYOUT MÁS COMPACTO
+       ================================ */
+
     .layout {
         padding: 12px;
         gap: 12px;
         padding-top: 116px;
     }
-    
+
     .hero {
         padding: 20px 16px;
     }
-    
+
     .hero__title {
         font-size: 18px;
         margin-bottom: 8px;
     }
-    
+
     .hero__description {
         font-size: 14px;
     }
-    
+
     .article {
         padding: 16px;
     }
-    
+
     .article__title {
         font-size: 16px;
     }
-    
-    /* Feed controls más compactos */
+
+    /* ================================
+       FEED CONTROLS MÁS COMPACTOS
+       ================================ */
+
     .feed-controls {
         padding: 12px;
         margin-bottom: 16px;
     }
-    
+
     .tab {
         font-size: 13px;
         padding: 6px 10px;
     }
-    
-    /* User nav más compacto */
+
+    /* ================================
+       USER NAV MÁS COMPACTO
+       ================================ */
+
     .user-nav {
         gap: 4px;
     }
-    
-    /* User dropdown más pequeño */
+
+    /* ================================
+       USER DROPDOWN MÁS PEQUEÑO
+       ================================ */
+
     .user-dropdown {
         position: fixed !important;
         top: 60px !important;
@@ -3267,34 +4116,34 @@ SECCION 18: MÓVIL PEQUEÑO (480px y menores)
         animation: mobileDropdownFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: none;
     }
-    
+
     .user-avatar {
         width: 28px;
         height: 28px;
     }
-    
+
     .dropdown-item {
         padding: 12px 16px;
         font-size: 15px;
     }
-    
+
     .user-info {
         padding: 14px 16px;
     }
-    
+
     .user-info__name {
         font-size: 15px;
     }
-    
+
     .user-nav {
         gap: 4px;
     }
-    
+
     .user-nav .icon-btn {
         width: 32px;
         height: 32px;
     }
-    
+
     .user-avatar {
         width: 30px;
         height: 30px;
@@ -3302,51 +4151,61 @@ SECCION 18: MÓVIL PEQUEÑO (480px y menores)
 }
 
 /* =====================================================================
-SECCION 19: TABLET (769px - 1024px)
+SECCIÓN 19: TABLET (769px - 1024px)
 ===================================================================== */
 
+/**
+ * Ajustes específicos para dispositivos tablet
+ * Balance entre experiencia móvil y desktop
+ */
+
 @media (min-width: 769px) and (max-width: 1024px) {
-    
+
     /* Mostrar barra de búsqueda normal en tablet */
     .topbar .search {
         display: flex !important;
-        transform: translateX(0); 
+        transform: translateX(0);
     }
-    
+
     .layout {
         grid-template-columns: 200px 1fr;
+        /* 2 columnas: leftbar y contenido */
         padding: 20px;
         gap: 20px;
         padding-left: 76px;
+        /* Compensa minibar */
         padding-top: 76px;
     }
-    
+
     .rightbar {
         display: none;
+        /* Oculta rightbar en tablet */
     }
-    
+
     .topbar__inner {
         width: 100%;
         max-width: none;
         padding: 0 20px;
         margin-left: 60px;
+        /* Compensa minibar reducida */
     }
-    
+
     /* Search bar tablet */
     .search {
         max-width: 300px;
         margin: 0 auto;
     }
-    
+
     /* Ajustes de contenido para tablet */
     .content {
         min-width: 0;
+        /* Permite que se reduzca */
     }
-    
+
     .hero__title {
         font-size: 24px;
     }
-    
+
     /* Ajustar leftbar para tablet */
     .leftbar {
         position: sticky;
@@ -3358,25 +4217,33 @@ SECCION 19: TABLET (769px - 1024px)
         border-right: none;
         background: transparent;
     }
-    
+
     /* Ocultar hamburger en tablet */
     .hambtn {
         display: none;
     }
-    
+
     .mobile-overlay {
         display: none !important;
     }
 }
 
 /* =====================================================================
-SECCION 20: UTILIDADES Y ESTADOS ESPECIALES
+SECCIÓN 20: UTILIDADES Y ESTADOS ESPECIALES
 ===================================================================== */
+
+/**
+ * Utilidades CSS y estados especiales para funcionalidades específicas
+ */
 
 /* Prevenir zoom en inputs en iOS */
 @media (max-width: 768px) {
-    input, select, textarea {
+
+    input,
+    select,
+    textarea {
         font-size: 16px !important;
+        /* Tamaño mínimo para evitar zoom */
     }
 }
 
@@ -3384,6 +4251,7 @@ SECCION 20: UTILIDADES Y ESTADOS ESPECIALES
 @media (max-width: 768px) {
     .leftbar {
         -webkit-overflow-scrolling: touch;
+        /* Scroll suave en iOS */
     }
 }
 
@@ -3391,22 +4259,27 @@ SECCION 20: UTILIDADES Y ESTADOS ESPECIALES
 @media (max-width: 768px) and (orientation: landscape) {
     .leftbar {
         height: calc(100vh - 40px);
+        /* Altura reducida */
     }
-    
+
     .mobile-overlay {
         height: calc(100vh - 40px);
     }
-    
+
     .minibar {
         height: calc(100vh - 40px);
     }
-    
+
     .layout {
         padding-top: 100px;
     }
 }
 
-/* Estados de usuario logueado/no logueado */
+/* ================================
+   ESTADOS DE USUARIO LOGUEADO/NO LOGUEADO
+   ================================ */
+
+/* Mostrar/ocultar elementos según estado de autenticación */
 body.user-logged-in .actions {
     display: none;
 }
@@ -3423,12 +4296,15 @@ body:not(.user-logged-in) .actions {
     display: flex;
 }
 
-/* Restaurar estilos en desktop */
+/* ================================
+   RESTAURAR ESTILOS EN DESKTOP
+   ================================ */
+
 @media (min-width: 769px) {
     .hambtn {
         display: none;
     }
-    
+
     .brand {
         order: 1;
         position: static;
@@ -3436,39 +4312,41 @@ body:not(.user-logged-in) .actions {
         margin-left: 0;
         margin-right: 0;
     }
-    
+
     .search {
         display: flex !important;
         order: 2;
         max-width: 400px;
         margin: 0 auto;
     }
-    
+
     .actions {
         order: 3;
         margin-left: auto;
     }
-    
+
     .user-nav {
         order: 3;
         margin-left: auto;
     }
-    
+
     .user-nav .btn--create-post span {
         display: inline;
+        /* Muestra texto en desktop */
     }
-    
+
     .user-nav .btn--create-post {
         width: auto;
         height: 36px;
         padding: 8px 16px;
         border-radius: 4px;
     }
-    
+
     .minibar {
         transform: translateX(0);
+        /* Muestra minibar */
     }
-    
+
     .leftbar {
         position: sticky;
         top: 76px;
@@ -3479,20 +4357,26 @@ body:not(.user-logged-in) .actions {
         border-right: none;
         background: transparent;
     }
-    
+
     .mobile-overlay {
         display: none !important;
     }
 }
 
-/* Mejoras visuales adicionales */
+/* ================================
+   MEJORAS VISUALES ADICIONALES
+   ================================ */
+
+/* Efecto de focus en form groups */
 .form-group:focus-within .form-label {
     color: #3b49df;
 }
 
+/* Overlay de modal mejorado */
 .modal__overlay {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
+    /* Más desenfoque */
 }
 
 /* Tabs activos mejorados */

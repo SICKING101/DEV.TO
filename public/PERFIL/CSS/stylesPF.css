@@ -1,723 +1,884 @@
 /* =====================================================================
-        CSS VARIABLES SECTION
+        SECCIÓN 1: VARIABLES CSS
         ===================================================================== */
+        
+        /* 
+          :root - Define variables CSS globales que pueden ser reutilizadas en todo el documento
+          Estas variables permiten mantener consistencia y facilitar cambios en el diseño
+        */
         :root {
-            --brand-color: #400000;
-            --accent-color: #3b49df;
-            --text-primary: #242424;
-            --text-secondary: #595959;
-            --text-muted: #717171;
-            --border-color: #e5e5e5;
-            --bg-color: #ffffff;
-            --bg-secondary: #f9f9f9;
+            /* Variables de color de la marca */
+            --brand-color: #400000;        /* Color principal de la marca - rojo oscuro */
+            --accent-color: #3b49df;       /* Color de acento - azul vibrante */
+            --text-primary: #242424;       /* Color principal para texto - casi negro */
+            --text-secondary: #595959;     /* Color secundario para texto - gris medio */
+            --text-muted: #717171;         /* Color para texto atenuado - gris más claro */
+            --border-color: #e5e5e5;       /* Color para bordes - gris muy claro */
+            --bg-color: #ffffff;           /* Color de fondo principal - blanco */
+            --bg-secondary: #f9f9f9;       /* Color de fondo secundario - gris muy claro */
 
-            /* Colors */
-            --bg: #f5f5f5;
-            --card: #ffffff;
-            --muted: #6b6b6b;
-            --accent: #3b49df;
-            --accent-hover: #2f3ab2;
-            --border: #e6e6e6;
-            --text: #242424;
+            /* Variables de color reorganizadas y consolidadas */
+            --bg: #f5f5f5;                 /* Color de fondo general - gris claro */
+            --card: #ffffff;               /* Color para tarjetas/containers - blanco */
+            --muted: #6b6b6b;              /* Color para elementos atenuados - gris */
+            --accent: #3b49df;             /* Color de acento - azul */
+            --accent-hover: #2f3ab2;       /* Color de acento en estado hover - azul más oscuro */
+            --border: #e6e6e6;             /* Color para bordes - gris claro */
+            --text: #242424;               /* Color principal de texto - casi negro */
 
-            /* Spacing & Sizing */
-            --radius: 8px;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            --maxw: 1200px;
+            /* Variables de espaciado y dimensionamiento */
+            --radius: 8px;                 /* Radio de borde estándar */
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra estándar sutil */
+            --maxw: 1200px;                /* Ancho máximo del contenido */
 
-            --radius: 5px;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+            /* Redefinición de variables (nota: esto sobrescribe las anteriores) */
+            --radius: 5px;                 /* Nuevo radio de borde más pequeño */
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), /* Sombra más pronunciada con dos capas */
                 0 1px 2px rgba(0, 0, 0, 0.24);
         }
 
-        /* =====================================================================
-        RESET & BASE STYLES SECTION
+/* =====================================================================
+        SECCIÓN 2: ESTILOS BASE Y RESET
         ===================================================================== */
+        
+        /* 
+          Reset universal - Elimina márgenes y padding por defecto de todos los elementos
+          y establece box-sizing: border-box para un modelo de caja más predecible
+        */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0;                    /* Elimina márgenes por defecto */
+            padding: 0;                   /* Elimina padding por defecto */
+            box-sizing: border-box;       /* Incluye padding y border en el width/height */
+            /* Define la familia de fuentes con fallbacks para mejor compatibilidad */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
+        /* 
+          Estilos base del cuerpo del documento
+        */
         body {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            line-height: 1.5;
-            display: flex;
-            min-height: 100vh;
+            background-color: var(--bg-secondary); /* Fondo usando variable CSS */
+            color: var(--text-primary);           /* Color de texto principal */
+            line-height: 1.5;                     /* Altura de línea para mejor legibilidad */
+            display: flex;                        /* Usa flexbox para layout */
+            min-height: 100vh;                    /* Altura mínima de toda la ventana */
         }
 
-        /* =====================================================================
-        LAYOUT STYLES SECTION
+/* =====================================================================
+        SECCIÓN 3: ESTILOS DE LAYOUT
         ===================================================================== */
+        
+        /* 
+          Contenedor principal que organiza la estructura de la página
+        */
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 3fr;
-            gap: 30px;
-            flex: 1;
-            margin-left: 64px; /* Para compensar el minibar */
+            max-width: 1200px;              /* Ancho máximo del contenido */
+            margin: 0 auto;                 /* Centra el contenedor horizontalmente */
+            padding: 20px;                  /* Espaciado interno */
+            display: grid;                  /* Usa CSS Grid para layout */
+            grid-template-columns: 1fr 3fr; /* Sidebar 1 parte, contenido principal 3 partes */
+            gap: 30px;                      /* Espacio entre columnas del grid */
+            flex: 1;                        /* Ocupa todo el espacio disponible en flex container */
+            margin-left: 64px;              /* Compensa la barra lateral fija (minibar) */
         }
 
-        /* =====================================================================
-        SIDEBAR STYLES SECTION
+/* =====================================================================
+        SECCIÓN 4: ESTILOS DE BARRA LATERAL (SIDEBAR)
         ===================================================================== */
+        
+        /* 
+          Barra lateral de navegación
+        */
         .sidebar {
-            background-color: var(--bg-color);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            height: fit-content;
+            background-color: var(--bg-color);  /* Fondo blanco */
+            border-radius: var(--radius);       /* Bordes redondeados */
+            padding: 20px;                      /* Espaciado interno */
+            box-shadow: var(--shadow);          /* Sombra sutil */
+            height: fit-content;                /* Altura se ajusta al contenido */
         }
 
+        /* Título de la sidebar */
         .sidebar h2 {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: var(--text-primary);
+            font-size: 1.1rem;          /* Tamaño de fuente mediano */
+            margin-bottom: 15px;        /* Espacio inferior */
+            color: var(--text-primary); /* Color de texto principal */
         }
 
+        /* Lista de navegación */
         .sidebar ul {
-            list-style: none;
+            list-style: none;           /* Elimina viñetas por defecto */
         }
 
+        /* Elementos de la lista */
         .sidebar li {
-            margin-bottom: 10px;
+            margin-bottom: 10px;        /* Espacio entre elementos de lista */
         }
 
+        /* Enlaces de navegación */
         .sidebar a {
-            text-decoration: none;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
+            text-decoration: none;      /* Elimina subrayado */
+            color: var(--text-secondary); /* Color de texto secundario */
+            display: flex;              /* Usa flexbox para alinear icono y texto */
+            align-items: center;        /* Centra verticalmente */
+            padding: 8px 12px;          /* Espaciado interno */
+            border-radius: var(--radius); /* Bordes redondeados */
+            transition: all 0.2s ease;  /* Transición suave para efectos hover */
         }
 
+        /* Estados hover de enlaces */
         .sidebar a:hover {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
+            background-color: var(--bg-secondary); /* Fondo gris claro al pasar mouse */
+            color: var(--text-primary);           /* Cambia color de texto */
         }
 
+        /* Enlace activo/actual */
         .sidebar a.active {
-            background-color: var(--accent-color);
-            color: white;
+            background-color: var(--accent-color); /* Fondo azul para elemento activo */
+            color: white;                         /* Texto blanco */
         }
 
+        /* Iconos dentro de enlaces */
         .sidebar a svg {
-            margin-right: 10px;
+            margin-right: 10px;         /* Espacio entre icono y texto */
         }
 
-        /* =====================================================================
-        MAIN CONTENT STYLES SECTION
+/* =====================================================================
+        SECCIÓN 5: ESTILOS DE CONTENIDO PRINCIPAL
         ===================================================================== */
+        
+        /* 
+          Área de contenido principal
+        */
         .main-content {
-            background-color: var(--bg-color);
-            border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: var(--shadow);
+            background-color: var(--bg-color); /* Fondo blanco */
+            border-radius: var(--radius);      /* Bordes redondeados */
+            padding: 30px;                     /* Espaciado interno generoso */
+            box-shadow: var(--shadow);         /* Sombra sutil */
         }
 
+        /* Secciones dentro del contenido principal */
         .section {
-            margin-bottom: 40px;
+            margin-bottom: 40px;        /* Espacio entre secciones */
         }
 
+        /* Títulos de sección */
         .section h1 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--text-primary);
+            font-size: 1.5rem;          /* Tamaño grande para títulos principales */
+            margin-bottom: 20px;        /* Espacio inferior */
+            color: var(--text-primary); /* Color de texto principal */
         }
 
         .section h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--text-primary);
+            font-size: 1.2rem;          /* Tamaño mediano para subtítulos */
+            margin-bottom: 15px;        /* Espacio inferior */
+            color: var(--text-primary); /* Color de texto principal */
         }
 
         .section h3 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: var(--text-primary);
+            font-size: 1rem;            /* Tamaño estándar para títulos terciarios */
+            margin-bottom: 10px;        /* Espacio inferior */
+            color: var(--text-primary); /* Color de texto principal */
         }
 
-        /* =====================================================================
-        FORM STYLES SECTION
+/* =====================================================================
+        SECCIÓN 6: ESTILOS DE FORMULARIOS
         ===================================================================== */
+        
+        /* 
+          Grupos de campos de formulario
+        */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 20px;        /* Espacio entre grupos de campos */
         }
 
+        /* Etiquetas de formulario */
         .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-primary);
+            display: block;             /* Hace que la etiqueta ocupe toda la línea */
+            margin-bottom: 8px;         /* Espacio entre etiqueta y campo */
+            font-weight: 500;           /* Peso de fuente semi-negrita */
+            color: var(--text-primary); /* Color de texto principal */
         }
 
+        /* Campos de formulario */
         .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: border-color 0.2s ease;
+            width: 100%;                /* Ocupa todo el ancho disponible */
+            padding: 10px 12px;         /* Espaciado interno */
+            border: 1px solid var(--border-color); /* Borde sutil */
+            border-radius: var(--radius); /* Bordes redondeados */
+            font-size: 1rem;            /* Tamaño de fuente estándar */
+            transition: border-color 0.2s ease; /* Transición suave para focus */
         }
 
+        /* Estado focus de campos */
         .form-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
+            outline: none;              /* Elimina outline por defecto */
+            border-color: var(--accent-color); /* Cambia color de borde al azul de acento */
         }
 
+        /* Texto de ayuda/descripción en formularios */
         .form-text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 5px;
+            font-size: 0.85rem;         /* Tamaño de fuente pequeño */
+            color: var(--text-muted);   /* Color de texto atenuado */
+            margin-top: 5px;            /* Espacio superior */
         }
 
+        /* Contador de caracteres */
         .char-count {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-align: right;
-            margin-top: 5px;
+            font-size: 0.85rem;         /* Tamaño de fuente pequeño */
+            color: var(--text-muted);   /* Color de texto atenuado */
+            text-align: right;          /* Alineación a la derecha */
+            margin-top: 5px;            /* Espacio superior */
         }
 
+        /* Grupo de checkboxes */
         .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
+            display: flex;              /* Usa flexbox para alinear horizontalmente */
+            align-items: center;        /* Centra verticalmente */
+            margin-top: 10px;           /* Espacio superior */
         }
 
         .checkbox-group input {
-            margin-right: 8px;
+            margin-right: 8px;          /* Espacio entre checkbox y texto */
         }
 
+        /* Vista previa de color */
         .color-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: var(--radius);
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-            border: 1px solid var(--border-color);
+            width: 30px;                /* Ancho fijo */
+            height: 30px;               /* Alto fijo - cuadrado */
+            border-radius: var(--radius); /* Bordes redondeados */
+            display: inline-block;      /* Permite alineación con otros elementos */
+            margin-right: 10px;         /* Espacio a la derecha */
+            vertical-align: middle;     /* Alineación vertical con texto */
+            border: 1px solid var(--border-color); /* Borde sutil */
         }
 
+        /* Input de color de marca con vista previa */
         .brand-color-input {
-            display: flex;
-            align-items: center;
+            display: flex;              /* Usa flexbox para alinear elementos */
+            align-items: center;        /* Centra verticalmente */
         }
 
         .brand-color-input input {
-            width: 100px;
-            margin-left: 10px;
+            width: 100px;               /* Ancho específico para input de color */
+            margin-left: 10px;          /* Espacio entre vista previa y input */
         }
 
-        /* =====================================================================
-        CONNECT ACCOUNTS STYLES SECTION
+/* =====================================================================
+        SECCIÓN 7: ESTILOS DE CUENTAS CONECTADAS
         ===================================================================== */
+        
+        /* 
+          Sección para conectar cuentas externas
+        */
         .connect-accounts {
-            margin-top: 20px;
+            margin-top: 20px;           /* Espacio superior */
         }
 
+        /* Elementos individuales de cuenta conectable */
         .connect-account {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            display: flex;              /* Usa flexbox para alinear icono y texto */
+            align-items: center;        /* Centra verticalmente */
+            padding: 12px;              /* Espaciado interno */
+            border: 1px solid var(--border-color); /* Borde sutil */
+            border-radius: var(--radius); /* Bordes redondeados */
+            margin-bottom: 10px;        /* Espacio entre elementos */
+            cursor: pointer;            /* Cambia cursor a pointer para indicar clickeable */
+            transition: all 0.2s ease;  /* Transición suave para efectos hover */
         }
 
+        /* Estado hover de elementos de cuenta */
         .connect-account:hover {
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-secondary); /* Fondo gris claro al pasar mouse */
         }
 
         .connect-account svg {
-            margin-right: 10px;
-            width: 24px;
-            height: 24px;
+            margin-right: 10px;         /* Espacio entre icono y texto */
+            width: 24px;                /* Ancho fijo para iconos */
+            height: 24px;               /* Alto fijo para iconos */
         }
 
-        /* =====================================================================
-        PROFILE IMAGE STYLES SECTION
+/* =====================================================================
+        SECCIÓN 8: ESTILOS DE IMAGEN DE PERFIL
         ===================================================================== */
+        
+        /* 
+          Contenedor de imagen de perfil
+        */
         .profile-image {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+            display: flex;              /* Usa flexbox para alinear imagen y botón */
+            align-items: center;        /* Centra verticalmente */
+            margin-bottom: 20px;        /* Espacio inferior */
         }
 
+        /* Imagen de perfil */
         .profile-image img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-right: 20px;
-            object-fit: cover;
-            border: 1px solid var(--border-color);
+            width: 80px;                /* Ancho fijo */
+            height: 80px;               /* Alto fijo - cuadrado */
+            border-radius: 50%;         /* Bordes redondeados al 50% para forma circular */
+            margin-right: 20px;         /* Espacio a la derecha */
+            object-fit: cover;          /* Ajusta la imagen para cubrir el contenedor */
+            border: 1px solid var(--border-color); /* Borde sutil */
         }
 
+        /* Botón para cambiar imagen */
         .profile-image button {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background-color: var(--bg-secondary); /* Fondo gris claro */
+            border: 1px solid var(--border-color); /* Borde sutil */
+            padding: 8px 16px;          /* Espaciado interno */
+            border-radius: var(--radius); /* Bordes redondeados */
+            cursor: pointer;            /* Cambia cursor a pointer */
+            transition: all 0.2s ease;  /* Transición suave para efectos hover */
         }
 
+        /* Estado hover del botón */
         .profile-image button:hover {
-            background-color: var(--border-color);
+            background-color: var(--border-color); /* Fondo más oscuro al pasar mouse */
         }
 
-        /* =====================================================================
-        BUTTON STYLES SECTION
+/* =====================================================================
+        SECCIÓN 9: ESTILOS DE BOTONES
         ===================================================================== */
+        
+        /* 
+          Botón principal de guardar/acción
+        */
         .save-button {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
+            background-color: var(--accent-color); /* Fondo azul de acento */
+            color: white;               /* Texto blanco */
+            border: none;               /* Sin borde */
+            padding: 12px 24px;         /* Espaciado interno generoso */
+            border-radius: var(--radius); /* Bordes redondeados */
+            font-size: 1rem;            /* Tamaño de fuente estándar */
+            font-weight: 500;           /* Peso de fuente semi-negrita */
+            cursor: pointer;            /* Cambia cursor a pointer */
+            transition: background-color 0.2s ease; /* Transición suave para color de fondo */
         }
 
+        /* Estado hover del botón */
         .save-button:hover {
-            background-color: #2a38c9;
+            background-color: #2a38c9;  /* Color azul más oscuro al pasar mouse */
         }
 
-        /* =====================================================================
-        UTILITY STYLES SECTION
+/* =====================================================================
+        SECCIÓN 10: ESTILOS UTILITARIOS
         ===================================================================== */
+        
+        /* 
+          Divisor visual entre secciones
+        */
         .divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 20px 0;
+            height: 1px;                        /* Altura mínima - línea delgada */
+            background-color: var(--border-color); /* Color de borde para coincidir */
+            margin: 20px 0;                     /* Espacio vertical */
         }
 
+        /* Contenedor de horarios de trabajo */
         .work-hours {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+            display: flex;              /* Usa flexbox para disposición horizontal */
+            flex-wrap: wrap;            /* Permite que los elementos pasen a siguiente línea */
+            gap: 10px;                  /* Espacio entre elementos */
+            margin-top: 10px;           /* Espacio superior */
         }
 
+        /* Elementos individuales de horario */
         .work-hour {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            background-color: var(--bg-secondary);
+            display: flex;              /* Usa flexbox para alinear checkbox y texto */
+            align-items: center;        /* Centra verticalmente */
+            padding: 8px 12px;          /* Espaciado interno */
+            border: 1px solid var(--border-color); /* Borde sutil */
+            border-radius: var(--radius); /* Bordes redondeados */
+            background-color: var(--bg-secondary); /* Fondo gris claro */
         }
 
         .work-hour input {
-            margin-right: 5px;
+            margin-right: 5px;          /* Espacio entre checkbox y texto */
         }
 
+        /* Opciones de pronombres */
         .pronouns-options {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
+            display: flex;              /* Disposición horizontal */
+            gap: 15px;                  /* Espacio entre opciones */
+            margin-top: 10px;           /* Espacio superior */
         }
 
+        /* Opción individual de pronombre */
         .pronoun-option {
-            display: flex;
-            align-items: center;
+            display: flex;              /* Usa flexbox para alinear radio y texto */
+            align-items: center;        /* Centra verticalmente */
         }
 
         .pronoun-option input {
-            margin-right: 5px;
+            margin-right: 5px;          /* Espacio entre radio button y texto */
         }
 
+        /* Elementos de aprendizaje */
         .learning-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
+            display: flex;              /* Usa flexbox para layout */
+            align-items: flex-start;    /* Alinea elementos en la parte superior */
+            margin-bottom: 15px;        /* Espacio inferior */
+            padding: 15px;              /* Espaciado interno */
+            border: 1px solid var(--border-color); /* Borde sutil */
+            border-radius: var(--radius); /* Bordes redondeados */
         }
 
         .learning-item input[type="checkbox"] {
-            margin-right: 10px;
-            margin-top: 5px;
+            margin-right: 10px;         /* Espacio entre checkbox y contenido */
+            margin-top: 5px;            /* Pequeño ajuste vertical */
         }
 
+        /* Contenido de elemento de aprendizaje */
         .learning-content {
-            flex: 1;
+            flex: 1;                    /* Ocupa todo el espacio disponible */
         }
 
         .learning-content textarea {
-            width: 100%;
-            min-height: 80px;
-            margin-bottom: 10px;
+            width: 100%;                /* Ancho completo */
+            min-height: 80px;           /* Altura mínima */
+            margin-bottom: 10px;        /* Espacio inferior */
         }
 
+        /* Etiquetas/tags */
         .tag {
-            display: inline-block;
-            background-color: var(--bg-secondary);
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            margin-right: 5px;
-            margin-bottom: 5px;
+            display: inline-block;      /* Permite múltiples tags en línea */
+            background-color: var(--bg-secondary); /* Fondo gris claro */
+            padding: 4px 8px;           /* Espaciado interno pequeño */
+            border-radius: 15px;        /* Bordes muy redondeados - forma de píldora */
+            font-size: 0.85rem;         /* Tamaño de fuente pequeño */
+            margin-right: 5px;          /* Espacio entre tags */
+            margin-bottom: 5px;         /* Espacio inferior */
         }
 
+        /* Elemento destacado/resaltado */
         .highlight {
-            background-color: #fff9db;
-            border-left: 3px solid #ffd43b;
-            padding: 10px 15px;
-            margin: 15px 0;
+            background-color: #fff9db;  /* Fondo amarillo muy claro */
+            border-left: 3px solid #ffd43b; /* Borde izquierdo amarillo */
+            padding: 10px 15px;         /* Espaciado interno */
+            margin: 15px 0;             /* Espacio vertical */
+            /* Bordes redondeados solo en esquina superior derecha e inferior derecha */
             border-radius: 0 var(--radius) var(--radius) 0;
         }
 
-        /* =====================================================================
-        MINIBAR STYLES 
+/* =====================================================================
+        SECCIÓN 11: ESTILOS DE MINIBAR (BARRA LATERAL PEQUEÑA)
         ===================================================================== */
+        
+        /* 
+          Minibar - barra lateral fija minimalista
+        */
         .minibar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 64px;
-            height: 100vh;
-            background: #fff;
-            border-right: 1px solid var(--border);
-            z-index: 1000;
-            padding: 0.75rem 0;
-            display: flex;
-            flex-direction: column;
+            position: fixed;            /* Posición fija en la ventana */
+            left: 0;                    /* Pegada al lado izquierdo */
+            top: 0;                     /* Pegada a la parte superior */
+            width: 64px;                /* Ancho fijo y pequeño */
+            height: 100vh;              /* Altura completa de la ventana */
+            background: #fff;           /* Fondo blanco */
+            border-right: 1px solid var(--border); /* Borde derecho sutil */
+            z-index: 1000;              /* Alto z-index para estar por encima de otros elementos */
+            padding: 0.75rem 0;         /* Espaciado interno vertical */
+            display: flex;              /* Usa flexbox para layout interno */
+            flex-direction: column;     /* Disposición vertical */
         }
 
+        /* Navegación del minibar */
         .minibar__nav {
-            flex: 1;
-            width: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
+            flex: 1;                    /* Ocupa todo el espacio disponible */
+            width: 100%;                /* Ancho completo */
+            overflow-y: auto;           /* Scroll vertical si es necesario */
+            overflow-x: hidden;         /* Oculta scroll horizontal */
+            /* Estilos personalizados para scrollbar (Firefox) */
             scrollbar-width: thin;
             scrollbar-color: #ccc transparent;
         }
 
+        /* Personalización de scrollbar para Webkit (Chrome, Safari, Edge) */
         .minibar__nav::-webkit-scrollbar {
-            width: 4px;
+            width: 4px;                 /* Ancho muy delgado */
         }
 
         .minibar__nav::-webkit-scrollbar-track {
-            background: transparent;
+            background: transparent;    /* Fondo transparente */
         }
 
         .minibar__nav::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 3px;
+            background: #d1d5db;        /* Color del thumb - gris */
+            border-radius: 3px;         /* Bordes ligeramente redondeados */
         }
 
         .minibar__nav::-webkit-scrollbar-thumb:hover {
-            background: #a1a1aa;
+            background: #a1a1aa;        /* Color más oscuro al pasar mouse */
         }
 
+        /* Lista de elementos del minibar */
         .minibar__list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            margin: 0;
-            padding: 0;
+            list-style: none;           /* Elimina viñetas */
+            display: flex;              /* Usa flexbox */
+            flex-direction: column;     /* Disposición vertical */
+            align-items: center;        /* Centra horizontalmente */
+            gap: 0.25rem;               /* Espacio muy pequeño entre elementos */
+            margin: 0;                  /* Sin margen */
+            padding: 0;                 /* Sin padding */
         }
 
+        /* Elementos individuales del minibar */
         .minibar__item {
-            position: relative;
-            width: 100%;
-            display: flex;
-            justify-content: center;
+            position: relative;         /* Posición relativa para elementos hijos absolutos */
+            width: 100%;                /* Ancho completo */
+            display: flex;              /* Usa flexbox */
+            justify-content: center;    /* Centra contenido horizontalmente */
         }
 
+        /* Enlaces del minibar */
         .minibar__link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
-            text-decoration: none;
-            position: relative;
-            color: inherit;
-            cursor: pointer;
+            display: flex;              /* Usa flexbox para centrar contenido */
+            align-items: center;        /* Centra verticalmente */
+            justify-content: center;    /* Centra horizontalmente */
+            width: 44px;                /* Ancho fijo */
+            height: 44px;               /* Alto fijo - cuadrado */
+            border-radius: var(--radius); /* Bordes redondeados */
+            transition: all 0.2s ease;  /* Transición suave para efectos */
+            text-decoration: none;      /* Sin subrayado */
+            position: relative;         /* Posición relativa para pseudo-elementos */
+            color: inherit;             /* Hereda color del texto */
+            cursor: pointer;            /* Cursor pointer para indicar clickeable */
         }
 
+        /* Estado hover de enlaces */
         .minibar__link:hover {
-            background: #f5f5f5;
-            transform: scale(1.05);
+            background: #f5f5f5;        /* Fondo gris claro al pasar mouse */
+            transform: scale(1.05);     /* Efecto de escala sutil */
         }
 
+        /* Elemento activo del minibar */
         .minibar__item--active .minibar__link {
-            background: #f5f6fd;
-            color: var(--accent);
+            background: #f5f6fd;        /* Fondo azul muy claro */
+            color: var(--accent);       /* Color azul de acento */
         }
 
+        /* Imágenes en minibar (para avatares, etc.) */
         .minibar__image {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            object-fit: cover;
+            width: 28px;                /* Ancho fijo */
+            height: 28px;               /* Alto fijo - cuadrado */
+            border-radius: 6px;         /* Bordes redondeados */
+            object-fit: cover;          /* Ajusta imagen para cubrir contenedor */
         }
 
+        /* Iconos del minibar */
         .minibar__icon {
-            color: currentColor;
-            width: 24px;
-            height: 24px;
+            color: currentColor;        /* Hereda color del elemento padre */
+            width: 24px;                /* Ancho fijo para iconos */
+            height: 24px;               /* Alto fijo para iconos */
         }
 
-        /* PREVIEW */
+        /* =============================================================
+        SUBSECCIÓN 11.1: VISTA PREVIA DEL MINIBAR
+        ============================================================= */
+        
+        /* 
+          Paneles de vista previa que aparecen al hacer hover
+        */
         .minibar__preview {
-            position: fixed;
-            left: 76px;
-            width: 320px;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 9999;
-            overflow: hidden;
-            pointer-events: auto;
-            animation: fadeIn 0.2s ease-out;
+            position: fixed;            /* Posición fija en ventana */
+            left: 76px;                 /* Posicionado a la derecha del minibar */
+            width: 320px;               /* Ancho fijo para panel */
+            background: #fff;           /* Fondo blanco */
+            border: 1px solid var(--border); /* Borde sutil */
+            border-radius: 8px;         /* Bordes redondeados */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
+            display: none;              /* Oculto por defecto */
+            z-index: 9999;              /* Z-index muy alto para estar por encima de todo */
+            overflow: hidden;           /* Oculta contenido que se sale */
+            pointer-events: auto;       /* Permite interacción */
+            animation: fadeIn 0.2s ease-out; /* Animación de entrada */
         }
 
+        /* Muestra vista previa al hacer hover en elemento del minibar */
         .minibar__item:hover .minibar__preview {
-            display: block;
+            display: block;             /* Cambia display a block */
         }
 
+        /* Cabecera de la vista previa */
         .preview__header {
-            width: 100%;
-            height: 120px;
-            overflow: hidden;
-            border-radius: var(--radius) var(--radius) 0 0;
+            width: 100%;                /* Ancho completo */
+            height: 120px;              /* Alto fijo */
+            overflow: hidden;           /* Oculta contenido que se sale */
+            border-radius: var(--radius) var(--radius) 0 0; /* Bordes redondeados solo arriba */
+            /* Degradado de fondo azul/púrpura */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
+        /* Imagen de cabecera de vista previa */
         .preview__header-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+            width: 100%;                /* Ancho completo */
+            height: 100%;               /* Alto completo */
+            object-fit: cover;          /* Ajusta imagen para cubrir área */
+            display: block;             /* Display block para eliminar espacio inferior */
         }
 
+        /* Contenedor de icono en vista previa */
         .preview__icon-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem 0 1rem;
-            background: #f8f9fa;
+            display: flex;              /* Usa flexbox para centrar */
+            justify-content: center;    /* Centra horizontalmente */
+            align-items: center;        /* Centra verticalmente */
+            padding: 1.5rem 0 1rem;     /* Espaciado interno */
+            background: #f8f9fa;        /* Fondo gris muy claro */
         }
 
+        /* Icono de vista previa */
         .preview__icon {
-            color: var(--accent);
-            width: 48px;
-            height: 48px;
+            color: var(--accent);       /* Color azul de acento */
+            width: 48px;                /* Ancho más grande que iconos normales */
+            height: 48px;               /* Alto más grande que iconos normales */
         }
 
+        /* Contenido principal de vista previa */
         .preview__content {
-            padding: 1.25rem;
+            padding: 1.25rem;           /* Espaciado interno generoso */
         }
 
+        /* Título de vista previa */
         .preview__title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
+            font-size: 1.1rem;          /* Tamaño de fuente mediano-grande */
+            font-weight: 700;           /* Peso de fuente negrita */
+            margin-bottom: 0.5rem;      /* Espacio inferior */
+            color: var(--text);         /* Color de texto principal */
         }
 
+        /* Descripción de vista previa */
         .preview__description {
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
+            color: var(--muted);        /* Color de texto atenuado */
+            font-size: 0.9rem;          /* Tamaño de fuente pequeño */
+            margin-bottom: 1rem;        /* Espacio inferior */
+            line-height: 1.4;           /* Altura de línea para mejor legibilidad */
         }
 
+        /* Botón de vista previa */
         .preview__btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            font-size: 0.9rem;
+            width: 100%;                /* Ancho completo */
+            padding: 0.75rem;           /* Espaciado interno */
+            background: var(--accent);  /* Fondo azul de acento */
+            color: #fff;                /* Texto blanco */
+            border: none;               /* Sin borde */
+            border-radius: var(--radius); /* Bordes redondeados */
+            font-weight: 600;           /* Peso de fuente negrita */
+            cursor: pointer;            /* Cursor pointer */
+            transition: background-color 0.2s ease; /* Transición suave para color */
+            font-size: 0.9rem;          /* Tamaño de fuente pequeño */
         }
 
+        /* Estado hover del botón */
         .preview__btn:hover {
-            background: var(--accent-hover);
+            background: var(--accent-hover); /* Color azul más oscuro */
         }
 
-        /* BOTONES ADICIONALES */
+        /* =============================================================
+        SUBSECCIÓN 11.2: PIE DEL MINIBAR
+        ============================================================= */
+        
+        /* 
+          Pie del minibar - botones adicionales
+        */
         .minibar__footer {
-            padding: 0.75rem 0;
-            border-top: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            flex-shrink: 0;
+            padding: 0.75rem 0;         /* Espaciado interno vertical */
+            border-top: 1px solid var(--border); /* Borde superior para separar */
+            display: flex;              /* Usa flexbox */
+            flex-direction: column;     /* Disposición vertical */
+            align-items: center;        /* Centra horizontalmente */
+            gap: 0.5rem;                /* Espacio entre elementos */
+            flex-shrink: 0;             /* Evita que se reduzca */
         }
 
+        /* Botones de acción del minibar */
         .minibar__action-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius);
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--muted);
-            font-size: 1.5rem;
-            font-weight: bold;
+            display: flex;              /* Usa flexbox para centrar */
+            align-items: center;        /* Centra verticalmente */
+            justify-content: center;    /* Centra horizontalmente */
+            width: 44px;                /* Ancho fijo igual a enlaces */
+            height: 44px;               /* Alto fijo igual a enlaces */
+            border-radius: var(--radius); /* Bordes redondeados */
+            background: none;           /* Sin fondo */
+            border: none;               /* Sin borde */
+            cursor: pointer;            /* Cursor pointer */
+            transition: all 0.2s ease;  /* Transición suave */
+            color: var(--muted);        /* Color de texto atenuado */
+            font-size: 1.5rem;          /* Tamaño de fuente grande (para símbolos +, -) */
+            font-weight: bold;          /* Peso de fuente negrita */
         }
 
+        /* Estado hover de botones de acción */
         .minibar__action-btn:hover {
-            background: #f5f5f5;
-            color: var(--accent);
+            background: #f5f5f5;        /* Fondo gris claro */
+            color: var(--accent);       /* Color azul de acento */
         }
 
+        /* Animación de entrada para vistas previas */
         @keyframes fadeIn {
             from { 
-                opacity: 0; 
-                transform: translateX(-10px); 
+                opacity: 0;             /* Comienza completamente transparente */
+                transform: translateX(-10px); /* Desplazado ligeramente a la izquierda */
             }
             to { 
-                opacity: 1; 
-                transform: translateX(0); 
+                opacity: 1;             /* Termina completamente opaco */
+                transform: translateX(0); /* En posición normal */
             }
         }
 
-        /* CONTENIDO DE DEMOSTRACIÓN */
+        /* =============================================================
+        SUBSECCIÓN 11.3: CONTENIDO PRINCIPAL CON MINIBAR
+        ============================================================= */
+        
+        /* 
+          Ajustes del contenido principal cuando hay minibar
+        */
         .main-content {
-            margin-left: 64px;
-            padding: 2rem;
-            min-height: 100vh;
-            background: var(--bg);
-            overflow-y: auto;
+            margin-left: 64px;          /* Margen para no superponerse con minibar */
+            padding: 2rem;              /* Espaciado interno generoso */
+            min-height: 100vh;          /* Altura mínima de ventana completa */
+            background: var(--bg);      /* Fondo gris claro */
+            overflow-y: auto;           /* Permite scroll vertical si es necesario */
         }
 
-        /* ESTILOS PARA DEMOSTRACIÓN */
+        /* =============================================================
+        SUBSECCIÓN 11.4: ESTILOS DEMOSTRATIVOS ADICIONALES
+        ============================================================= */
+        
+        /* 
+          Estilos para secciones de demostración
+        */
         .demo-section {
-            background: white;
-            padding: 2rem;
-            border-radius: var(--radius);
-            margin-bottom: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: white;          /* Fondo blanco */
+            padding: 2rem;              /* Espaciado interno generoso */
+            border-radius: var(--radius); /* Bordes redondeados */
+            margin-bottom: 2rem;        /* Espacio inferior */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Sombra sutil */
         }
 
+        /* Contador de caracteres (definición adicional) */
         .char-count {
-            font-size: 0.8rem;
-            color: #717171;
-            text-align: right;
-            margin-top: 0.5rem;
+            font-size: 0.8rem;          /* Tamaño de fuente muy pequeño */
+            color: #717171;             /* Color gris */
+            text-align: right;          /* Alineación a la derecha */
+            margin-top: 0.5rem;         /* Espacio superior pequeño */
         }
 
+        /* Campos de texto y textarea (definición adicional) */
         textarea, input[type="text"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 1rem;
+            width: 100%;                /* Ancho completo */
+            padding: 0.75rem;           /* Espaciado interno */
+            border: 1px solid var(--border); /* Borde sutil */
+            border-radius: var(--radius); /* Bordes redondeados */
+            font-size: 1rem;            /* Tamaño de fuente estándar */
         }
 
+        /* Input de color de marca (definición adicional) */
         .brand-color-input {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            display: flex;              /* Usa flexbox para alinear */
+            align-items: center;        /* Centra verticalmente */
+            gap: 1rem;                  /* Espacio entre elementos */
         }
 
+        /* Vista previa de color (definición adicional) */
         .color-preview {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: #3b49df;
+            width: 40px;                /* Ancho ligeramente mayor */
+            height: 40px;               /* Alto ligeramente mayor */
+            border-radius: var(--radius); /* Bordes redondeados */
+            border: 1px solid var(--border); /* Borde sutil */
+            background: #3b49df;        /* Color azul de fondo */
         }
 
-        /* =====================================================================
-        SEMANTIC ELEMENT STYLES SECTION
+/* =====================================================================
+        SECCIÓN 12: ESTILOS PARA ELEMENTOS SEMÁNTICOS
         ===================================================================== */
-        /* Estilos para elementos semánticos que reemplazan divs */
+        
+        /* 
+          Estilos para elementos HTML5 semánticos que reemplazan divs genéricos
+        */
+
+        /* Fieldset - agrupación de campos de formulario */
         fieldset {
-            border: none;
-            padding: 0;
-            margin: 0;
+            border: none;               /* Elimina borde por defecto */
+            padding: 0;                 /* Sin padding */
+            margin: 0;                  /* Sin margen */
         }
 
+        /* Legend - título para fieldset */
         legend {
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            display: block;
+            font-weight: 500;           /* Peso de fuente semi-negrita */
+            color: var(--text-primary); /* Color de texto principal */
+            margin-bottom: 8px;         /* Espacio inferior */
+            display: block;             /* Display block para ocupar línea completa */
         }
 
+        /* Menu - contenedor de elementos de menú */
         menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+            list-style: none;           /* Elimina viñetas */
+            padding: 0;                 /* Sin padding */
+            margin: 0;                  /* Sin margen */
         }
 
+        /* Figure - contenedor para contenido multimedia */
         figure {
-            margin: 0;
+            margin: 0;                  /* Elimina margen por defecto */
         }
 
+        /* Output - elemento para mostrar resultados de cálculo */
         output {
-            display: block;
+            display: block;             /* Display block para ocupar línea completa */
         }
 
-        /* =====================================================================
-        ANIMATION STYLES SECTION
+/* =====================================================================
+        SECCIÓN 13: ESTILOS DE ANIMACIONES
         ===================================================================== */
+        
+        /* 
+          Definición de animaciones CSS
+        */
+
+        /* Animación de desvanecimiento y desplazamiento vertical */
         @keyframes fadeIn {
             from {
-                opacity: 0;
-                transform: translateY(-4px);
+                opacity: 0;             /* Comienza transparente */
+                transform: translateY(-4px); /* Desplazado ligeramente hacia arriba */
             }
             to {
-                opacity: 1;
-                transform: translateY(0);
+                opacity: 1;             /* Termina opaco */
+                transform: translateY(0); /* En posición normal */
             }
         }
 
-        /* =====================================================================
-        RESPONSIVE STYLES SECTION
+/* =====================================================================
+        SECCIÓN 14: ESTILOS RESPONSIVOS
         ===================================================================== */
+        
+        /* 
+          Media queries para adaptar la interfaz a dispositivos móviles
+          Se activa cuando el ancho de pantalla es 768px o menos
+        */
         @media (max-width: 768px) {
+            /* Contenedor principal en móvil */
             .container {
-                grid-template-columns: 1fr;
-                margin-left: 0;
-                padding: 10px;
+                grid-template-columns: 1fr; /* Una sola columna en lugar de dos */
+                margin-left: 0;         /* Elimina margen para minibar */
+                padding: 10px;          /* Reduce padding */
             }
             
+            /* Oculta el minibar en móvil */
             .minibar {
                 display: none;
             }
             
+            /* Ajustes de contenido principal en móvil */
             .main-content {
-                padding: 20px;
+                padding: 20px;          /* Reduce padding */
             }
             
+            /* Horarios de trabajo en móvil */
             .work-hours {
-                justify-content: center;
+                justify-content: center; /* Centra elementos */
             }
             
+            /* Opciones de pronombres en columna en móvil */
             .pronouns-options {
-                flex-direction: column;
-                gap: 10px;
+                flex-direction: column; /* Disposición vertical */
+                gap: 10px;              /* Espacio entre opciones */
             }
         }
