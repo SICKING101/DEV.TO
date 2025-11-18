@@ -2,57 +2,41 @@
 // SECCIÓN 1: DECLARACIÓN DE ELEMENTOS DEL DOM
 // =====================================================================
 
-/**
- * Esta sección contiene todas las referencias a elementos del DOM
- * que se utilizarán en toda la aplicación.
- * Se organizan por categorías para mejor mantenibilidad.
- */
-
 // Elementos principales de la interfaz
-const articlesEl = document.getElementById('articles'); // Contenedor principal de artículos
-const loadingEl = document.getElementById('loading'); // Indicador de carga
-const popularTagsEl = document.getElementById('popularTags'); // Lista de tags populares
-const searchInput = document.getElementById('searchInput'); // Campo de búsqueda principal
-const sortSelect = document.getElementById('sortSelect'); // Selector de ordenamiento
+const articlesEl = document.getElementById('articles');
+const loadingEl = document.getElementById('loading');
+const popularTagsEl = document.getElementById('popularTags');
+const searchInput = document.getElementById('searchInput');
+const sortSelect = document.getElementById('sortSelect');
 
 // Elementos de navegación y autenticación
-const tabs = document.querySelectorAll('.tab'); // Pestañas de filtrado (latest, top, trending)
-const authActions = document.getElementById('authActions'); // Contenedor de acciones para usuarios no autenticados
-const userNav = document.getElementById('userNav'); // Contenedor de navegación para usuarios autenticados
-const userAvatar = document.getElementById('userAvatar'); // Avatar del usuario en la barra superior
-const dropdownAvatar = document.getElementById('dropdownAvatar'); // Avatar en el dropdown del usuario
-const dropdownUsername = document.getElementById('dropdownUsername'); // Nombre de usuario en el dropdown
-const dropdownEmail = document.getElementById('dropdownEmail'); // Email del usuario en el dropdown
-const userDropdown = document.getElementById('userDropdown'); // Menú desplegable del usuario
+const tabs = document.querySelectorAll('.tab');
+const authActions = document.getElementById('authActions');
+const userNav = document.getElementById('userNav');
+const userAvatar = document.getElementById('userAvatar');
+const dropdownAvatar = document.getElementById('dropdownAvatar');
+const dropdownUsername = document.getElementById('dropdownUsername');
+const dropdownEmail = document.getElementById('dropdownEmail');
+const userDropdown = document.getElementById('userDropdown');
 
 // Elementos del menú responsive
-const menuToggle = document.getElementById('menuToggle'); // Botón para toggle del menú móvil
-const leftbar = document.getElementById('leftbar'); // Barra lateral izquierda
-const minibar = document.getElementById('minibar'); // Barra lateral mini (íconos)
+const menuToggle = document.getElementById('menuToggle');
+const leftbar = document.getElementById('leftbar');
+const minibar = document.getElementById('minibar');
 
 // =====================================================================
-// SECCIÓN 2: SISTEMA DE AUTENTICACIÓN - AUTH MANAGER
+// SECCION 2: SISTEMA DE AUTENTICACION - AUTH MANAGER
 // =====================================================================
 
-/**
- * Clase principal que maneja toda la autenticación de la aplicación
- * Gestiona tokens JWT, estado de sesión y comunicación con el backend
- */
 class AuthManager {
     constructor() {
-        // Inicializar estado de autenticación desde localStorage
         this.token = localStorage.getItem('jwtToken');
-        this.isAuthenticated = !!this.token; // Convertir a booleano
+        this.isAuthenticated = !!this.token;
     }
 
-    /**
-     * Sincroniza el estado de autenticación entre diferentes sistemas
-     * @returns {boolean} Estado actual de autenticación
-     */
     syncAuthState() {
         console.log('🔄 Sincronizando estado de autenticacion...');
 
-        // Verificar si hay token en localStorage pero no en authManager
         const storedToken = localStorage.getItem('jwtToken');
         if (storedToken && !this.token) {
             console.log('🔄 Token encontrado en localStorage, actualizando authManager');
@@ -60,7 +44,6 @@ class AuthManager {
             this.isAuthenticated = true;
         }
 
-        // Verificar si hay usuario en devCommunity pero authManager no está autenticado
         if (window.devCommunity && window.devCommunity.currentUser && !this.isAuthenticated) {
             console.log('🔄 Usuario encontrado en devCommunity, marcando como autenticado');
             this.isAuthenticated = true;
@@ -75,10 +58,6 @@ class AuthManager {
         return this.isAuthenticated;
     }
 
-    /**
-     * Genera headers de autenticación para requests HTTP
-     * @returns {Object} Headers con token de autorización
-     */
     getAuthHeaders() {
         if (this.token) {
             return {
@@ -89,10 +68,6 @@ class AuthManager {
         return { 'Content-Type': 'application/json' };
     }
 
-    /**
-     * Verifica la validez del token con el servidor
-     * @returns {Promise<boolean>} True si el token es válido
-     */
     async verifyToken() {
         if (!this.token) return false;
         try {
@@ -108,19 +83,12 @@ class AuthManager {
         }
     }
 
-    /**
-     * Establece el token JWT y actualiza el estado de autenticación
-     * @param {string} token - Token JWT
-     */
     setToken(token) {
         this.token = token;
         this.isAuthenticated = true;
         localStorage.setItem('jwtToken', token);
     }
 
-    /**
-     * Elimina el token JWT (logout parcial)
-     */
     clearToken() {
         console.log("🗑 Eliminando token JWT...");
         this.token = null;
@@ -128,74 +96,57 @@ class AuthManager {
         localStorage.removeItem('jwtToken');
     }
 
-    /**
-     * Elimina cookies de autenticación del navegador
-     */
     clearAuthCookies() {
         document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 
-    /**
-     * Limpia todos los datos del usuario del almacenamiento local
-     */
     clearAllUserData() {
         console.log("🧹 Limpiando todos los datos del usuario...");
 
-        // Limpiar localStorage
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('userData');
         localStorage.removeItem('currentUser');
         localStorage.removeItem('userProfile');
         localStorage.removeItem('userLoggedIn');
 
-        // Limpiar sessionStorage
         sessionStorage.clear();
-
-        // Limpiar cookies
         this.clearAuthCookies();
 
-        // Resetear estado interno
         this.token = null;
         this.isAuthenticated = false;
 
         console.log("✔ Datos de usuario completamente eliminados");
     }
 
-    /**
-     * Limpia la cache de la aplicación
-     */
     clearAllCache() {
-        // Limpiar cache de comentarios si existe
         if (window.devCommunity && window.devCommunity.commentSystem) {
             window.devCommunity.commentSystem.commentsCache.clear();
         }
 
-        // Limpiar variables globales
         window.currentUser = null;
         window.userData = null;
 
         console.log("🧹 Cache limpiada");
     }
 
-    /**
-     * Realiza el logout completo del usuario
-     * Invalida el token en el servidor y limpia todos los datos locales
-     */
+    // ============================================================
+    // LOGOUT REAL Y FUNCIONAL — YA NO USA TOKEN BORRADO
+    // ============================================================
     async logout() {
         try {
             console.log("🚪 Iniciando logout...");
 
-            // Guardar token temporalmente antes de borrarlo para invalidación en servidor
+            // Guardamos el token temporalmente ANTES de borrarlo
             const tokenToInvalidate = this.token;
 
-            // 1. Limpiar datos locales inmediatamente
+            // 1. Limpiar localmente ANTES DE TODO
             this.clearAllUserData();
 
-            // 2. Intentar logout en backend si existía token
+            // 2. Intentar logout en backend SI existía token
             if (tokenToInvalidate) {
-                try {
+            try {
                     await fetch('/api/auth/logout', {
                         method: 'POST',
                         headers: {
@@ -209,15 +160,14 @@ class AuthManager {
                 }
             }
 
-            // 3. Limpiar cache de la aplicación
+            // 3. Limpiar cache
             this.clearAllCache();
 
-            // 4. Redirigir al login
+            // 4. Redirigir
             window.location.href = '/login.html';
 
         } catch (error) {
             console.error("❌ Error en logout:", error);
-            // Fallback: limpiar todo y redirigir
             this.clearAllUserData();
             window.location.href = '/login.html';
         }
@@ -225,27 +175,21 @@ class AuthManager {
 }
 
 // =====================================================================
-// SECCIÓN 3: SISTEMA MEJORADO DE MANEJO DE IMÁGENES DE PERFIL
+// SISTEMA MEJORADO DE MANEJO DE IMÁGENES DE PERFIL
 // =====================================================================
 
 /**
- * Clase especializada en el manejo de imágenes de perfil
- * Soporta múltiples proveedores OAuth (Google, GitHub, Facebook)
- * y proporciona fallbacks robustos
+ * Maneja imágenes de perfil con soporte para Google OAuth
  */
 class ProfileImageManager {
     constructor() {
-        this.defaultAvatar = '/IMAGENES/default-avatar.png'; // Avatar por defecto
+        this.defaultAvatar = '/IMAGENES/default-avatar.png';
     }
 
     /**
-     * Normaliza la URL de la imagen de perfil para diferentes proveedores
-     * @param {string} profilePicture - URL original de la imagen
-     * @param {Object} userData - Datos del usuario para contexto
-     * @returns {string} URL normalizada de la imagen
+     * Normaliza la URL de la imagen de perfil para diferentes proveedores OAuth
      */
     normalizeProfilePicture(profilePicture, userData = null) {
-        // Validar entrada
         if (!profilePicture || profilePicture === 'null' || profilePicture === 'undefined') {
             return this.defaultAvatar;
         }
@@ -265,15 +209,11 @@ class ProfileImageManager {
             return profilePicture;
         }
 
-        // Fallback al avatar por defecto
         return this.defaultAvatar;
     }
 
     /**
-     * Procesa imágenes de proveedores OAuth específicos
-     * @param {string} url - URL de la imagen OAuth
-     * @param {Object} userData - Datos del usuario
-     * @returns {string} URL procesada
+     * Procesa imágenes de proveedores OAuth
      */
     processOAuthImage(url, userData) {
         try {
@@ -302,13 +242,11 @@ class ProfileImageManager {
     }
 
     /**
-     * Procesa específicamente imágenes de Google OAuth
-     * @param {string} googleUrl - URL de imagen de Google
-     * @returns {string} URL optimizada de Google
+     * Procesa específicamente imágenes de Google
      */
     processGoogleImage(googleUrl) {
         console.log('🔧 Procesando imagen de Google:', googleUrl);
-
+        
         try {
             // Si ya tiene parámetros de tamaño, dejarla como está
             if (googleUrl.includes('=s96-c') || googleUrl.includes('=s100') || googleUrl.includes('=s200')) {
@@ -340,9 +278,7 @@ class ProfileImageManager {
     }
 
     /**
-     * Asegura que la imagen sea accesible y evita problemas de cache
-     * @param {string} url - URL original de la imagen
-     * @returns {string} URL con parámetros de cache
+     * Asegura que la imagen sea accesible
      */
     ensureImageAccessibility(url) {
         // Agregar timestamp para evitar cache si es necesario
@@ -350,32 +286,25 @@ class ProfileImageManager {
             // Para Google, agregar parámetro de no-cache
             return url + (url.includes('?') ? '&' : '?') + 'timestamp=' + new Date().getTime();
         }
-
+        
         return url;
     }
 
     /**
-     * Configura un elemento img con manejo de errores y reintentos
-     * @param {HTMLImageElement} imgElement - Elemento imagen a configurar
-     * @param {string} src - URL de la imagen
-     * @param {string} alt - Texto alternativo
-     * @param {number} maxRetries - Número máximo de reintentos
+     * Maneja errores de carga de imágenes con reintentos
      */
     setupImageWithRetry(imgElement, src, alt = 'User Avatar', maxRetries = 2) {
         let retries = 0;
-
+        
         // Usar la URL normalizada
         const normalizedSrc = this.normalizeProfilePicture(src);
         imgElement.src = normalizedSrc;
         imgElement.alt = alt;
-
-        /**
-         * Maneja errores de carga con reintentos automáticos
-         */
+        
         const handleError = () => {
             retries++;
             console.warn(`🖼️ Error cargando imagen (intento ${retries}/${maxRetries}):`, normalizedSrc);
-
+            
             if (retries <= maxRetries) {
                 // Reintentar con timestamp diferente para evitar cache
                 const timestamp = new Date().getTime();
@@ -389,7 +318,6 @@ class ProfileImageManager {
             }
         };
 
-        // Configurar event handlers
         imgElement.onerror = handleError;
         imgElement.onload = () => {
             console.log('✅ Imagen cargada exitosamente:', normalizedSrc);
@@ -397,26 +325,22 @@ class ProfileImageManager {
     }
 }
 
-// Instancia global del ProfileImageManager
+// Instancia global
 const profileImageManager = new ProfileImageManager();
 
 // Instancia global del AuthManager
 const authManager = new AuthManager();
 
+
 // =====================================================================
-// SECCIÓN 4: NAVEGACIÓN RESPONSIVE
+// SECCION 3: RESPONSIVE NAV (COMPLETO TAL CUAL)
 // =====================================================================
 
-/**
- * Sistema completo de navegación responsive
- * Maneja el menú móvil, overlays y comportamientos táctiles
- */
 document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menuToggle');
     const leftbar = document.getElementById('leftbar');
     const body = document.body;
 
-    // Crear overlay móvil si no existe
     let mobileOverlay = document.getElementById('mobileOverlay');
     if (!mobileOverlay) {
         mobileOverlay = document.createElement('div');
@@ -427,76 +351,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let isMenuOpen = false;
 
-    /**
-     * Abre el menú móvil con animación
-     */
     function openMobileMenu() {
         leftbar.classList.add('open');
         mobileOverlay.classList.add('active');
         body.classList.add('menu-open');
         menuToggle.setAttribute('aria-expanded', 'true');
-        menuToggle.innerHTML = '✕'; // Icono de cerrar
+        menuToggle.innerHTML = '✕';
         isMenuOpen = true;
     }
 
-    /**
-     * Cierra el menú móvil con animación
-     */
     function closeMobileMenu() {
         leftbar.classList.remove('open');
         mobileOverlay.classList.remove('active');
         body.classList.remove('menu-open');
         menuToggle.setAttribute('aria-expanded', 'false');
-        menuToggle.innerHTML = '☰'; // Icono de hamburguesa
+        menuToggle.innerHTML = '☰';
         isMenuOpen = false;
     }
 
-    // Configurar toggle del menú
     if (menuToggle) {
         menuToggle.addEventListener('click', function (e) {
-            e.stopPropagation(); // Prevenir burbujeo
+            e.stopPropagation();
             isMenuOpen ? closeMobileMenu() : openMobileMenu();
         });
     }
 
-    // Cerrar menú al hacer clic en el overlay
     mobileOverlay.addEventListener('click', closeMobileMenu);
 
-    // Cerrar menú con tecla Escape
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && isMenuOpen) closeMobileMenu();
     });
 
-    // Cerrar menú al hacer clic en enlaces móviles
     const mobileLinks = leftbar.querySelectorAll('a');
     mobileLinks.forEach(link => {
         link.addEventListener('click', function () {
-            // Solo cerrar para navegación interna
             if (!this.href.startsWith('http') && window.innerWidth <= 768) {
                 closeMobileMenu();
             }
         });
     });
 
-    // Cerrar menú al redimensionar a desktop
     window.addEventListener('resize', function () {
         if (window.innerWidth > 768 && isMenuOpen) closeMobileMenu();
         updateHamburgerVisibility();
     });
 
-    // Prevenir cierre al hacer clic dentro del menú
     leftbar.addEventListener('click', e => e.stopPropagation());
 
-    // Cerrar menú al hacer clic fuera
     document.addEventListener('click', function (e) {
         if (isMenuOpen && !leftbar.contains(e.target) && e.target !== menuToggle) {
             closeMobileMenu();
         }
     });
 
-    /**
-     * Actualiza el estado de la interfaz según autenticación
-     */
     function updateUserState() {
         const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
         const userNav = document.getElementById('userNav');
@@ -515,61 +422,46 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    /**
-     * Actualiza visibilidad del botón hamburguesa
-     */
     function updateHamburgerVisibility() {
         menuToggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
         if (window.innerWidth > 768) closeMobileMenu();
     }
 
-    /**
-     * Inicializa el sistema de navegación
-     */
     function initialize() {
         updateUserState();
         updateHamburgerVisibility();
     }
 
-    // Inicializar y configurar listeners
     initialize();
     window.addEventListener('resize', updateHamburgerVisibility);
 });
 
+
 // =====================================================================
-// SECCIÓN 5: MODAL DE LOGOUT
+// SECCION 4: MODAL DE LOGOUT (COMPLETO)
 // =====================================================================
 
-/**
- * Maneja el modal de confirmación para logout
- * Proporciona una experiencia de usuario segura para cerrar sesión
- */
-
-// Función global para mostrar el modal de logout
 window.handleLogout = function (event) {
-    if (event) event.preventDefault(); // Prevenir comportamiento por defecto
+    if (event) event.preventDefault();
     const logoutModal = document.getElementById('logoutModal');
     logoutModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
 };
 
-// Configuración del modal de logout
 document.addEventListener('DOMContentLoaded', function () {
     const logoutModal = document.getElementById('logoutModal');
     const logoutConfirm = document.getElementById('logoutConfirm');
     const logoutCancel = document.getElementById('logoutCancel');
     const modalOverlay = logoutModal.querySelector('.modal__overlay');
 
-    // Confirmar logout
     if (logoutConfirm) {
         logoutConfirm.addEventListener('click', async function () {
             logoutModal.style.display = 'none';
             document.body.style.overflow = '';
-            await authManager.logout(); // Ejecutar logout completo
+            await authManager.logout();
         });
     }
 
-    // Cancelar logout
     if (logoutCancel) {
         logoutCancel.addEventListener('click', function () {
             logoutModal.style.display = 'none';
@@ -577,7 +469,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Cerrar modal al hacer clic en el overlay
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function () {
             logoutModal.style.display = 'none';
@@ -585,7 +476,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Cerrar modal con tecla Escape
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && logoutModal.style.display === 'flex') {
             logoutModal.style.display = 'none';
@@ -594,26 +484,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+
 // =====================================================================
-// SECCIÓN 6: SISTEMA DE REQUESTS AUTENTICADOS
+// SECCION 5: REQUESTS AUTENTICADOS (COMPLETOS)
 // =====================================================================
 
-/**
- * Funciones para realizar requests HTTP autenticados
- * Manejan automáticamente tokens JWT y refresh de tokens
- */
-
-/**
- * Realiza una request HTTP autenticada con manejo automático de tokens
- * @param {string} url - Endpoint de la API
- * @param {Object} options - Opciones de fetch
- * @returns {Promise<Response>} Response de la request
- */
 async function makeAuthenticatedRequest(url, options = {}) {
-    // Obtener headers de autenticación
     const authHeaders = authManager.getAuthHeaders();
 
-    // Combinar configuraciones
     const config = {
         ...options,
         headers: {
@@ -625,12 +503,10 @@ async function makeAuthenticatedRequest(url, options = {}) {
     try {
         const response = await fetch(url, config);
 
-        // Si el token expiró, intentar refresh
         if (response.status === 401 && authManager.token) {
             console.log('Token expirado, intentando refresh...');
             const refreshed = await refreshToken();
             if (refreshed) {
-                // Reintentar request con nuevo token
                 config.headers.Authorization = `Bearer ${authManager.token}`;
                 return await fetch(url, config);
             }
@@ -643,10 +519,6 @@ async function makeAuthenticatedRequest(url, options = {}) {
     }
 }
 
-/**
- * Refresca el token JWT usando el refresh token
- * @returns {Promise<boolean>} True si el refresh fue exitoso
- */
 async function refreshToken() {
     try {
         const response = await fetch('/api/auth/refresh', {
@@ -665,56 +537,38 @@ async function refreshToken() {
         console.error('Error refrescando token:', error);
     }
 
-    // Si el refresh falla, hacer logout
     authManager.clearToken();
     window.location.href = '/';
     return false;
 }
 
+
 // =====================================================================
-// SECCIÓN 7: SISTEMA DE AVATARS E INTERFAZ DE AUTENTICACIÓN
+// SECCION 6 y 7: AVATARS Y AUTH UI (COMPLETO)
 // =====================================================================
 
-/**
- * Funciones para manejar la interfaz de usuario relacionada con autenticación
- * Actualizan la UI según el estado de autenticación del usuario
- */
-
-/**
- * Maneja errores de carga de imágenes de avatar
- * @param {HTMLImageElement} img - Elemento imagen que falló
- */
 function handleImageError(img) {
     img.src = '/IMAGENES/default-avatar.png';
     img.alt = 'Default Avatar';
 }
 
-/**
- * Configura manejadores de errores para todas las imágenes de avatar
- */
 function setupImageErrorHandlers() {
     if (userAvatar) userAvatar.addEventListener('error', () => handleImageError(userAvatar));
     if (dropdownAvatar) dropdownAvatar.addEventListener('error', () => handleImageError(dropdownAvatar));
 }
 
-/**
- * Verifica el estado de autenticación con el servidor
- * @returns {Promise<Object|null>} Datos del usuario o null si no autenticado
- */
 async function checkAuth() {
     try {
         console.log('🔐 Verificando estado de autenticacion...');
 
         const token = localStorage.getItem('jwtToken');
 
-        // Verificar si hay token
         if (!token) {
             console.log('❌ No hay token');
             showUnauthenticatedState();
             return null;
         }
 
-        // Verificar token con el servidor
         const response = await fetch('/api/user', {
             method: 'GET',
             credentials: 'include',
@@ -733,7 +587,6 @@ async function checkAuth() {
 
         const data = await response.json();
 
-        // Verificar estructura de respuesta
         if (data.user && data.user.id) {
             showAuthenticatedState(data.user);
             return data.user;
@@ -750,19 +603,12 @@ async function checkAuth() {
     }
 }
 
-/**
- * Muestra la interfaz para usuario autenticado
- * @param {Object} user - Datos del usuario
- */
 function showAuthenticatedState(user) {
-    // Mostrar navegación de usuario y ocultar acciones de auth
     if (authActions) authActions.style.display = 'none';
     if (userNav) userNav.style.display = 'flex';
 
-    // Obtener imagen de perfil o usar default
     const profilePic = user.profilePicture || user.avatar || '/IMAGENES/default-avatar.png';
 
-    // Actualizar avatars
     if (userAvatar) {
         userAvatar.src = profilePic;
         userAvatar.alt = user.username;
@@ -773,24 +619,16 @@ function showAuthenticatedState(user) {
         dropdownAvatar.alt = user.username;
     }
 
-    // Actualizar información del usuario
     if (dropdownUsername) dropdownUsername.textContent = user.username;
     if (dropdownEmail) dropdownEmail.textContent = user.email;
 }
 
-/**
- * Muestra la interfaz para usuario no autenticado
- */
 function showUnauthenticatedState() {
-    // Mostrar acciones de auth y ocultar navegación de usuario
     if (authActions) authActions.style.display = 'flex';
     if (userNav) userNav.style.display = 'none';
     resetUserInfo();
 }
 
-/**
- * Resetea la información del usuario en la interfaz
- */
 function resetUserInfo() {
     const defaultAvatar = '/IMAGENES/default-avatar.png';
     if (userAvatar) userAvatar.src = defaultAvatar;
@@ -799,9 +637,6 @@ function resetUserInfo() {
     if (dropdownEmail) dropdownEmail.textContent = 'user@example.com';
 }
 
-/**
- * Limpia todos los datos de usuario del almacenamiento
- */
 function clearAllUserData() {
     localStorage.removeItem('userLoggedIn');
     localStorage.removeItem('jwtToken');
@@ -810,6 +645,7 @@ function clearAllUserData() {
     localStorage.removeItem('userProfile');
     sessionStorage.clear();
 }
+
 
 // =====================================================================
 // SECCIÓN 8: DROPDOWN DEL USUARIO
@@ -824,7 +660,6 @@ function initUserDropdown() {
     const userDropdown = document.getElementById('userDropdown');
     const userNav = document.getElementById('userNav');
 
-    // Verificar que todos los elementos existan
     if (!userAvatar || !userDropdown || !userNav) {
         console.log('User dropdown elements not found:', {
             userAvatar: !!userAvatar,
@@ -836,7 +671,7 @@ function initUserDropdown() {
 
     console.log('Initializing user dropdown...');
 
-    // Configuración inicial del dropdown
+    // Asegurar que el dropdown esté oculto inicialmente
     userDropdown.style.display = 'none';
     userDropdown.style.position = 'absolute';
     userDropdown.style.top = '100%';
@@ -872,7 +707,7 @@ function initUserDropdown() {
         e.stopPropagation();
     });
 
-    // Cerrar con tecla Escape
+    // También cerrar con la tecla Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && userDropdown.style.display === 'block') {
             userDropdown.style.display = 'none';
@@ -888,18 +723,14 @@ function initUserDropdown() {
 // =====================================================================
 
 /**
- * Renderiza la lista de tags populares y configura su funcionalidad
+ * Renderiza la lista de tags populares
  */
 function renderTags() {
     if (!popularTagsEl) return;
 
-    // Tags populares predefinidos
     const popularTags = ['javascript', 'webdev', 'python', 'devops', 'react', 'nodejs', 'ai', 'machinelearning'];
 
-    // Limpiar contenedor
     popularTagsEl.innerHTML = '';
-
-    // Crear elementos de tag
     popularTags.forEach(tag => {
         const li = document.createElement('li');
         li.className = 'taglist__item';
@@ -964,15 +795,13 @@ function initMinibar() {
  */
 class CommentSystem {
     constructor(devCommunity) {
-        this.devCommunity = devCommunity; // Referencia a la app principal
-        this.commentsCache = new Map(); // Cache para comentarios
-        this.debug = true; // Modo debug
+        this.devCommunity = devCommunity;
+        this.commentsCache = new Map();
+        this.debug = true;
     }
 
     /**
      * Logging para debugging del sistema de comentarios
-     * @param {string} message - Mensaje a loguear
-     * @param {*} data - Datos adicionales
      */
     log(message, data = null) {
         if (this.debug) {
@@ -1001,11 +830,10 @@ class CommentSystem {
         this.log(`Comments section visible: ${isVisible}`);
 
         if (!isVisible) {
-            // Cargar y mostrar comentarios
             await this.loadComments(postId);
             commentsSection.style.display = 'block';
 
-            // Animación de entrada
+            // Agregar animación suave
             commentsSection.style.opacity = '0';
             commentsSection.style.transform = 'translateY(-10px)';
 
@@ -1016,7 +844,7 @@ class CommentSystem {
             }, 10);
 
         } else {
-            // Animación de salida
+            // Animación al cerrar
             commentsSection.style.transition = 'all 0.3s ease';
             commentsSection.style.opacity = '0';
             commentsSection.style.transform = 'translateY(-10px)';
@@ -1035,7 +863,7 @@ class CommentSystem {
         try {
             this.log(`Loading comments for post: ${postId}`);
 
-            // Verificar cache primero
+            // Verificar si ya tenemos comentarios en cache
             if (this.commentsCache.has(postId)) {
                 const cachedComments = this.commentsCache.get(postId);
                 this.log(`Using cached comments: ${cachedComments.length} comments`);
@@ -1043,10 +871,9 @@ class CommentSystem {
                 return;
             }
 
-            // Cargar desde API
+            // Intentar cargar comentarios desde la API
             const response = await fetch(`/api/posts/${postId}/comments`);
 
-            // Manejar endpoint no disponible
             if (response.status === 404) {
                 this.log('Comments endpoint not available (404), using empty comments');
                 this.commentsCache.set(postId, []);
@@ -1074,7 +901,7 @@ class CommentSystem {
 
             this.log(`Loaded ${comments.length} comments from API`);
 
-            // Cachear comentarios
+            // Cachear los comentarios
             this.commentsCache.set(postId, comments);
             this.renderComments(postId, comments);
 
@@ -1110,7 +937,6 @@ class CommentSystem {
             return;
         }
 
-        // Renderizar todos los comentarios
         container.innerHTML = comments.map(comment => this.createCommentHTML(comment)).join('');
 
         this.log(`Successfully rendered ${comments.length} comments`);
@@ -1129,7 +955,7 @@ class CommentSystem {
 
         this.log('Creating HTML for comment', comment);
 
-        // Extraer datos del comentario con manejo de diferentes formatos
+        // Manejar diferentes formatos de comentario
         const user = comment.userId || comment.user || comment.author || {};
         const commentDate = comment.createdAt ?
             new Date(comment.createdAt).toLocaleDateString('en-US', {
@@ -1200,7 +1026,6 @@ class CommentSystem {
      * @param {string} postId - ID del post
      */
     async addComment(postId) {
-        // Verificar autenticación
         if (!this.devCommunity.currentUser) {
             window.location.href = '/Login.html';
             return;
@@ -1209,7 +1034,6 @@ class CommentSystem {
         const commentInput = document.getElementById(`comment-input-${postId}`);
         const content = commentInput?.value.trim();
 
-        // Validaciones
         if (!content) {
             this.showCommentError(postId, 'Comment cannot be empty');
             return;
@@ -1234,32 +1058,31 @@ class CommentSystem {
             const data = await response.json();
             this.log('Add comment API response', data);
 
-            // Manejar errores del servidor
+            // Si hay error 500 pero el comentario se creó en la base de datos
             if (!response.ok) {
+                // Intentar verificar si el comentario se creó de todas formas
                 await this.verifyAndHandleCommentCreation(postId, content, commentInput);
                 return;
             }
 
-            // Manejar éxito
+            // Si la respuesta es exitosa
             this.handleCommentSuccess(postId, data, commentInput);
 
         } catch (error) {
             console.error('Error adding comment:', error);
+            // Intentar verificar si el comentario se creó a pesar del error
             await this.verifyAndHandleCommentCreation(postId, content, commentInput);
         }
     }
 
     /**
      * Verifica si un comentario se creó exitosamente a pesar de errores del servidor
-     * @param {string} postId - ID del post
-     * @param {string} content - Contenido del comentario
-     * @param {HTMLTextAreaElement} commentInput - Elemento input del comentario
      */
     async verifyAndHandleCommentCreation(postId, content, commentInput) {
         try {
             this.log('Verifying if comment was created despite server error...');
 
-            // Esperar para dar tiempo al servidor
+            // Esperar un momento para dar tiempo al servidor
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Recargar comentarios para verificar
@@ -1269,16 +1092,18 @@ class CommentSystem {
             const currentComments = this.commentsCache.get(postId) || [];
             this.log(`Current comments after verification: ${currentComments.length}`);
 
-            // Buscar nuestro comentario
+            // Buscar si nuestro comentario está en la lista
             const newCommentExists = currentComments.some(comment =>
                 comment.content === content ||
                 (comment.content && comment.content.includes(content.substring(0, 50)))
             );
 
             if (newCommentExists) {
+                // El comentario se creó exitosamente a pesar del error del servidor
                 this.log('Comment was successfully created despite server error');
                 this.handleCommentSuccess(postId, null, commentInput);
             } else {
+                // El comentario realmente no se creó
                 this.showCommentError(postId, 'Error adding comment to database. Please try again.');
             }
         } catch (verifyError) {
@@ -1289,21 +1114,18 @@ class CommentSystem {
 
     /**
      * Maneja el éxito en la creación de un comentario
-     * @param {string} postId - ID del post
-     * @param {Object} commentData - Datos del comentario creado
-     * @param {HTMLTextAreaElement} commentInput - Elemento input
      */
     handleCommentSuccess(postId, commentData, commentInput) {
         this.log('Handling comment success', { postId, commentData });
 
-        // Limpiar input
+        // Limpiar el input
         if (commentInput) commentInput.value = '';
 
-        // Recargar comentarios
+        // Invalidar cache y recargar comentarios
         this.commentsCache.delete(postId);
         this.loadComments(postId);
 
-        // Actualizar contador
+        // Actualizar contador de comentarios
         this.updateCommentCount(postId, 1);
 
         this.showCommentSuccess(postId, 'Comment added successfully!');
@@ -1336,7 +1158,7 @@ class CommentSystem {
             </section>
         `;
 
-        // Configurar textarea
+        // Enfocar el textarea
         const textarea = commentText.querySelector('.comment-edit-input');
         textarea.focus();
         textarea.setSelectionRange(textarea.value.length, textarea.value.length);
@@ -1354,7 +1176,6 @@ class CommentSystem {
         const textarea = commentElement.querySelector('.comment-edit-input');
         const newContent = textarea.value.trim();
 
-        // Validaciones
         if (!newContent) {
             this.showMessage('Comment cannot be empty', 'error');
             return;
@@ -1366,6 +1187,7 @@ class CommentSystem {
         }
 
         try {
+            // Usar el mismo endpoint que para crear comentarios pero con método PUT
             const response = await fetch(`/api/comments/${commentId}`, {
                 method: 'PUT',
                 headers: {
@@ -1378,10 +1200,10 @@ class CommentSystem {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Recargar comentarios desde servidor
+                    // Recargar los comentarios del post desde la base de datos
                     const postId = this.getPostIdFromComment(commentId);
                     if (postId) {
-                        this.commentsCache.delete(postId);
+                        this.commentsCache.delete(postId); // Limpiar cache
                         await this.loadComments(postId);
                     }
                     this.showMessage('Comment updated successfully!', 'success');
@@ -1389,19 +1211,18 @@ class CommentSystem {
                     throw new Error('Failed to update comment');
                 }
             } else {
-                // Fallback: edición local
+                // Si el endpoint no existe, manejar localmente
                 this.handleLocalCommentEdit(commentId, newContent);
             }
         } catch (error) {
             console.error('Error updating comment:', error);
+            // En caso de error, manejar localmente
             this.handleLocalCommentEdit(commentId, newContent);
         }
     }
 
     /**
      * Maneja la edición de comentarios localmente (fallback)
-     * @param {string} commentId - ID del comentario
-     * @param {string} newContent - Nuevo contenido
      */
     handleLocalCommentEdit(commentId, newContent) {
         this.log(`Handling local comment edit: ${commentId}`);
@@ -1412,8 +1233,10 @@ class CommentSystem {
         const postId = this.getPostIdFromComment(commentId);
         if (!postId) return;
 
-        // Actualizar en cache
+        // Obtener comentarios actuales del cache
         const currentComments = this.commentsCache.get(postId) || [];
+
+        // Actualizar el comentario en el cache
         const updatedComments = currentComments.map(comment => {
             const id = comment._id || comment.id;
             if (id === commentId) {
@@ -1426,7 +1249,10 @@ class CommentSystem {
             return comment;
         });
 
+        // Actualizar cache
         this.commentsCache.set(postId, updatedComments);
+
+        // Re-renderizar comentarios
         this.renderComments(postId, updatedComments);
 
         this.showMessage('Comment updated successfully! (local)', 'success');
@@ -1441,7 +1267,7 @@ class CommentSystem {
         const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
         if (!commentElement) return;
 
-        // Recargar para cancelar cambios
+        // Recargar los comentarios del post para cancelar la edición
         const postId = this.getPostIdFromComment(commentId);
         if (postId) {
             this.loadComments(postId);
@@ -1455,7 +1281,6 @@ class CommentSystem {
     async deleteComment(commentId) {
         this.log(`Delete comment: ${commentId}`);
 
-        // Confirmación
         if (!confirm('Are you sure you want to delete this comment?')) {
             return;
         }
@@ -1472,10 +1297,10 @@ class CommentSystem {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Recargar desde servidor
+                    // Recargar los comentarios del post desde la base de datos
                     const postId = this.getPostIdFromComment(commentId);
                     if (postId) {
-                        this.commentsCache.delete(postId);
+                        this.commentsCache.delete(postId); // Limpiar cache
                         await this.loadComments(postId);
                         this.updateCommentCount(postId, -1);
                     }
@@ -1484,18 +1309,18 @@ class CommentSystem {
                     throw new Error('Failed to delete comment');
                 }
             } else {
-                // Fallback: eliminación local
+                // Si el endpoint no existe, manejar localmente
                 this.handleLocalCommentDelete(commentId);
             }
         } catch (error) {
             console.error('Error deleting comment:', error);
+            // En caso de error, manejar localmente
             this.handleLocalCommentDelete(commentId);
         }
     }
 
     /**
      * Maneja la eliminación de comentarios localmente (fallback)
-     * @param {string} commentId - ID del comentario
      */
     handleLocalCommentDelete(commentId) {
         this.log(`Handling local comment deletion: ${commentId}`);
@@ -1512,10 +1337,11 @@ class CommentSystem {
             return;
         }
 
-        // Eliminar de cache
+        // Obtener comentarios actuales del cache
         const currentComments = this.commentsCache.get(postId) || [];
         this.log(`Current comments before deletion: ${currentComments.length}`);
 
+        // Filtrar el comentario a eliminar
         const updatedComments = currentComments.filter(comment => {
             const id = comment._id || comment.id;
             return id !== commentId;
@@ -1523,8 +1349,13 @@ class CommentSystem {
 
         this.log(`Comments after deletion: ${updatedComments.length}`);
 
+        // Actualizar cache
         this.commentsCache.set(postId, updatedComments);
+
+        // Re-renderizar comentarios
         this.renderComments(postId, updatedComments);
+
+        // Actualizar contador de comentarios - RESTAR 1
         this.updateCommentCount(postId, -1);
 
         this.showMessage('Comment deleted successfully! (local)', 'success');
@@ -1553,7 +1384,7 @@ class CommentSystem {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Recargar para mostrar like actualizado
+                    // Recargar comentarios para mostrar el like actualizado
                     const postId = this.getPostIdFromComment(commentId);
                     if (postId) {
                         this.commentsCache.delete(postId);
@@ -1563,18 +1394,18 @@ class CommentSystem {
                     throw new Error('Failed to toggle like');
                 }
             } else {
-                // Fallback: like local
+                // Si el endpoint no existe, manejar localmente
                 this.handleLocalCommentLike(commentId);
             }
         } catch (error) {
             console.error('Error toggling comment like:', error);
+            // En caso de error, manejar localmente
             this.handleLocalCommentLike(commentId);
         }
     }
 
     /**
      * Maneja los likes de comentarios localmente (fallback)
-     * @param {string} commentId - ID del comentario
      */
     handleLocalCommentLike(commentId) {
         this.log(`Handling local comment like: ${commentId}`);
@@ -1642,6 +1473,7 @@ class CommentSystem {
      * @param {string} postId - ID del post
      */
     setupCommentActions(postId) {
+        // Configurar event listeners para el formulario de comentarios
         const commentInput = document.getElementById(`comment-input-${postId}`);
         const submitBtn = commentInput?.nextElementSibling;
 
@@ -1653,7 +1485,7 @@ class CommentSystem {
                 }
             });
 
-            // Auto-resize
+            // Auto-resize del textarea
             commentInput.addEventListener('input', () => {
                 this.autoResizeTextarea(commentInput);
             });
@@ -1671,8 +1503,6 @@ class CommentSystem {
 
     /**
      * Muestra un mensaje de error en los comentarios
-     * @param {string} postId - ID del post
-     * @param {string} message - Mensaje de error
      */
     showCommentError(postId, message) {
         const commentInput = document.getElementById(`comment-input-${postId}`);
@@ -1684,7 +1514,7 @@ class CommentSystem {
             existingError.remove();
         }
 
-        // Crear elemento de error
+        // Mostrar error temporal
         const errorSection = document.createElement('section');
         errorSection.className = 'comment-error';
         errorSection.innerHTML = `
@@ -1705,10 +1535,9 @@ class CommentSystem {
 
         commentInput.parentNode.insertBefore(errorSection, commentInput.nextSibling);
 
-        // Scroll al error
+        // Hacer scroll al error
         errorSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-        // Auto-remover después de 5 segundos
         setTimeout(() => {
             if (errorSection.parentNode) {
                 errorSection.parentNode.removeChild(errorSection);
@@ -1718,8 +1547,6 @@ class CommentSystem {
 
     /**
      * Muestra un mensaje de éxito en los comentarios
-     * @param {string} postId - ID del post
-     * @param {string} message - Mensaje de éxito
      */
     showCommentSuccess(postId, message) {
         const commentsSection = document.getElementById(`comments-${postId}`);
@@ -1749,7 +1576,6 @@ class CommentSystem {
             commentsContainer.insertBefore(successSection, commentsContainer.firstChild);
         }
 
-        // Auto-remover después de 5 segundos
         setTimeout(() => {
             if (successSection.parentNode) {
                 successSection.parentNode.removeChild(successSection);
@@ -1759,8 +1585,6 @@ class CommentSystem {
 
     /**
      * Muestra un mensaje toast al usuario
-     * @param {string} message - Mensaje a mostrar
-     * @param {string} type - Tipo de mensaje (success, error)
      */
     showMessage(message, type = 'success') {
         // Remover toasts anteriores
@@ -1774,7 +1598,7 @@ class CommentSystem {
             top: 20px;
             right: 20px;
             padding: 12px 20px;
-            background: ${type === 'success' ? '#28a745' : '#dc3545'};
+            background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
             color: white;
             border-radius: 4px;
             z-index: 10000;
@@ -1785,7 +1609,6 @@ class CommentSystem {
 
         document.body.appendChild(toast);
 
-        // Auto-remover después de 5 segundos
         setTimeout(() => {
             if (document.body.contains(toast)) {
                 document.body.removeChild(toast);
@@ -1795,8 +1618,6 @@ class CommentSystem {
 
     /**
      * Escapa caracteres HTML para prevenir XSS
-     * @param {string} unsafe - Texto sin escapar
-     * @returns {string} Texto escapado
      */
     escapeHtml(unsafe) {
         return unsafe
@@ -1818,20 +1639,19 @@ class CommentSystem {
  */
 class DevCommunity {
     constructor() {
-        this.currentUser = null; // Usuario actualmente autenticado
-        this.posts = []; // Array de posts cargados
-        this.currentPage = 1; // Paginación actual
-        this.isLoading = false; // Estado de carga
-        this.hasMorePosts = true; // Si hay más posts para cargar
-        this.commentSystem = new CommentSystem(this); // Sistema de comentarios
-        this.postDeletionSystem = new PostDeletionSystem(this); // Sistema de eliminación de posts
-        this.postEditSystem = new PostEditSystem(this); // Sistema de edición de posts
-        this.init(); // Inicialización
+        this.currentUser = null;
+        this.posts = [];
+        this.currentPage = 1;
+        this.isLoading = false;
+        this.hasMorePosts = true;
+        this.commentSystem = new CommentSystem(this);
+        this.postDeletionSystem = new PostDeletionSystem(this); // ← AGREGAR ESTA LÍNEA
+        this.postEditSystem = new PostEditSystem(this); // ← NUEVA LÍNEA
+        this.init();
     }
 
     /**
      * Verifica y sincroniza el estado de autenticación
-     * @returns {boolean} Estado de autenticación
      */
     checkAndSyncAuth() {
         console.log('🔐 Verificando y sincronizando autenticación...');
@@ -2069,13 +1889,10 @@ class DevCommunity {
 
     /**
      * Maneja la respuesta de la API de posts
-     * @param {Object} data - Datos de respuesta
-     * @param {string} view - Vista activa
      */
     handlePostsResponse(data, view) {
         let posts = [];
 
-        // Extraer posts de diferentes formatos de respuesta
         if (data.posts && data.posts.length > 0) {
             posts = data.posts;
         } else if (Array.isArray(data)) {
@@ -2088,7 +1905,6 @@ class DevCommunity {
         }
 
         if (posts.length > 0) {
-            // Actualizar posts según paginación
             if (this.currentPage === 1) {
                 this.posts = posts;
             } else {
@@ -2112,16 +1928,13 @@ class DevCommunity {
 
     /**
      * Aplica filtros locales a los posts (fallback si el backend no lo hace)
-     * @param {Array} posts - Array de posts
-     * @param {string} view - Vista activa
-     * @returns {Array} Posts filtrados
      */
     applyLocalFilters(posts, view) {
         console.log(`Applying local filter: ${view} to ${posts.length} posts`);
 
         switch (view) {
             case 'top':
-                // Ordenar por total de reacciones
+                // Ordenar por total de reacciones (suma de todas las reacciones)
                 return posts.sort((a, b) => {
                     const aReactions = this.calculateTotalReactions(a);
                     const bReactions = this.calculateTotalReactions(b);
@@ -2129,7 +1942,7 @@ class DevCommunity {
                 });
 
             case 'trending':
-                // Ordenar por cantidad de corazones
+                // Ordenar por cantidad de corazones (reacción específica)
                 return posts.sort((a, b) => {
                     const aHearts = a.reactionCounts?.heart || 0;
                     const bHearts = b.reactionCounts?.heart || 0;
@@ -2149,8 +1962,6 @@ class DevCommunity {
 
     /**
      * Calcula el total de reacciones de un post
-     * @param {Object} post - Datos del post
-     * @returns {number} Total de reacciones
      */
     calculateTotalReactions(post) {
         if (!post.reactionCounts) return 0;
@@ -2162,7 +1973,6 @@ class DevCommunity {
 
     /**
      * Maneja datos de ejemplo cuando la API no está disponible
-     * @param {string} view - Vista activa
      */
     handleMockPosts(view) {
         // Generar posts de ejemplo con diferentes cantidades de reacciones
@@ -2190,9 +2000,6 @@ class DevCommunity {
 
     /**
      * Genera posts de ejemplo con diferentes cantidades de reacciones
-     * @param {number} count - Cantidad de posts a generar
-     * @param {number} offset - Offset para IDs únicos
-     * @returns {Array} Array de posts de ejemplo
      */
     generateMockPosts(count = 10, offset = 0) {
         const mockPosts = [];
@@ -2252,7 +2059,6 @@ class DevCommunity {
             return;
         }
 
-        // Renderizar todos los posts
         articlesContainer.innerHTML = this.posts.map(post => this.createPostHTML(post)).join('');
 
         // Asegurar que las tarjetas se vean bien
@@ -2264,10 +2070,8 @@ class DevCommunity {
     }
 
     /**
-     * Crea el HTML para un post individual IDÉNTICO a Dev.to
-     * @param {Object} post - Datos del post
-     * @returns {string} HTML del post
-     */
+         * Crea el HTML para un post individual
+         */
     createPostHTML(post) {
         const readingTime = post.readingTime || Math.ceil((post.content?.length || 0) / 200) || 1;
         const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', {
@@ -2286,23 +2090,13 @@ class DevCommunity {
         const deleteButtonHTML = this.postDeletionSystem.createDeleteButtonHTML(post);
         const editButtonHTML = this.postEditSystem.createEditButtonHTML(post);
 
-        // Determinar la clase de tamaño de la imagen
-        const coverSizeClass = post.coverSize ? ` article-card__cover--${post.coverSize}` : '';
-
         return `
-        <article class="article-card" data-post-id="${postId}" style="opacity: 1;">
-            <section class="article-card__inner">
-                ${post.coverImage ? `
-                    <figure class="article-card__cover${coverSizeClass}">
-                        <img src="${post.coverImage}" alt="Cover image for ${post.title}" onerror="this.style.display='none'">
-                    </figure>
-                ` : ''}
-
-                <section class="article-card__content">
+            <article class="article-card" data-post-id="${postId}" style="opacity: 1; background: white;">
+                <section class="article-card__inner">
                     <header class="article-card__header">
                         <img src="${profilePicture}" alt="${username}" class="article-card__avatar" onerror="this.src='/IMAGENES/default-avatar.png'">
                         <section class="article-card__user-info">
-                            <a href="#" class="article-card__username">${username}</a>
+                            <span class="article-card__username">${username}</span>
                             <time class="article-card__date">${date}</time>
                         </section>
                         <section class="article-card__actions">
@@ -2317,32 +2111,39 @@ class DevCommunity {
                         </section>
                     </header>
 
+                <section class="article-card__content">
                     <h2 class="article-card__title">
                         <a href="#" onclick="devCommunity.viewPost('${postId}'); return false;">${post.title || 'Untitled Post'}</a>
                     </h2>
                     
+                    ${post.coverImage ? `
+                        <figure class="article-card__cover">
+                            <img src="${post.coverImage}" alt="Cover image for ${post.title}" onerror="this.style.display='none'">
+                        </figure>
+                    ` : ''}
+
                     ${post.tags && post.tags.length > 0 ? `
                         <nav class="article-card__tags">
                             ${post.tags.map(tag => `
-                                <a href="#" class="tag" onclick="devCommunity.filterByTag('${tag}'); return false;">#${tag}</a>
+                                <span class="tag">#${tag}</span>
                             `).join('')}
                         </nav>
                     ` : ''}
-
-                    <footer class="article-card__footer">
-                        <nav class="article-card__reactions">
-                            ${this.createReactionsHTML(post)}
-                        </nav>
-                        
-                        <section class="article-card__meta">
-                            <span class="article-card__reading-time">${readingTime} min read</span>
-                            <button class="article-card__comments-btn" onclick="devCommunity.commentSystem.toggleComments('${postId}')">
-                                <i class="fas fa-comment"></i>
-                                <span>${post.commentsCount || 0}</span>
-                            </button>
-                        </section>
-                    </footer>
                 </section>
+
+                <footer class="article-card__footer">
+                    <nav class="article-card__reactions">
+                        ${this.createReactionsHTML(post)}
+                    </nav>
+                    
+                    <section class="article-card__meta">
+                        <span class="article-card__reading-time">${readingTime} min read</span>
+                        <button class="article-card__comments-btn" onclick="devCommunity.commentSystem.toggleComments('${postId}')">
+                            <i class="fas fa-comment"></i>
+                            <span>${post.commentsCount || 0}</span>
+                        </button>
+                    </section>
+                </footer>
 
                 <!-- SECCIÓN DE COMENTARIOS -->
                 <section class="article-card__comments" id="comments-${postId}" style="display: none;">
@@ -2440,8 +2241,6 @@ class DevCommunity {
 
     /**
      * Actualiza las reacciones de un post en la interfaz
-     * @param {string} postId - ID del post
-     * @param {Object} reactionData - Datos actualizados de reacciones
      */
     updatePostReactions(postId, reactionData) {
         const postElement = document.querySelector(`[data-post-id="${postId}"]`);
@@ -2488,8 +2287,6 @@ class DevCommunity {
 
     /**
      * Actualiza el estado de favorito de un post en la interfaz
-     * @param {string} postId - ID del post
-     * @param {Object} favoriteData - Datos actualizados de favoritos
      */
     updatePostFavorite(postId, favoriteData) {
         const postElement = document.querySelector(`[data-post-id="${postId}"]`);
@@ -2527,7 +2324,6 @@ class DevCommunity {
     switchFeedView(view) {
         console.log(`Switching to view: ${view}`);
 
-        // Actualizar tabs activos
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(tab => {
             tab.classList.toggle('tab--active', tab.dataset.view === view);
@@ -2546,7 +2342,6 @@ class DevCommunity {
 
     /**
      * Muestra el filtro activo en la interfaz
-     * @param {string} view - Vista activa
      */
     showActiveFilter(view) {
         // Remover indicadores anteriores
@@ -2612,7 +2407,6 @@ class DevCommunity {
     handleScroll() {
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-        // Cargar más posts cuando esté cerca del final
         if (scrollTop + clientHeight >= scrollHeight - 500 && !this.isLoading && this.hasMorePosts) {
             this.loadPosts();
         }
@@ -2674,7 +2468,7 @@ class DevCommunity {
 }
 
 // =====================================================================
-// SECCIÓN 13: FUNCIONALIDAD DE LA MINIBAR MEJORADA
+// SECCIÓN 14: FUNCIONALIDAD DE LA MINIBAR 
 // =====================================================================
 
 /**
@@ -2682,8 +2476,10 @@ class DevCommunity {
  * Maneja los previews que aparecen al pasar el mouse sobre los íconos
  */
 document.addEventListener('DOMContentLoaded', function () {
+    // Obtener todos los elementos de la minibar (íconos como inicio, trending, etc.)
     const minibarItems = document.querySelectorAll('.minibar__item');
-    let activePreview = null; // Preview actualmente activo
+    // Variable para trackear el preview actualmente activo
+    let activePreview = null;
 
     /**
      * Calcula la posición óptima del preview evitando que se salga de la pantalla
@@ -2692,19 +2488,24 @@ document.addEventListener('DOMContentLoaded', function () {
      * @returns {number} Posición top calculada
      */
     function calculatePreviewPosition(link, preview) {
+        // Obtener posición y dimensiones del enlace sobre el que se hace hover
         const linkRect = link.getBoundingClientRect();
+        // Obtener altura de la ventana del navegador
         const viewportHeight = window.innerHeight;
 
         // Posición inicial: misma posición vertical que el enlace
         let topPosition = linkRect.top;
-        const previewHeight = 320; // Altura estimada del preview
+        // Altura estimada del preview (podría calcularse dinámicamente)
+        const previewHeight = 320;
 
         // Ajustar si el preview se sale por la parte inferior de la pantalla
+        // Se deja 20px de margen con el borde inferior
         if (topPosition + previewHeight > viewportHeight - 20) {
             topPosition = viewportHeight - previewHeight - 20;
         }
 
         // Ajustar si el preview se sale por la parte superior de la pantalla
+        // Se deja 20px de margen con el borde superior
         if (topPosition < 20) {
             topPosition = 20;
         }
@@ -2717,21 +2518,25 @@ document.addEventListener('DOMContentLoaded', function () {
      * @param {HTMLElement} item - Elemento del ítem de la minibar
      */
     function showPreview(item) {
+        // Buscar elementos del preview y el enlace dentro del ítem
         const preview = item.querySelector('.minibar__preview');
         const link = item.querySelector('.minibar__link');
 
+        // Verificar que ambos elementos existan
         if (preview && link) {
-            // Ocultar preview anterior si existe
+            // Ocultar preview anterior si existe y es diferente al actual
+            // Esto evita tener múltiples previews visibles simultáneamente
             if (activePreview && activePreview !== preview) {
                 activePreview.style.display = 'none';
             }
 
-            // Calcular y aplicar posición
+            // Calcular posición óptima y aplicarla al preview
             const topPosition = calculatePreviewPosition(link, preview);
             preview.style.top = topPosition + 'px';
+            // Hacer visible el preview
             preview.style.display = 'block';
 
-            // Actualizar referencia
+            // Actualizar referencia al preview activo
             activePreview = preview;
         }
     }
@@ -2746,27 +2551,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Configurar event listeners para cada ítem
+    // Configurar event listeners para cada ítem de la minibar
     minibarItems.forEach(item => {
+        // Buscar elementos dentro de cada ítem
         const link = item.querySelector('.minibar__link');
         const preview = item.querySelector('.minibar__preview');
 
+        // Solo configurar eventos si el ítem tiene ambos elementos
         if (link && preview) {
-            // Mostrar preview al entrar
+            // Mostrar preview cuando el mouse entra en el ítem
             item.addEventListener('mouseenter', function () {
                 showPreview(item);
             });
 
-            // Ocultar preview al salir (con delay)
+            // Ocultar preview cuando el mouse sale del ítem
+            // Se usa setTimeout para dar tiempo al usuario para mover el mouse al preview
             item.addEventListener('mouseleave', function (e) {
                 setTimeout(() => {
+                    // Verificar que el mouse no esté sobre el ítem o el preview
+                    // Esto evita que el preview se oculte prematuramente
                     if (!item.matches(':hover') && !preview.matches(':hover')) {
                         hidePreview(preview);
                     }
-                }, 100);
+                }, 100); // Delay de 100ms para mejor experiencia de usuario
             });
 
-            // Mantener preview visible cuando el mouse está sobre él
+            // Mantener el preview visible cuando el mouse está sobre él
             preview.addEventListener('mouseenter', function () {
                 preview.style.display = 'block';
             });
@@ -2778,7 +2588,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Ocultar previews al hacer scroll
+    // Ocultar todos los previews cuando el usuario hace scroll
+    // Esto mejora la experiencia evitando previews en posiciones incorrectas
     window.addEventListener('scroll', function () {
         if (activePreview) {
             hidePreview(activePreview);
@@ -2787,12 +2598,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // =====================================================================
-// SECCIÓN 14: SISTEMA DE ELIMINACIÓN DE POSTS CON BACKEND
+// SECCIÓN 15: SISTEMA DE ELIMINACIÓN DE POSTS CON BACKEND
 // =====================================================================
 
 /**
  * Clase que maneja la eliminación de posts
- * Incluye confirmación, comunicación con backend y actualización de UI
  */
 class PostDeletionSystem {
     constructor(devCommunity) {
@@ -2802,8 +2612,6 @@ class PostDeletionSystem {
 
     /**
      * Logging para debugging del sistema de eliminación
-     * @param {string} message - Mensaje a loguear
-     * @param {*} data - Datos adicionales
      */
     log(message, data = null) {
         if (this.debug) {
@@ -2832,7 +2640,7 @@ class PostDeletionSystem {
     }
 
     /**
-     * Crea el HTML del botón de eliminar si el usuario es el autor
+     * Agrega el botón de eliminar al HTML del post si el usuario es el autor
      * @param {Object} post - Datos del post
      * @returns {string} HTML del botón de eliminar
      */
@@ -2891,7 +2699,7 @@ class PostDeletionSystem {
         // Agregar modal al DOM
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // Configurar eventos
+        // Configurar event listeners
         this.setupDeleteModalEvents(postId);
 
         // Prevenir scroll del body
@@ -2956,7 +2764,7 @@ class PostDeletionSystem {
             // Mostrar indicador de carga
             this.showDeletionLoading(postId, true);
 
-            // Usar makeAuthenticatedRequest para manejar autenticación
+            // 🔥 USAR makeAuthenticatedRequest EN LUGAR DE fetch DIRECTAMENTE
             const response = await makeAuthenticatedRequest(`/api/posts/${postId}`, {
                 method: 'DELETE'
             });
@@ -2997,7 +2805,7 @@ class PostDeletionSystem {
     async handlePostDeletionSuccess(postId) {
         this.log(`Post deletion successful: ${postId}`);
 
-        // Remover el post del array local
+        // Encontrar y remover el post del array local
         const postIndex = this.devCommunity.posts.findIndex(post => {
             const id = post._id || post.id;
             return id === postId;
@@ -3010,13 +2818,20 @@ class PostDeletionSystem {
 
         this.showMessage('Post deleted successfully!', 'success');
 
-        // Recargar posts desde el servidor para consistencia
+        // Recargar los posts desde el servidor para asegurar consistencia
         await this.refreshPostsFromServer();
     }
 
     /**
      * Recarga los posts desde el servidor para mantener consistencia
      */
+    async refreshPosts() {
+        this.currentPage = 1;
+        this.hasMorePosts = true;
+        this.posts = [];
+        await this.loadPosts();
+    }
+
     async refreshPostsFromServer() {
         try {
             this.log('Refreshing posts from server...');
@@ -3125,7 +2940,6 @@ class PostDeletionSystem {
             toast.style.transform = 'translateX(0)';
         }, 10);
 
-        // Auto-remover con animación de salida
         setTimeout(() => {
             if (document.body.contains(toast)) {
                 toast.style.transform = 'translateX(100%)';
@@ -3155,24 +2969,21 @@ class PostDeletionSystem {
 }
 
 // =====================================================================
-// SECCIÓN 15: SISTEMA DE EDICIÓN DE POSTS CON DEBUGGING
+// SECCIÓN 15.1: SISTEMA DE EDICIÓN DE POSTS CON DEBUGGING
 // =====================================================================
 
 /**
  * Clase que maneja la edición de posts
- * Incluye formulario modal, validaciones y comunicación con backend
  */
 class PostEditSystem {
     constructor(devCommunity) {
         this.devCommunity = devCommunity;
         this.debug = true;
-        this.currentEditingPost = null; // Post actualmente en edición
+        this.currentEditingPost = null;
     }
 
     /**
      * Logging para debugging del sistema de edición
-     * @param {string} message - Mensaje a loguear
-     * @param {*} data - Datos adicionales
      */
     log(message, data = null) {
         if (this.debug) {
@@ -3201,7 +3012,7 @@ class PostEditSystem {
     }
 
     /**
-     * Crea el HTML del botón de editar si el usuario es el autor
+     * Agrega el botón de editar al HTML del post si el usuario es el autor
      * @param {Object} post - Datos del post
      * @returns {string} HTML del botón de editar
      */
@@ -3210,7 +3021,7 @@ class PostEditSystem {
             return '';
         }
 
-        // Forzar sincronización de autenticación
+        // Forzar sincronización de autenticación antes de mostrar el botón
         if (authManager) {
             authManager.syncAuthState();
         }
@@ -3224,9 +3035,9 @@ class PostEditSystem {
     }
 
     /**
-     * Muestra el formulario de edición para un post
-     * @param {string} postId - ID del post a editar
-     */
+ * Muestra el formulario de edición para un post - CORREGIDO
+ * @param {string} postId - ID del post a editar
+ */
     async showEditForm(postId) {
         try {
             this.log(`🔄 Iniciando showEditForm para post: ${postId}`);
@@ -3258,7 +3069,7 @@ class PostEditSystem {
                 return;
             }
 
-            // Sincronizar token si es necesario
+            // Si authManager no tiene token pero hay uno en localStorage, actualizarlo
             if (!authManager.token && localStorage.getItem('jwtToken')) {
                 console.log('🔄 Actualizando token en authManager desde localStorage');
                 authManager.token = localStorage.getItem('jwtToken');
@@ -3271,7 +3082,7 @@ class PostEditSystem {
             const url = `/api/posts/${postId}/edit`;
             console.log('🌐 Realizando request a:', url);
 
-            // Preparar headers
+            // Preparar headers de autenticación
             const headers = {
                 'Content-Type': 'application/json'
             };
@@ -3284,11 +3095,11 @@ class PostEditSystem {
 
             console.log('📋 Headers de la solicitud:', headers);
 
-            // Cargar datos del post
+            // Cargar datos del post con debugging extendido
             const response = await fetch(url, {
                 method: 'GET',
                 headers: headers,
-                credentials: 'include'
+                credentials: 'include' // Importante para cookies de sesión
             });
 
             console.log('📡 Response recibida:', {
@@ -3301,7 +3112,7 @@ class PostEditSystem {
             if (!response.ok) {
                 let errorMessage = `Error ${response.status}: ${response.statusText}`;
 
-                // Obtener detalles del error
+                // Intentar obtener más detalles del error
                 try {
                     const errorData = await response.json();
                     console.log('📡 Error data:', errorData);
@@ -3334,9 +3145,10 @@ class PostEditSystem {
 
             let userMessage = error.message;
 
-            // Mensajes amigables para el usuario
+            // Mensajes más amigables para el usuario
             if (error.message.includes('401')) {
                 userMessage = 'Please log in to edit posts';
+                // Forzar recarga para renovar autenticación
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -3362,7 +3174,7 @@ class PostEditSystem {
     renderEditForm(post) {
         this.log('🎨 Renderizando formulario de edición mejorado para post:', post);
 
-        // Crear modal de edición
+        // Crear modal de edición mejorado
         const modalHTML = `
         <section id="editPostModal" class="modal" style="display: flex;">
             <section class="modal__overlay"></section>
@@ -3524,10 +3336,10 @@ class PostEditSystem {
         // Agregar modal al DOM
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // Configurar eventos
+        // Configurar event listeners mejorados
         this.setupEditFormEvents();
 
-        // Prevenir scroll
+        // Prevenir scroll del body
         document.body.style.overflow = 'hidden';
 
         console.log('✅ Formulario de edición mejorado renderizado exitosamente');
@@ -3573,7 +3385,7 @@ class PostEditSystem {
             titleInput.addEventListener('input', this.updateTitleCounter);
             this.updateTitleCounter({ target: titleInput });
 
-            // Efectos de foco
+            // Efecto de foco mejorado
             titleInput.addEventListener('focus', () => {
                 titleInput.parentNode.classList.add('focused');
             });
@@ -3582,7 +3394,7 @@ class PostEditSystem {
             });
         }
 
-        // Efectos hover para radio buttons
+        // Efectos hover para los radio buttons
         const radioLabels = modal.querySelectorAll('.radio-label');
         radioLabels.forEach(label => {
             label.addEventListener('mouseenter', () => {
@@ -3599,8 +3411,7 @@ class PostEditSystem {
     }
 
     /**
-     * Actualiza el contador de caracteres del título
-     * @param {Event} e - Evento de input
+     * Actualiza el contador de caracteres del título con estilos mejorados
      */
     updateTitleCounter(e) {
         const input = e.target;
@@ -3631,7 +3442,6 @@ class PostEditSystem {
 
     /**
      * Ajusta automáticamente la altura del textarea
-     * @param {Event} e - Evento de input
      */
     autoResizeTextarea(e) {
         const textarea = e.target;
@@ -3661,17 +3471,17 @@ class PostEditSystem {
 
     /**
      * Maneja la selección de nueva imagen de portada
-     * @param {File} file - Archivo de imagen seleccionado
      */
     handleCoverImageChange(file) {
         if (!file) return;
 
-        // Validaciones
+        // Validar tipo de archivo
         if (!file.type.startsWith('image/')) {
             this.showMessage('Please select a valid image file', 'error');
             return;
         }
 
+        // Validar tamaño (5MB)
         if (file.size > 5 * 1024 * 1024) {
             this.showMessage('Image must be less than 5MB', 'error');
             return;
@@ -3688,13 +3498,13 @@ class PostEditSystem {
                 img.src = e.target.result;
                 img.style.display = 'block';
 
-                // Actualizar input hidden
+                // Reemplazar input hidden
                 const removeCoverInput = document.getElementById('editRemoveCoverImage');
                 if (removeCoverInput) {
                     removeCoverInput.value = 'false';
                 }
 
-                // Configurar input file
+                // Agregar input file para el nuevo archivo
                 let fileInput = document.getElementById('editPostCoverImage');
                 if (!fileInput) {
                     fileInput = document.createElement('input');
@@ -3705,7 +3515,7 @@ class PostEditSystem {
                     currentCoverSection.appendChild(fileInput);
                 }
 
-                // Asignar archivo seleccionado
+                // Crear un FileList simulado (esto es un workaround)
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 fileInput.files = dataTransfer.files;
@@ -3728,7 +3538,7 @@ class PostEditSystem {
                 removeCoverInput.value = 'true';
             }
 
-            // Limpiar input file
+            // Remover input file si existe
             const fileInput = document.getElementById('editPostCoverImage');
             if (fileInput) {
                 fileInput.value = '';
@@ -3739,7 +3549,7 @@ class PostEditSystem {
     }
 
     /**
-     * Actualiza el post en el servidor
+     * Actualiza el post - CON DEBUGGING MEJORADO
      */
     async updatePost() {
         try {
@@ -3783,7 +3593,7 @@ class PostEditSystem {
                 return;
             }
 
-            // Preparar datos para enviar
+            // Preparar datos
             formData.append('title', title);
             formData.append('content', content);
             formData.append('tags', tags);
@@ -3797,7 +3607,7 @@ class PostEditSystem {
                 console.log('🖼️ Archivo de imagen agregado:', coverImageInput.files[0].name);
             }
 
-            // Mostrar loading
+            // Mostrar indicador de carga
             this.showEditLoading(true);
 
             const url = `/api/posts/${postId}`;
@@ -3831,7 +3641,7 @@ class PostEditSystem {
 
             this.showMessage(data.message, 'success');
 
-            // Cerrar modal y recargar
+            // Cerrar modal y recargar posts
             this.closeEditForm();
 
             console.log('✅ Post actualizado exitosamente');
@@ -3869,8 +3679,7 @@ class PostEditSystem {
     }
 
     /**
-     * Muestra/oculta el indicador de carga
-     * @param {boolean} show - Mostrar u ocultar
+     * Muestra/oculta el indicador de carga mejorado
      */
     showEditLoading(show) {
         const updateBtn = document.querySelector('#editPostModal .btn--primary');
@@ -3883,6 +3692,8 @@ class PostEditSystem {
                 updateBtn.disabled = true;
                 if (draftBtn) draftBtn.disabled = true;
                 if (cancelBtn) cancelBtn.disabled = true;
+
+                // Agregar efecto de desvanecimiento
                 updateBtn.style.opacity = '0.8';
             } else {
                 updateBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Update Post';
@@ -3896,8 +3707,6 @@ class PostEditSystem {
 
     /**
      * Muestra un mensaje toast
-     * @param {string} message - Mensaje a mostrar
-     * @param {string} type - Tipo de mensaje
      */
     showMessage(message, type = 'success') {
         // Remover toasts anteriores
@@ -3931,7 +3740,6 @@ class PostEditSystem {
             toast.style.transform = 'translateX(0)';
         }, 10);
 
-        // Auto-remover con animación
         setTimeout(() => {
             if (document.body.contains(toast)) {
                 toast.style.transform = 'translateX(100%)';
@@ -3946,8 +3754,6 @@ class PostEditSystem {
 
     /**
      * Obtiene el color del toast según el tipo
-     * @param {string} type - Tipo de mensaje
-     * @returns {string} Color en hexadecimal
      */
     getToastColor(type) {
         const colors = {
@@ -3961,8 +3767,6 @@ class PostEditSystem {
 
     /**
      * Escapa caracteres HTML para prevenir XSS
-     * @param {string} unsafe - Texto sin escapar
-     * @returns {string} Texto escapado
      */
     escapeHtml(unsafe) {
         if (!unsafe) return '';
@@ -3973,36 +3777,22 @@ class PostEditSystem {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
+
+
 }
 
 // =====================================================================
 // SECCIÓN 16: FUNCIONES GLOBALES Y EVENT HANDLERS
 // =====================================================================
 
-/**
- * Funciones globales para ser accedidas desde event handlers en HTML
- * Estas funciones actúan como puente entre el HTML y la lógica de la aplicación
- */
-
-// Toggle de comentarios
+// Funciones globales para los event handlers del HTML
 window.toggleComments = (postId) => window.devCommunity?.commentSystem.toggleComments(postId);
-
-// Agregar reacción a post
 window.addReaction = (postId, reactionType) => window.devCommunity?.addReaction(postId, reactionType);
-
-// Toggle de favoritos
 window.toggleFavorite = (postId) => window.devCommunity?.toggleFavorite(postId);
-
-// Agregar comentario
 window.addComment = (postId) => window.devCommunity?.commentSystem.addComment(postId);
-
-// Ver post (abrir comentarios)
 window.viewPost = (postId) => window.devCommunity?.viewPost(postId);
-
-// Eliminar post
 window.deletePost = (postId) => window.devCommunity?.postDeletionSystem?.showDeleteConfirmation(postId);
-
-// Editar post
+// Función global para editar posts
 window.editPost = (postId) => window.devCommunity?.postEditSystem?.showEditForm(postId);
 
 // =====================================================================
@@ -4011,7 +3801,6 @@ window.editPost = (postId) => window.devCommunity?.postEditSystem?.showEditForm(
 
 /**
  * Función principal de inicialización de la aplicación
- * Configura todos los sistemas y los pone en marcha
  */
 function init() {
     console.log('Initializing DEV Community with Comment System...');
@@ -4021,7 +3810,6 @@ function init() {
         authManager.syncAuthState();
     }
 
-    // Configurar sistemas básicos
     setupImageErrorHandlers();
     initUserDropdown();
     renderTags();
@@ -4040,10 +3828,7 @@ function init() {
     console.log('DEV Community with Comment System initialized successfully');
 }
 
-/**
- * Función global para debugging de autenticación
- * Útil para troubleshooting desde la consola del navegador
- */
+// Función global para debugging de autenticación
 window.debugAuth = function () {
     console.log('🔐 DEBUG DE AUTENTICACIÓN COMPLETO:');
     console.log('====================================');
@@ -4082,6 +3867,8 @@ window.debugAuth = function () {
         });
 };
 
+// También puedes llamar a debugAuth() desde la consola del navegador
+
 // Inicializar cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(init, 100);
@@ -4094,41 +3881,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =====================================================================
-// SECCIÓN 18: DETECCIÓN DE DISPOSITIVO Y FUNCIONALIDAD MÓVIL
+// SECCIÓN 18: DETECCIÓN DE DISPOSITIVO
 // =====================================================================
 
-/**
- * Funciones para detección de dispositivo y funcionalidad móvil específica
- */
-
-/**
- * Detecta si el dispositivo es móvil
- * @returns {boolean} True si es dispositivo móvil
- */
 function isMobileDevice() {
     return window.innerWidth <= 768;
 }
 
-/**
- * Detecta si el dispositivo es tablet
- * @returns {boolean} True si es tablet
- */
 function isTabletDevice() {
     return window.innerWidth > 768 && window.innerWidth <= 1024;
 }
 
-/**
- * Detecta si el dispositivo es desktop
- * @returns {boolean} True si es desktop
- */
 function isDesktopDevice() {
     return window.innerWidth > 1024;
 }
 
-/**
- * Funcionalidad de búsqueda móvil
- * Maneja el toggle del campo de búsqueda en dispositivos móviles
- */
+
+
+// Mobile Search Functionality
 document.addEventListener('DOMContentLoaded', function () {
     const searchToggle = document.getElementById('searchToggle');
     const mobileSearch = document.getElementById('mobileSearch');
@@ -4137,7 +3907,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const body = document.body;
 
     if (searchToggle && mobileSearch) {
-        // Abrir búsqueda móvil
+        // Abrir search
         searchToggle.addEventListener('click', function () {
             mobileSearch.classList.add('active');
             body.classList.add('search-open');
@@ -4146,19 +3916,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 100);
         });
 
-        /**
-         * Cierra la búsqueda móvil
-         */
+        // Cerrar search
         function closeSearch() {
             mobileSearch.classList.remove('active');
             body.classList.remove('search-open');
             mobileSearchInput.blur();
         }
 
-        // Cerrar con botón de cerrar
         searchClose.addEventListener('click', closeSearch);
 
-        // Cerrar con tecla Escape
+        // Cerrar con Escape key
         mobileSearchInput.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeSearch();
@@ -4178,110 +3945,45 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // =====================================================================
-// SECCIÓN 19: SISTEMA DE VISIBILIDAD DEL PROMO DE AUTENTICACIÓN
+// SECCIÓN: MANEJO DE PROMO PARA USUARIOS GUEST
 // =====================================================================
 
-/**
- * Clase que maneja la visibilidad del cuadro promocional de autenticación
- * Controla cuándo mostrar/ocultar el promo para usuarios no autenticados
- */
-class AuthPromoManager {
+class PromoManager {
     constructor() {
-        this.promoElement = document.getElementById('promoGuest');
-        this.debug = true;
+        this.promo = document.getElementById("promoGuest");
+        this.isInitialized = false;
         this.init();
     }
 
-    /**
-     * Logging para debugging del sistema de promo
-     * @param {string} message - Mensaje a loguear
-     * @param {*} data - Datos adicionales
-     */
-    log(message, data = null) {
-        if (this.debug) {
-            if (data) {
-                console.log(`[AuthPromoManager] ${message}`, data);
-            } else {
-                console.log(`[AuthPromoManager] ${message}`);
-            }
-        }
-    }
-
-    /**
-     * Inicializa el sistema de visibilidad del promo
-     */
     init() {
-        this.log('Inicializando AuthPromoManager...');
-
-        // Verificar estado inicial
-        this.checkAndUpdateVisibility();
-
-        // Configurar observadores de cambios
-        this.setupObservers();
-
-        this.log('AuthPromoManager inicializado correctamente');
-    }
-
-    /**
-     * Verifica el estado de autenticación y actualiza la visibilidad del promo
-     */
-    checkAndUpdateVisibility() {
-        const isAuthenticated = this.checkAuthenticationStatus();
-        this.log('Estado de autenticación detectado:', { isAuthenticated });
-
-        this.updatePromoVisibility(isAuthenticated);
-    }
-
-    /**
-     * Verifica el estado de autenticación usando múltiples métodos
-     * @returns {boolean} True si el usuario está autenticado
-     */
-    checkAuthenticationStatus() {
-        // Método 1: Verificar AuthManager
-        if (window.authManager && authManager.isAuthenticated) {
-            this.log('Autenticación detectada a través de AuthManager');
-            return true;
-        }
-
-        // Método 2: Verificar DevCommunity
-        if (window.devCommunity && window.devCommunity.currentUser) {
-            this.log('Autenticación detectada a través de DevCommunity');
-            return true;
-        }
-
-        // Método 3: Verificar localStorage
-        const jwtToken = localStorage.getItem('jwtToken');
-        const userLoggedIn = localStorage.getItem('userLoggedIn');
-
-        if (jwtToken || userLoggedIn === 'true') {
-            this.log('Autenticación detectada a través de localStorage', {
-                jwtToken: !!jwtToken,
-                userLoggedIn: userLoggedIn
-            });
-            return true;
-        }
-
-        // Método 4: Verificar sessionStorage
-        const sessionUser = sessionStorage.getItem('user');
-        if (sessionUser) {
-            this.log('Autenticación detectada a través de sessionStorage');
-            return true;
-        }
-
-        this.log('Usuario NO autenticado detectado');
-        return false;
-    }
-
-    /**
-     * Actualiza la visibilidad del promo según el estado de autenticación
-     * @param {boolean} isAuthenticated - Estado de autenticación del usuario
-     */
-    updatePromoVisibility(isAuthenticated) {
-        if (!this.promoElement) {
-            this.log('Elemento promo no encontrado');
+        if (!this.promo) {
+            console.log("❌ Promo element not found");
             return;
         }
 
+        console.log("✅ PromoManager inicializado");
+        this.isInitialized = true;
+        
+        // Verificación inmediata
+        this.checkAndToggle();
+        
+        // Escuchar cambios en authManager
+        this.setupAuthListener();
+        
+        // Escuchar cambios en localStorage
+        this.setupStorageListener();
+        
+        // Observar cambios en devCommunity
+        this.setupDevCommunityObserver();
+    }
+
+    checkAndToggle() {
+        if (!this.isInitialized) return;
+
+        const isAuthenticated = this.checkAuthentication();
+        console.log("🔐 Estado de autenticación:", isAuthenticated);
+        
+        // Transición suave pero inmediata
         if (isAuthenticated) {
             this.hidePromo();
         } else {
@@ -4289,278 +3991,129 @@ class AuthPromoManager {
         }
     }
 
-    /**
-     * Muestra el cuadro promocional para usuarios no autenticados
-     */
-    showPromo() {
-        if (!this.promoElement) return;
-
-        this.promoElement.style.display = 'block';
-
-        // Animación de entrada suave
-        this.promoElement.style.opacity = '0';
-        this.promoElement.style.transform = 'translateY(20px)';
-
-        setTimeout(() => {
-            this.promoElement.style.transition = 'all 0.3s ease';
-            this.promoElement.style.opacity = '1';
-            this.promoElement.style.transform = 'translateY(0)';
-        }, 10);
-
-        this.log('Promo mostrado');
+    checkAuthentication() {
+        // Múltiples verificaciones para mayor precisión
+        return (
+            localStorage.getItem("jwtToken") !== null ||
+            localStorage.getItem("userLoggedIn") === 'true' ||
+            (window.devCommunity && window.devCommunity.currentUser) ||
+            (authManager && authManager.isAuthenticated) ||
+            document.body.classList.contains('user-logged-in')
+        );
     }
 
-    /**
-     * Oculta el cuadro promocional para usuarios autenticados
-     */
     hidePromo() {
-        if (!this.promoElement) return;
-
-
-        this.promoElement.style.display = 'none';
-
-
-        this.log('Promo ocultado');
+        if (this.promo.style.display !== "none") {
+            this.promo.style.display = "none";
+            console.log("🎯 Promo ocultada inmediatamente");
+        }
     }
 
-    /**
-     * Configura observadores para detectar cambios en el estado de autenticación
-     */
-    setupObservers() {
-        // Observar cambios en localStorage
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'jwtToken' || event.key === 'userLoggedIn') {
-                this.log('Cambio detectado en localStorage:', event.key);
-                setTimeout(() => this.checkAndUpdateVisibility(), 100);
-            }
-        });
-
-        // Observar cambios en AuthManager (si está disponible)
-        if (window.authManager) {
-            this.setupAuthManagerObserver();
+    showPromo() {
+        if (this.promo.style.display !== "block") {
+            this.promo.style.display = "block";
+            console.log("🎯 Promo mostrada inmediatamente");
         }
-
-        // Observar cambios en DevCommunity (si está disponible)
-        if (window.devCommunity) {
-            this.setupDevCommunityObserver();
-        }
-
-        // Observar eventos personalizados de autenticación
-        this.setupCustomEventListeners();
-
-        this.log('Observadores configurados correctamente');
     }
 
-    /**
-     * Configura observador para cambios en AuthManager
-     */
-    setupAuthManagerObserver() {
-        // Guardar referencia original de los métodos
+    setupAuthListener() {
+        // Sobrescribir métodos del AuthManager para detectar cambios
         const originalSetToken = authManager.setToken;
         const originalClearToken = authManager.clearToken;
-        const originalLogout = authManager.logout;
 
-        // Sobrescribir setToken para detectar login
-        authManager.setToken = function (token) {
+        authManager.setToken = function(token) {
             originalSetToken.call(this, token);
-            window.dispatchEvent(new CustomEvent('authStateChanged', {
-                detail: { isAuthenticated: true }
-            }));
+            console.log("🔄 Token establecido - ocultando promo");
+            window.promoManager?.hidePromo();
         };
 
-        // Sobrescribir clearToken y logout para detectar logout
-        authManager.clearToken = function () {
+        authManager.clearToken = function() {
             originalClearToken.call(this);
-            window.dispatchEvent(new CustomEvent('authStateChanged', {
-                detail: { isAuthenticated: false }
-            }));
+            console.log("🔄 Token eliminado - mostrando promo");
+            window.promoManager?.showPromo();
         };
-
-        authManager.logout = async function () {
-            await originalLogout.call(this);
-            window.dispatchEvent(new CustomEvent('authStateChanged', {
-                detail: { isAuthenticated: false }
-            }));
-        };
-
-        this.log('Observador de AuthManager configurado');
     }
 
-    /**
-     * Configura observador para cambios en DevCommunity
-     */
-    setupDevCommunityObserver() {
-        // Observar cambios en currentUser
-        const originalShowUserNavigation = window.devCommunity.showUserNavigation;
-        const originalShowAuthNavigation = window.devCommunity.showAuthNavigation;
-
-        window.devCommunity.showUserNavigation = function () {
-            originalShowUserNavigation.call(this);
-            window.dispatchEvent(new CustomEvent('authStateChanged', {
-                detail: { isAuthenticated: true }
-            }));
-        };
-
-        window.devCommunity.showAuthNavigation = function () {
-            originalShowAuthNavigation.call(this);
-            window.dispatchEvent(new CustomEvent('authStateChanged', {
-                detail: { isAuthenticated: false }
-            }));
-        };
-
-        this.log('Observador de DevCommunity configurado');
-    }
-
-    /**
-     * Configura listeners para eventos personalizados de autenticación
-     */
-    setupCustomEventListeners() {
-        // Escuchar eventos de cambio de autenticación
-        window.addEventListener('authStateChanged', (event) => {
-            this.log('Evento authStateChanged recibido:', event.detail);
-            this.updatePromoVisibility(event.detail.isAuthenticated);
-        });
-
-        // Escuchar eventos de login/logout globales
-        window.addEventListener('userLoggedIn', () => {
-            this.log('Evento userLoggedIn recibido');
-            this.updatePromoVisibility(true);
-        });
-
-        window.addEventListener('userLoggedOut', () => {
-            this.log('Evento userLoggedOut recibido');
-            this.updatePromoVisibility(false);
-        });
-
-        // Escuchar cambios de visibilidad de página (para sincronización)
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                this.log('Página visible, verificando estado de autenticación');
-                setTimeout(() => this.checkAndUpdateVisibility(), 500);
+    setupStorageListener() {
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'jwtToken' || e.key === 'userLoggedIn') {
+                console.log("📦 Cambio en localStorage detectado");
+                setTimeout(() => this.checkAndToggle(), 10);
             }
         });
 
-        this.log('Listeners de eventos personalizados configurados');
+        this.interceptLocalStorage();
     }
 
-    /**
-     * Función de sincronización manual para casos especiales
-     */
-    sync() {
-        this.log('Sincronización manual solicitada');
-        this.checkAndUpdateVisibility();
+    interceptLocalStorage() {
+        const originalSetItem = localStorage.setItem;
+        const originalRemoveItem = localStorage.removeItem;
+
+        localStorage.setItem = function(key, value) {
+            originalSetItem.call(this, key, value);
+            if (key === 'jwtToken' || key === 'userLoggedIn') {
+                console.log("✏️ Escritura en localStorage:", key);
+                setTimeout(() => window.promoManager?.checkAndToggle(), 10);
+            }
+        };
+
+        localStorage.removeItem = function(key) {
+            originalRemoveItem.call(this, key);
+            if (key === 'jwtToken' || key === 'userLoggedIn') {
+                console.log("🗑️ Eliminación de localStorage:", key);
+                setTimeout(() => window.promoManager?.checkAndToggle(), 10);
+            }
+        };
     }
 
-    /**
-     * Función de debug para verificar el estado actual
-     */
-    debugStatus() {
-        console.group('🔐 DEBUG - AuthPromoManager Status');
-        console.log('📊 Elemento promo:', this.promoElement ? 'ENCONTRADO' : 'NO ENCONTRADO');
-        console.log('👀 Visibilidad actual:', this.promoElement?.style.display || 'unknown');
-        console.log('🔑 Estado autenticación:', this.checkAuthenticationStatus());
-        console.log('🏪 AuthManager:', window.authManager ? 'DISPOINBLE' : 'NO DISPONIBLE');
-        console.log('🌐 DevCommunity:', window.devCommunity ? 'DISPONIBLE' : 'NO DISPONIBLE');
-        console.log('💾 localStorage jwtToken:', localStorage.getItem('jwtToken') ? 'PRESENTE' : 'AUSENTE');
-        console.log('💾 localStorage userLoggedIn:', localStorage.getItem('userLoggedIn'));
-        console.groupEnd();
+    setupDevCommunityObserver() {
+        // Observar cuando devCommunity se inicialice o cambie
+        let checkCount = 0;
+        const maxChecks = 50; // Máximo 5 segundos
+
+        const checkDevCommunity = () => {
+            checkCount++;
+            
+            if (window.devCommunity && window.devCommunity.currentUser) {
+                console.log("🎯 DevCommunity detectado - ocultando promo");
+                this.hidePromo();
+                return;
+            }
+
+            if (checkCount < maxChecks) {
+                setTimeout(checkDevCommunity, 100);
+            }
+        };
+
+        checkDevCommunity();
     }
 }
 
-// =====================================================================
-// INICIALIZACIÓN DEL SISTEMA DE PROMO
-// =====================================================================
+// Inicialización inmediata
+document.addEventListener("DOMContentLoaded", () => {
+    window.promoManager = new PromoManager();
+});
 
-/**
- * Inicializa el sistema de visibilidad del promo
- */
-function initAuthPromoSystem() {
-    console.log('🎯 Inicializando sistema de visibilidad del promo...');
-
-    // Esperar a que el DOM esté completamente cargado
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            window.authPromoManager = new AuthPromoManager();
-        });
-    } else {
-        window.authPromoManager = new AuthPromoManager();
-    }
-}
-
-// =====================================================================
-// INTEGRACIÓN CON SISTEMAS EXISTENTES
-// =====================================================================
-
-/**
- * Función para integrar el AuthPromoManager con sistemas existentes
- */
-function integrateAuthPromoWithExistingSystems() {
-    console.log('🔄 Integrando AuthPromoManager con sistemas existentes...');
-
-    // Integración con AuthManager
-    if (window.authManager) {
-        console.log('✅ Integrado con AuthManager');
-    }
-
-    // Integración con DevCommunity
-    if (window.devCommunity) {
-        console.log('✅ Integrado con DevCommunity');
-    }
-
-    // Configurar función global de debug
-    window.debugAuthPromo = () => {
-        if (window.authPromoManager) {
-            window.authPromoManager.debugStatus();
-        } else {
-            console.log('❌ AuthPromoManager no está inicializado');
-        }
+function enhanceAuthSystem() {
+    // Sobrescribir funciones de login/logout globales
+    const originalLogout = authManager.logout;
+    
+    authManager.logout = async function() {
+        console.log("🚪 Logout iniciado - mostrando promo");
+        // Mostrar promo inmediatamente al iniciar logout
+        window.promoManager?.showPromo();
+        await originalLogout.call(this);
     };
-}
 
-// =====================================================================
-// EVENTOS GLOBALES DE AUTENTICACIÓN
-// =====================================================================
-
-/**
- * Dispara evento global de login
- */
-window.dispatchLoginEvent = function () {
-    console.log('🚀 Disparando evento global de login');
-    window.dispatchEvent(new CustomEvent('userLoggedIn'));
-    window.dispatchEvent(new CustomEvent('authStateChanged', {
-        detail: { isAuthenticated: true }
-    }));
-};
-
-/**
- * Dispara evento global de logout
- */
-window.dispatchLogoutEvent = function () {
-    console.log('🚪 Disparando evento global de logout');
-    window.dispatchEvent(new CustomEvent('userLoggedOut'));
-    window.dispatchEvent(new CustomEvent('authStateChanged', {
-        detail: { isAuthenticated: false }
-    }));
-};
-
-// =====================================================================
-// INICIALIZACIÓN AUTOMÁTICA
-// =====================================================================
-
-// Inicializar el sistema cuando se carga el script
-setTimeout(() => {
-    initAuthPromoSystem();
-    integrateAuthPromoWithExistingSystems();
-}, 1000);
-
-// Re-sincronización periódica (cada 3 segundos) para casos edge
-setInterval(() => {
-    if (window.authPromoManager) {
-        window.authPromoManager.sync();
+    if (window.handleLoginSuccess) {
+        const originalLoginSuccess = window.handleLoginSuccess;
+        window.handleLoginSuccess = function(userData) {
+            console.log("🔑 Login exitoso - ocultando promo");
+            window.promoManager?.hidePromo();
+            return originalLoginSuccess(userData);
+        };
     }
-}, 3000);
-
-console.log('✅ SECCIÓN 19 - Sistema de visibilidad del promo cargado correctamente');
+}
 
 // Ejecutar las mejoras después de que cargue todo
 setTimeout(enhanceAuthSystem, 1000);
