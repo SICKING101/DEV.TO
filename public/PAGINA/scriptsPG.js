@@ -4548,10 +4548,9 @@ window.dispatchLogoutEvent = function () {
 // =====================================================================
 
 // Inicializar el sistema cuando se carga el script
-setTimeout(() => {
     initAuthPromoSystem();
     integrateAuthPromoWithExistingSystems();
-}, 1000);
+
 
 // Re-sincronización periódica (cada 3 segundos) para casos edge
 setInterval(() => {

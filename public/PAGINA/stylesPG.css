@@ -3076,11 +3076,16 @@ SECCIÓN 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
     /* Reset de transform para search en móvil */
     .search {
         transform: translateX(0);
+        display: none;
     }
 
     /* Ocultar texto del botón crear post en móvil */
     .user-nav .btn--create-post {
         display: none !important;
+    }
+
+    .search-container{
+        display: none;
     }
 
     /* ================================
@@ -3157,6 +3162,7 @@ SECCIÓN 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         width: 40px;
         height: 30px;
         /* Tamaño reducido para móvil */
+        margin-right: 250px;
     }
 
     /* ================================
@@ -3492,6 +3498,7 @@ SECCIÓN 17: ESTILOS RESPONSIVE - MÓVIL (768px y menores)
         /* Elementos a ancho completo */
         padding: 16px;
         margin-bottom: 20px;
+        margin-top: -75px;
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
